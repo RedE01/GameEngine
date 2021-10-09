@@ -16,8 +16,17 @@ project "Game"
 	}
 
 	links {
-		"GameEngine"
+		"GameEngine",
+		"glfw",
+		"glew"
 	}
+
+	filter "system:linux"
+		links {
+			"dl",
+			"GL",
+			"pthread"
+		}
 
 	filter "configurations:Debug"
 		symbols "On"
