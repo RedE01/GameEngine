@@ -1,39 +1,21 @@
 #include "Application.h"
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "Window.h"
 
 namespace GameEngine {
 
 	Application::Application(const std::string& name) {
-		GLFWwindow* window;
+		m_window = std::make_unique<Window>(name, 640, 480);
+	}
 
-		if (!glfwInit()) return;
+	Application::~Application() {
 
-		window = glfwCreateWindow(640, 480, name.c_str(), NULL, NULL);
-		if (!window) {
-			glfwTerminate();
-			return;
-		}
-
-		glfwMakeContextCurrent(window);
-
-		while (!glfwWindowShouldClose(window)) {
-			glClear(GL_COLOR_BUFFER_BIT);
-
-
-			glfwSwapBuffers(window);
-			glfwPollEvents();
-		}
-
-		glfwTerminate();
-		return;	
 	}
 
 	void Application::run() {
-		// while(true) {
-
-		// }
+		while(true) {
+			m_window->pollEvents();
+			m_window->swapBuffers();
+		}
 	}
 
 }
