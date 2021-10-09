@@ -2,6 +2,10 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include "Events/ApplicationEvent.h"
+#include "Events/KeyboardEvent.h"
+#include "Events/MouseEvent.h"
+
 namespace GameEngine {
 
 	Window::Window(const std::string& title, unsigned int width, unsigned int height) {
@@ -25,6 +29,8 @@ namespace GameEngine {
 		glfwSetWindowUserPointer(m_window, &m_data);
 
 		glfwSwapInterval(true);
+
+		setEventCallbackFunctions();
 	}
 
 	Window::~Window() {
@@ -43,4 +49,61 @@ namespace GameEngine {
 		return m_window;
 	}
 
+	void Window::setEventFunction(std::function<void(Event*)> eventFunction) {
+		m_data.eventFunction = eventFunction;
+	}
+
+	void Window::setEventCallbackFunctions() {
+		glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
+			windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+
+			if(data.eventFunction) {
+				WindowCloseEvent e;
+				data.eventFunction(&e);
+			}
+		});
+
+		glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mod) {
+			windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+
+			if(data.eventFunction) {
+				if(action == GLFW_PRESS) {
+					KeyPress e(key, scancode, mod);
+					data.eventFunction(&e);
+				}
+				else if(action == GLFW_RELEASE) {
+					KeyReleased e(key, scancode, mod);
+					data.eventFunction(&e);
+				}
+				else if(action == GLFW_REPEAT) {
+					KeyTyped e(key, scancode, mod);
+					data.eventFunction(&e);
+				}
+			}
+		});
+
+		glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos) {
+			windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+
+			if(data.eventFunction) {
+				MouseMoved e(xpos, ypos);
+				if(data.eventFunction) data.eventFunction(&e);
+			}
+		});
+
+		glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods) {
+			windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+
+			if(data.eventFunction) {
+				if(action == GLFW_PRESS) {
+					MouseButtonPressed e(button, mods);
+					if(data.eventFunction) data.eventFunction(&e);
+				}
+				else if(action == GLFW_RELEASE) {
+					MouseButtonReleased e(button, mods);
+					if(data.eventFunction) data.eventFunction(&e);
+				}
+			}
+		});
+	}
 }
