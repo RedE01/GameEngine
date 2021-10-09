@@ -12,7 +12,7 @@ project "Game"
 	}
 
 	includedirs {
-		"../GameEngine/src/"
+		"../GameEngine/include"
 	}
 
 	links {
