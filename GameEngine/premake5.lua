@@ -13,7 +13,8 @@ project "GameEngine"
 
 	includedirs {
 		"vendor/glfw/glfw/include",
-		"vendor/glew/glew/include"
+		"vendor/glew/glew/include",
+		"vendor/glm/glm/glm/"
 	}
 
 	filter "configurations:Debug"
