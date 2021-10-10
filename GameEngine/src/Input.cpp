@@ -15,7 +15,6 @@ namespace GameEngine {
 	Vector2 g_prevMousePos = Vector2(0, 0);
 	bool g_mouseKeys[MOUSE_BUTTON_LAST + 1] = { false };
 	bool g_mouseKeysPrevious[MOUSE_BUTTON_LAST + 1] = { false };
-	Vector2i g_viewportOffset = Vector2i(0, 0);
 	Vector2i g_viewportSize = Vector2i(0, 0);
 	Window* m_window = nullptr;
 
@@ -58,7 +57,7 @@ namespace GameEngine {
 	}
 
 	Vector2 Input::GetMousePosition() {
-		return g_mousePos - Vector2(g_viewportOffset);
+		return g_mousePos;
 	}
 
 	Vector2 Input::GetMouseViewportPositon() {
@@ -74,11 +73,11 @@ namespace GameEngine {
 	}
 
 	float Input::GetMouseX() {
-		return g_mousePos.x + g_viewportOffset.x;
+		return g_mousePos.x;
 	}
 
 	float Input::GetMouseY() {
-		return g_mousePos.y + g_viewportOffset.y;
+		return g_mousePos.y;
 	}
 
 	float Input::GetMouseDeltaX() {
@@ -126,9 +125,8 @@ namespace GameEngine {
 		}
 	}
 
-	void Input::Update(Vector2i viewportSize, Vector2i viewportOffset) {
+	void Input::Update(Vector2i viewportSize) {
 		g_viewportSize = viewportSize;
-		g_viewportOffset = viewportOffset;
 
 		std::memcpy(g_keysPrevious, g_keys, KEY_LAST);
 		std::memcpy(g_mouseKeysPrevious, g_mouseKeys, MOUSE_BUTTON_LAST);

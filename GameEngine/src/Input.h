@@ -26,6 +26,6 @@ namespace GameEngine {
 		void SetCursorMode(const int& cursorMode);
 
 		void HandleEvent(Event* e);
-		void Update(Vector2i viewportSize, Vector2i viewportOffset);
+		void Update(Vector2i viewportSize);
 	}
 }
