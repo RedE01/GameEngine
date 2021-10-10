@@ -1,0 +1,29 @@
+#pragma once
+#include "Buffer.h"
+#include <vector>
+
+namespace GameEngine {
+
+    enum class VertexAttributeType {
+        BYTE, UNSIGNED_BYTE, SHORT, UNSIGNED_SHORT, INT, UNSIGNED_INT, FLOAT, DOUBLE
+    };
+
+    struct VertexAttribute {
+        VertexAttribute(unsigned int size, VertexAttributeType type, bool normalized)
+            : size(size), type(type), normalized(normalized) {}
+        unsigned int size;
+        VertexAttributeType type;
+        bool normalized;
+    };
+
+    class VertexBuffer : public Buffer {
+    public:
+        VertexBuffer(const std::vector<VertexAttribute>& attributes);
+        VertexBuffer(const VertexBuffer& vbo) = delete;
+
+
+    private:
+        virtual int getBufferType() const override;
+    };
+
+}
