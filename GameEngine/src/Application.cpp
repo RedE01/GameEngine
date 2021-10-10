@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "Rendering/Renderer.h"
 #include "Window.h"
 #include "Input.h"
 #include "Events/Event.h"
@@ -7,6 +8,7 @@ namespace GameEngine {
 
 	Application::Application(const std::string& name) {
 		m_window = std::make_unique<Window>(name, 640, 480);
+		m_renderer = std::make_unique<Renderer>();
 		
 		m_window->setEventFunction(std::bind(&Application::eventHandler, this, std::placeholders::_1));
 	}
@@ -18,6 +20,9 @@ namespace GameEngine {
 	void Application::run() {
 		while(m_running) {
 			Input::Update(m_window->getWindowSize());
+
+			m_renderer->renderFrame();
+
 			m_window->pollEvents();
 			m_window->swapBuffers();
 		}

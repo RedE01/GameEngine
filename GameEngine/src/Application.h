@@ -5,6 +5,7 @@
 namespace GameEngine {
 
 	class Window;
+	class Renderer;
 	class Event;
 
 	class Application {
@@ -19,6 +20,7 @@ namespace GameEngine {
 
 	private:
 		std::unique_ptr<Window> m_window;
+		std::unique_ptr<Renderer> m_renderer;
 		bool m_running = true;
 	};
 
