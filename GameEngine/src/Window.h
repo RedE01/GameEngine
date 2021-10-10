@@ -15,6 +15,8 @@ namespace GameEngine {
 
 		void swapBuffers();
 		void pollEvents();
+		int getWidth() const { return m_data.width; }
+		int getHeight() const { return m_data.height; }
 
 		GLFWwindow* getWindow() const; 
 		void setEventFunction(std::function<void(Event*)> eventFunction);
@@ -27,7 +29,7 @@ namespace GameEngine {
 
 		struct windowData {
 			std::string title;
-			unsigned int width, height;
+			int width, height;
 			std::function<void(Event*)> eventFunction;
 		};
 
