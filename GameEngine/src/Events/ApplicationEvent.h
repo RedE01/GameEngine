@@ -20,4 +20,15 @@ namespace GameEngine {
 		int width;
 		int height;
 	};
+
+	class WindowMovedEvent : public Event {
+	public:
+		virtual EventType getEventType() const override { return EventType::WindowMoved; }
+		virtual std::string getName() const override { return "WindowMoved"; }
+		virtual int getCategoryFlags() const override { return (int)EventCategory::Application; }
+
+	public:
+		int xpos;
+		int ypos;
+	};
 }
