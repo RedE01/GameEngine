@@ -5,6 +5,7 @@
 namespace GameEngine {
 
 	class Window;
+	class Event;
 
 	class Application {
 	public:
@@ -12,9 +13,13 @@ namespace GameEngine {
 		~Application();
 
 		void run();
+		
+	private:
+		void eventHandler(Event* event);
 
 	private:
 		std::unique_ptr<Window> m_window;
+		bool m_running = true;
 	};
 
 }
