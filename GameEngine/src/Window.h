@@ -1,4 +1,5 @@
 #pragma once
+#include "Math/Vector.h"
 #include <string>
 #include <functional>
 
@@ -15,8 +16,8 @@ namespace GameEngine {
 
 		void swapBuffers();
 		void pollEvents();
-		int getWidth() const { return m_data.width; }
-		int getHeight() const { return m_data.height; }
+		Vector2i getWindowSize() const { return m_data.windowSize; }
+		Vector2i getWindowPos() const { return m_data.windowPos; }
 
 		GLFWwindow* getWindow() const; 
 		void setEventFunction(std::function<void(Event*)> eventFunction);
@@ -29,7 +30,8 @@ namespace GameEngine {
 
 		struct windowData {
 			std::string title;
-			int width, height;
+			Vector2i windowSize;
+			Vector2i windowPos;
 			std::function<void(Event*)> eventFunction;
 		};
 

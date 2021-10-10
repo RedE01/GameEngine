@@ -22,7 +22,8 @@ namespace GameEngine {
 		}
 
 		m_data.title = title;
-		glfwGetFramebufferSize(m_window, &m_data.width, &m_data.height);
+		glfwGetFramebufferSize(m_window, &m_data.windowSize.x, &m_data.windowSize.y);
+		glfwGetWindowPos(m_window, &m_data.windowPos.x, &m_data.windowPos.y);
 
 		glfwMakeContextCurrent(m_window);
 		glfwSetWindowUserPointer(m_window, &m_data);
@@ -64,13 +65,24 @@ namespace GameEngine {
 
 		glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
 			windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
-			data.width = width;
-			data.height = height;
+			data.windowSize = Vector2i(width, height);
 
 			if(data.eventFunction) {
 				WindowResizeEvent e;
 				e.width = width;
 				e.height = height;
+				data.eventFunction(&e);
+			}
+		});
+
+		glfwSetWindowPosCallback(m_window, [](GLFWwindow* window, int x, int y) {
+			windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+			data.windowPos = Vector2i(x, y);
+
+			if(data.eventFunction) {
+				WindowMovedEvent e;
+				e.xpos = x;
+				e.ypos = y;
 				data.eventFunction(&e);
 			}
 		});
