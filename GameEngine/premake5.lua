@@ -11,7 +11,8 @@ project "GameEngine"
 		"src/**.cpp"
 	}
 
-	includedirs {
+	-- sysincludedirs is used instead of includedirs here so that the compiler doesn't generate warnings for these files
+	sysincludedirs {
 		"vendor/glfw/glfw/include",
 		"vendor/glew/glew/include",
 		"vendor/glm/glm/glm/"
