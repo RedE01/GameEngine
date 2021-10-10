@@ -15,6 +15,10 @@ project "Game"
 		"../GameEngine/include"
 	}
 
+	sysincludedirs {
+		"../GameEngine/vendor/glm/glm/glm"
+	}
+
 	links {
 		"GameEngine",
 		"glfw",
