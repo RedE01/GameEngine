@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include <cstdint>
+#include <cassert>
 
 template <typename T>
 class ResourceArray {
