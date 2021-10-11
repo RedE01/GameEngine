@@ -14,12 +14,12 @@ public:
 
 public:
 	T* create() {
-		m_data.push_back(T(m_nextId));
+		m_data.push_back(T(m_nextID));
 		size_t dataIndex = m_data.size() - 1;
-		m_indexMap[m_nextId] = dataIndex;
-		m_reverseIndexMap[dataIndex] = m_nextId;
+		m_indexMap[m_nextID] = dataIndex;
+		m_reverseIndexMap[dataIndex] = m_nextID;
 
-		++m_nextId;
+		++m_nextID;
 		return &m_data.back();
 	}
 
@@ -42,17 +42,17 @@ public:
 		// Find the id of the element that was just moved
 		ReverseIndexType::iterator search2 = m_reverseIndexMap.find(m_data.size());
 		assert(search2 != m_reverseIndexMap.end());
-		IDtype otherId = search2->second;
+		IDtype otherID = search2->second;
 
 		// Remove the element that was moved from m_reverseIndexMap
 		m_reverseIndexMap.erase(search2);
 
 		// If the element that was moved is the same as the one that was deleted (the last element was deleted), then we are done
-		if(otherId == id) return true;
+		if(otherID == id) return true;
 
 		// Otherwise, we have to update m_indexMap and m_reverseIndexMap for the element that was moved
-		m_indexMap[otherId] = dataIndex;
-		m_reverseIndexMap[dataIndex] = otherId;
+		m_indexMap[otherID] = dataIndex;
+		m_reverseIndexMap[dataIndex] = otherID;
 		
 		return true;
 	}
@@ -66,5 +66,5 @@ private:
 	DataStorageType m_data;
 	IndexMapType m_indexMap;
 	ReverseIndexType m_reverseIndexMap;
-	IDtype m_nextId = 0;
+	IDtype m_nextID = 0;
 };
