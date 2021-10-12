@@ -58,6 +58,12 @@ public:
 		return true;
 	}
 
+	void clear() {
+		m_data.clear();
+		m_indexMap.clear();
+		m_reverseIndexMap.clear();
+	}
+
 	size_t size() const { return m_data.size(); }
 
 	Iterator begin() { return m_data.begin(); }
