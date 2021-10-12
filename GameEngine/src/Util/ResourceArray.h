@@ -15,7 +15,7 @@ public:
 
 public:
 	T* create() {
-		m_data.push_back(T(m_nextID));
+		m_data.emplace_back(m_nextID);
 		size_t dataIndex = m_data.size() - 1;
 		m_indexMap[m_nextID] = dataIndex;
 		m_reverseIndexMap[dataIndex] = m_nextID;
@@ -36,8 +36,8 @@ public:
 		// If the dataIndex is >= m_data.size() then something has gone wrong
 		assert(dataIndex < m_data.size());
 
-		// Copy the last element to the position of the element that is to be removed, and then remove the last element
-		m_data[dataIndex] = m_data.back();
+		// Swap the element that is to be removed with the last element, and then remove the last element
+		std::swap(m_data[dataIndex], m_data.back());
 		m_data.pop_back();
 
 		// Find the id of the element that was just moved
