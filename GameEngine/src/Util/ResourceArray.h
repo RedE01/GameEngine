@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
+#include <optional>
 #include <cstdint>
 #include <cassert>
 
@@ -14,6 +15,16 @@ public:
 	using Iterator = DataStorageType::iterator;
 
 public:
+	std::optional<T*> get(IDtype id) {
+		IndexMapType::iterator search = m_indexMap.find(id);
+		if(search == m_indexMap.end()) return {};
+
+		size_t dataIndex = search->second;
+		if(dataIndex >= m_data.size()) return {};
+
+		return &(m_data[dataIndex]);
+	}
+
 	T* create() {
 		m_data.emplace_back(m_nextID);
 		size_t dataIndex = m_data.size() - 1;
