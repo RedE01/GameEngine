@@ -3,9 +3,6 @@
 namespace GameEngine {
 
 	Scene::~Scene() {
-		for(auto& go : m_gameObjects) {
-			go.deinit();
-		}
 		m_gameObjects.clear();
 	}
 
@@ -16,9 +13,6 @@ namespace GameEngine {
 	}
 
 	bool Scene::removeGameObject(Resource<GameObject> gameObjectResource) {
-		std::optional<GameObject*> go = getGameObject(gameObjectResource);
-		if(go.has_value()) go.value()->deinit();
-
 		return m_gameObjects.remove(gameObjectResource.ID);
 	}
 
