@@ -10,6 +10,8 @@ namespace GameEngine {
     public:
         Buffer();
         ~Buffer();
+        Buffer(const Buffer& other) = delete;
+        Buffer(Buffer&& other) = delete;
 
         virtual void setData(void* data, unsigned int dataSize, BufferDataUsage usageType);
 
@@ -18,6 +20,9 @@ namespace GameEngine {
 
         unsigned int getBufferID() const { return m_bufferID; }
         unsigned int getDataSize() const { return m_dataSize; }
+
+        Buffer& operator=(const Buffer& other) = delete;
+        Buffer& operator=(Buffer&& other) = delete;
 
     private:
         virtual int getBufferType() const = 0;

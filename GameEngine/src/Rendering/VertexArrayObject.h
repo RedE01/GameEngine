@@ -6,7 +6,6 @@ namespace GameEngine {
     class VertexArrayObject {
     public:
         VertexArrayObject();
-        VertexArrayObject(const VertexArrayObject& vao) = delete;
         ~VertexArrayObject();
 
         void bind();

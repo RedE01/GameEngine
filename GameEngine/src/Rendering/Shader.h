@@ -10,6 +10,8 @@ namespace GameEngine {
 	public:
 		Shader(const char* filepath);
 		~Shader();
+		Shader(const Shader& other) = delete;
+		Shader(Shader&& other) = delete;
 
 		bool compiledSuccessfully() { return m_compiled; }
 
@@ -44,6 +46,9 @@ namespace GameEngine {
 		void setUniformMat4(const char* name, const Matrix4& matrix);
 
 		unsigned int getShaderProgramID() const { return m_shaderProgramID; }
+
+		Shader& operator=(const Shader& other) = delete;
+		Shader& operator=(Shader&& other) = delete;
 
 	private:
 		int getUniformLocation(const char* name);

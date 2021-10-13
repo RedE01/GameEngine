@@ -19,8 +19,6 @@ namespace GameEngine {
     class VertexBuffer : public Buffer {
     public:
         VertexBuffer(const std::vector<VertexAttribute>& attributes);
-        VertexBuffer(const VertexBuffer& vbo) = delete;
-
 
     private:
         virtual int getBufferType() const override;
