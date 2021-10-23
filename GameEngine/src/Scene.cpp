@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "Components/ScriptComponentManager.h"
 
 namespace GameEngine {
 
@@ -9,5 +10,9 @@ namespace GameEngine {
 
 	void Scene::destroyEntity(const Entity& entity) {
 		m_entityRegistry.destroy(entity.getID());
+	}
+
+	void Scene::update(ScriptComponentManager* scriptComponentManager) {
+		scriptComponentManager->updateScriptComponents(m_entityRegistry);
 	}
 }
