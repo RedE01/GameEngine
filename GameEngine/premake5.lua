@@ -15,7 +15,8 @@ project "GameEngine"
 	sysincludedirs {
 		"vendor/glfw/glfw/include",
 		"vendor/glew/glew/include",
-		"vendor/glm/glm/glm/"
+		"vendor/glm/glm/glm/",
+		"vendor/entt/src"
 	}
 
 	filter "configurations:Debug"

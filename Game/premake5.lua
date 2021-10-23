@@ -16,7 +16,8 @@ project "Game"
 	}
 
 	sysincludedirs {
-		"../GameEngine/vendor/glm/glm/glm"
+		"../GameEngine/vendor/glm/glm/glm",
+		"../GameEngine/vendor/entt/src"
 	}
 
 	links {
