@@ -21,7 +21,7 @@ namespace GameEngine {
         VertexBuffer(const std::vector<VertexAttribute>& attributes);
 
     private:
-        virtual int getBufferType() const override;
+        virtual unsigned int getBufferType() const override;
     };
 
 }

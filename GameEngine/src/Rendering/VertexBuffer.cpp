@@ -27,7 +27,7 @@ namespace GameEngine {
         }
     }
 
-    int VertexBuffer::getBufferType() const {
+    unsigned int VertexBuffer::getBufferType() const {
         return GL_ARRAY_BUFFER;
     }
 

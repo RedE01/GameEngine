@@ -1,4 +1,5 @@
 #include "Buffer.h"
+#include <assert.h>
 #include <GL/glew.h>
 
 namespace GameEngine {
@@ -33,16 +34,17 @@ namespace GameEngine {
 
     GLenum getGLUsage(BufferDataUsage usage) {
         switch(usage) {
-            case BufferDataUsage::STREAM_DRAW: GL_STREAM_DRAW;
-            case BufferDataUsage::STREAM_READ: GL_STREAM_READ;
-            case BufferDataUsage::STREAM_COPY: GL_STREAM_COPY;
-            case BufferDataUsage::STATIC_DRAW: GL_STATIC_DRAW;
-            case BufferDataUsage::STATIC_READ: GL_STATIC_READ;
-            case BufferDataUsage::STATIC_COPY: GL_STATIC_COPY;
-            case BufferDataUsage::DYNAMIC_DRAW: GL_DYNAMIC_DRAW;
-            case BufferDataUsage::DYNAMIC_READ: GL_DYNAMIC_READ;
-            case BufferDataUsage::DYNAMIC_COPY: GL_DYNAMIC_COPY;
+            case BufferDataUsage::STREAM_DRAW: return GL_STREAM_DRAW;
+            case BufferDataUsage::STREAM_READ: return GL_STREAM_READ;
+            case BufferDataUsage::STREAM_COPY: return GL_STREAM_COPY;
+            case BufferDataUsage::STATIC_DRAW: return GL_STATIC_DRAW;
+            case BufferDataUsage::STATIC_READ: return GL_STATIC_READ;
+            case BufferDataUsage::STATIC_COPY: return GL_STATIC_COPY;
+            case BufferDataUsage::DYNAMIC_DRAW: return GL_DYNAMIC_DRAW;
+            case BufferDataUsage::DYNAMIC_READ: return GL_DYNAMIC_READ;
+            case BufferDataUsage::DYNAMIC_COPY: return GL_DYNAMIC_COPY;
         }
+        assert(0);
         return 0;
     }
 

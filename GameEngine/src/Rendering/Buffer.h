@@ -25,7 +25,7 @@ namespace GameEngine {
         Buffer& operator=(Buffer&& other) = delete;
 
     private:
-        virtual int getBufferType() const = 0;
+        virtual unsigned int getBufferType() const = 0;
 
     private:
         unsigned int m_bufferID;

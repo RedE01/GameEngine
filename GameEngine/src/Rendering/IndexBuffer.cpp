@@ -3,7 +3,7 @@
 
 namespace GameEngine {
 
-    int IndexBuffer::getBufferType() const {
+    unsigned int IndexBuffer::getBufferType() const {
         return GL_ELEMENT_ARRAY_BUFFER;
     }
 

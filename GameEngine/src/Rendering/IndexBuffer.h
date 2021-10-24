@@ -10,7 +10,7 @@ namespace GameEngine {
         unsigned int getIndexCount() const { return getDataSize() / sizeof(unsigned int); }
 
     private:
-        virtual int getBufferType() const override;
+        virtual unsigned int getBufferType() const override;
     };
 
 }
