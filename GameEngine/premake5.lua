@@ -16,7 +16,8 @@ project "GameEngine"
 		"vendor/glfw/glfw/include",
 		"vendor/glew/glew/include",
 		"vendor/glm/glm/glm/",
-		"vendor/entt/src"
+		"vendor/entt/src",
+		"vendor/assimp/assimp/include"
 	}
 
 	filter "configurations:Debug"

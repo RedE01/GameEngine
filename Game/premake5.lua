@@ -23,7 +23,8 @@ project "Game"
 	links {
 		"GameEngine",
 		"glfw",
-		"glew"
+		"glew",
+		"assimp"
 	}
 
 	filter "system:linux"
