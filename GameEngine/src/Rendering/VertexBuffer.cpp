@@ -15,7 +15,7 @@ namespace GameEngine {
             attributesStride += attributes[i].size * dataTypeSize;
         }
 
-        unsigned int currentOffset = 0;
+        uintptr_t currentOffset = 0;
         for(unsigned int i = 0; i < attributes.size(); ++i) {
             GLenum type = getOpenGLDataType(attributes[i].type);
             GLboolean normalized = attributes[i].normalized ? GL_TRUE : GL_FALSE;
