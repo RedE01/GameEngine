@@ -3,7 +3,7 @@
 namespace GameEngine {
 
 	Entity::Entity(entt::registry* entityRegistry, entityid entityID) 
-		: m_entityRegistry(entityRegistry), m_entityID(entityID) {
+		: m_entityID(entityID), m_entityRegistry(entityRegistry) {
 
 	}
 
