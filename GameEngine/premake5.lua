@@ -17,8 +17,11 @@ project "GameEngine"
 		"vendor/glew/glew/include",
 		"vendor/glm/glm/glm/",
 		"vendor/entt/src",
-		"vendor/assimp/assimp/include"
+		"vendor/assimp/assimp/include",
+		"vendor/stb/"
 	}
+
+	warnings "Extra"
 
 	filter "configurations:Debug"
 		defines "GAME_ENGINE_DEBUG"
