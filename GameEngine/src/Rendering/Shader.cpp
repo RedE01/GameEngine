@@ -1,45 +1,24 @@
 #include "Shader.h"
-#include <fstream>
-#include <sstream>
-#include <cstring>
-#include <iostream>
-#include <algorithm>
-
 #include <GL/glew.h>
 
 namespace GameEngine {
 
-	std::unordered_map<std::string, std::string> getSourcesFromFile(const char* filepath);
-	int createShader(const std::string& source, GLenum shaderType);
+	unsigned int createShader(const char* source, GLenum shaderType);
 	void deleteShader(unsigned int shaderID);
-	int createShaderProgram(unsigned int vertexShaderID, unsigned int fragmentShaderID);
+	unsigned int createShaderProgram(unsigned int vertexShaderID, unsigned int fragmentShaderID);
 
-	Shader::Shader(const char* filepath) {
-		std::unordered_map<std::string, std::string> sources = getSourcesFromFile(filepath);
+	Shader::Shader(const char* vertexShaderSource, const char* fragmentShaderSource) {
+		m_shaderProgramID = 0;
 
-		auto vertexShaderSource = sources.find("vertex");
-		auto fragmentShaderSource = sources.find("fragment");
+		unsigned int vertexShaderID = createShader(vertexShaderSource, GL_VERTEX_SHADER);
+		unsigned int fragmentShaderID = createShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
 
-		if(vertexShaderSource != sources.end() && fragmentShaderSource != sources.end()) {
-			int vertexShaderID = createShader(vertexShaderSource->second, GL_VERTEX_SHADER);
-			int fragmentShaderID = createShader(fragmentShaderSource->second, GL_FRAGMENT_SHADER);
-			if(vertexShaderID < 0 || fragmentShaderID < 0) {
-				m_compiled = false;
-				return;
-			}
-
+		if(vertexShaderID != 0 && fragmentShaderID != 0) {
 			m_shaderProgramID = createShaderProgram(vertexShaderID, fragmentShaderID);
-			useShader();
+		}
 
-			deleteShader(vertexShaderID);
-			deleteShader(fragmentShaderID);
-		}
-		else {
-			std::cout << "ERROR: No vertex and/or fragment shader" << std::endl;
-			m_compiled = false;
-			return;
-		}
-		m_compiled = true;
+		if(vertexShaderID != 0) deleteShader(vertexShaderID);
+		if(fragmentShaderID != 0) deleteShader(fragmentShaderID);
 	}
 
 	Shader::~Shader() {
@@ -48,6 +27,10 @@ namespace GameEngine {
 
 	void Shader::useShader() {
 		glUseProgram(m_shaderProgramID);
+	}
+
+	bool Shader::compiledSuccessfully() const {
+		return m_shaderProgramID != 0;
 	}
 
 	void Shader::setUniform1f(const char* name, const float& v) {
@@ -170,42 +153,10 @@ namespace GameEngine {
 		return uniformLocation;
 	}
 
-	std::unordered_map<std::string, std::string> getSourcesFromFile(const char* filepath) {
-		std::unordered_map<std::string, std::string> shaderSections;
-		
-		std::ifstream filestream(filepath, std::ios::in);
-		if(!filestream.is_open()) {
-			std::cout << "Could not open file " << filepath << std::endl;
-			return shaderSections;
-		}
-		std::stringstream buffer;
-		buffer << filestream.rdbuf();
-		filestream.close();
-		
-		std::string shaderSource = buffer.str();
-
-		const char* sectionToken = "#section";
-		size_t sectionTokenLength = std::strlen(sectionToken);
-		size_t pos = shaderSource.find(sectionToken, 0);
-		while(pos != std::string::npos) {
-			size_t eol = shaderSource.find_first_of("\r\n", pos);
-			size_t sectionTypeBegin = pos + sectionTokenLength + 1;
-			std::string sectionStr = shaderSource.substr(sectionTypeBegin, eol - sectionTypeBegin);
-			
-			size_t nextLinePos = shaderSource.find_first_of("\r\n", eol);
-			pos = shaderSource.find(sectionToken, nextLinePos);
-
-			shaderSections[sectionStr] = (pos == std::string::npos) ? shaderSource.substr(nextLinePos) : shaderSource.substr(nextLinePos, pos - nextLinePos);
-		}
-
-		return shaderSections;
-	}
-
-	int createShader(const std::string& source, GLenum shaderType) {
+	unsigned int createShader(const char* source, GLenum shaderType) {
 		unsigned int shaderID = glCreateShader(shaderType);
 
-		const char* shaderSourceCstr = source.c_str();
-		glShaderSource(shaderID, 1, &shaderSourceCstr, NULL);
+		glShaderSource(shaderID, 1, &source, NULL);
 		glCompileShader(shaderID);
 
 		int  success;
@@ -215,7 +166,7 @@ namespace GameEngine {
 		if(!success) {
 			glGetShaderInfoLog(shaderID, 512, NULL, infoLog);
 			std::cout << "ERROR: SHADER COMPILATION FAILED\n" << infoLog << std::endl;
-			return -1;
+			return 0;
 		}
 
 		return shaderID;
@@ -225,7 +176,7 @@ namespace GameEngine {
 		glDeleteShader(shaderID);
 	}
 
-	int createShaderProgram(unsigned int vertexShaderID, unsigned int fragmentShaderID) {
+	unsigned int createShaderProgram(unsigned int vertexShaderID, unsigned int fragmentShaderID) {
 		unsigned int shaderProgramID = glCreateProgram();
 
 		glAttachShader(shaderProgramID, vertexShaderID);
@@ -239,9 +190,11 @@ namespace GameEngine {
 		if(!success) {
 			glGetProgramInfoLog(shaderProgramID, 512, NULL, infoLog);
 			std::cout << "ERROR: SHADER PROGRAM LINKING FAILED\n" << infoLog << std::endl;
+			return 0;
 		}
 
 		return shaderProgramID;
 	}
+
 
 }

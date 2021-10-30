@@ -1,21 +1,18 @@
 #pragma once
 #include "../Math/Matrix.h"
 #include <unordered_map>
-#include <string>
-#include <memory>
 
 namespace GameEngine {
 
 	class Shader {
 	public:
-		Shader(const char* filepath);
+		Shader(const char* vertexShaderSource, const char* fragmentShaderSource);
 		~Shader();
 		Shader(const Shader& other) = delete;
 		Shader(Shader&& other) = delete;
 
-		bool compiledSuccessfully() { return m_compiled; }
-
 		void useShader();
+		bool compiledSuccessfully() const;
 
 		void setUniform1f(const char* name, const float& v);
 		void setUniform2f(const char* name, const float& v1, const float& v2);
@@ -55,7 +52,6 @@ namespace GameEngine {
 
 	private:
 		unsigned int m_shaderProgramID;
-		bool m_compiled;
 
 		std::unordered_map<const char*, int> m_uniformLocations;
 	};
