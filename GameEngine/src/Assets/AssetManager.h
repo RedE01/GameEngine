@@ -1,6 +1,7 @@
 #pragma once
 #include "ModelLoader.h"
 #include "ShaderLoader.h"
+#include "TextureLoader.h"
 #include <entt/resource/cache.hpp>
 
 namespace GameEngine {
@@ -10,6 +11,7 @@ namespace GameEngine {
 
 	using ModelAsset = AssetHandle<Model>;
 	using ShaderAsset = AssetHandle<Shader>;
+	using TextureAsset = AssetHandle<Texture>;
 
 	class AssetManager {
 	public:
@@ -38,6 +40,7 @@ namespace GameEngine {
 	private:
 		entt::resource_cache<Model> m_modelCache;
 		entt::resource_cache<Shader> m_shaderCache;
+		entt::resource_cache<Texture> m_textureCache;
 	};
 
 }

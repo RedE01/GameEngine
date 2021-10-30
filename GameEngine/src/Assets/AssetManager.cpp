@@ -85,6 +85,27 @@ namespace GameEngine {
 	template void AssetManager::clearAssets<Shader>();
 	template size_t AssetManager::numberOfAssets<Shader>();
 
+	// Texture
+	template<>
+	entt::resource_cache<Texture>& AssetManager::getResourceCache() {
+		return m_textureCache;
+	}
+
+	template<>
+	AssetHandle<Texture> AssetManager::load<Texture>(const std::string& filepath) {
+		return getResourceCache<Texture>().load<TextureLoader>(entt::hashed_string{filepath.c_str()}, filepath);
+	}
+
+	template<>
+	AssetHandle<Texture> AssetManager::reload<Texture>(const std::string& filepath) {
+		return getResourceCache<Texture>().reload<TextureLoader>(entt::hashed_string{filepath.c_str()}, filepath);
+	}
+
+	template AssetHandle<Texture> AssetManager::getHandle<Texture>(const std::string& filepath);
+	template bool AssetManager::exists<Texture>(const std::string& filepath);
+	template void AssetManager::clearAssets<Texture>();
+	template size_t AssetManager::numberOfAssets<Texture>();
+
 	// ----
 
 }
