@@ -2,16 +2,10 @@
 #include "ModelLoader.h"
 #include "ShaderLoader.h"
 #include "TextureLoader.h"
+#include "AssetHandle.h"
 #include <entt/resource/cache.hpp>
 
 namespace GameEngine {
-
-	template<typename T>
-	using AssetHandle = entt::resource_handle<T>;
-
-	using ModelAsset = AssetHandle<Model>;
-	using ShaderAsset = AssetHandle<Shader>;
-	using TextureAsset = AssetHandle<Texture>;
 
 	class AssetManager {
 	public:
