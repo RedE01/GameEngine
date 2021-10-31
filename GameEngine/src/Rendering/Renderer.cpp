@@ -1,7 +1,15 @@
 #include "Renderer.h"
+#include "../Scene.h"
+#include "../Components/MeshRendererComponent.h"
+#include "Model.h"
+#include "Material.h"
+#include "Shader.h"
+#include "Texture.h"
 #include <GL/glew.h>
 
 namespace GameEngine {
+
+	void renderModel(Model& model);
 
 	Renderer::Renderer() {
 		if(glewInit() != GLEW_OK) return;
@@ -15,8 +23,36 @@ namespace GameEngine {
 		glEnable(GL_FRAMEBUFFER_SRGB); // Temporary
 	}
 
-	void Renderer::renderFrame() {
+	void Renderer::renderFrame(Scene* scene) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		if(scene != nullptr) {
+			auto view = scene->m_entityRegistry.view<MeshRendererComponent>();
+			for(auto& entity : view) {
+				auto& meshRendererComponent = view.get<MeshRendererComponent>(entity);
+
+				if(meshRendererComponent.model) {
+					renderModel(meshRendererComponent.model.get());
+				}
+			}
+		}
+	}
+
+	void renderModel(Model& model) {
+		for(auto& mesh : model.meshes) {
+			if(mesh && mesh->material && mesh->material->shader) {
+				mesh->material->shader->useShader();
+
+				glActiveTexture(0);
+				if(mesh->material->texture) {
+					mesh->material->texture->bind();
+				}
+
+				mesh->bind();
+
+				glDrawElements(GL_TRIANGLES, mesh->getIndexCount(), GL_UNSIGNED_INT, 0);
+			}
+		}
 	}
 
 

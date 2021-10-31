@@ -29,7 +29,7 @@ namespace GameEngine {
 
 			m_scene->update(m_scriptComponentManager.get());
 
-			m_renderer->renderFrame();
+			m_renderer->renderFrame(m_scene.get());
 
 			m_window->pollEvents();
 			m_window->swapBuffers();

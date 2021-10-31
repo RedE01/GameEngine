@@ -18,6 +18,7 @@ namespace GameEngine {
 
 		friend class Entity;
 		friend class Application;
+		friend class Renderer;
 	};
 
 }

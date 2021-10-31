@@ -2,11 +2,13 @@
 
 namespace GameEngine {
 
+	class Scene;
+
 	class Renderer {
 	public:
 		Renderer();
 
-		void renderFrame();
+		void renderFrame(Scene* scene);
 	};
 
 }
