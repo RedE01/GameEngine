@@ -9,8 +9,8 @@ namespace GameEngine {
 
 	class AssetManager {
 	public:
-		template<typename T>
-		AssetHandle<T> load(const std::string& filepath);
+		template<typename T, typename ... Args>
+		AssetHandle<T> load(const std::string& filepath, Args...);
 
 		template<typename T>
 		AssetHandle<T> reload(const std::string& filepath);

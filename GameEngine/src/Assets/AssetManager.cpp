@@ -3,15 +3,15 @@
 
 namespace GameEngine {
 
-	template<typename T>
-	AssetHandle<T> AssetManager::load(const std::string& filepath) {
+	template<typename T, typename ... Args>
+	AssetHandle<T> AssetManager::load(const std::string& filepath, Args...) {
 		// Error: T does not have a loader
 		assert(0);
 		return AssetHandle<T>();
 	}
 
-	template<typename T>
-	AssetHandle<T> AssetManager::reload(const std::string& filepath) {
+	template<typename T, typename ... Args>
+	AssetHandle<T> AssetManager::reload(const std::string& filepath, Args...) {
 		// Error: T does not have a loader
 		assert(0);
 		return AssetHandle<T>();
@@ -99,6 +99,16 @@ namespace GameEngine {
 	template<>
 	AssetHandle<Texture> AssetManager::reload<Texture>(const std::string& filepath) {
 		return getResourceCache<Texture>().reload<TextureLoader>(entt::hashed_string{filepath.c_str()}, filepath);
+	}
+
+	template<>
+	AssetHandle<Texture> AssetManager::load<Texture>(const std::string& identifier, unsigned char* data, unsigned int dataLength) {
+		return getResourceCache<Texture>().load<TextureLoader>(entt::hashed_string{identifier.c_str()}, identifier, data, dataLength);
+	}
+
+	template<>
+	AssetHandle<Texture> AssetManager::reload<Texture>(const std::string& identifier, unsigned char* data, unsigned int dataLength) {
+		return getResourceCache<Texture>().reload<TextureLoader>(entt::hashed_string{identifier.c_str()}, identifier, data, dataLength);
 	}
 
 	template AssetHandle<Texture> AssetManager::getHandle<Texture>(const std::string& filepath);
