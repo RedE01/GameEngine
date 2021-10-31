@@ -9,6 +9,7 @@ namespace GameEngine {
 	class Event;
 	class Scene;
 	class ScriptComponentManager;
+	class AssetManager;
 
 	class Application {
 	public:
@@ -17,7 +18,11 @@ namespace GameEngine {
 
 		void run();
 
+		virtual void onUpdate() = 0;
+		virtual void onRender() = 0;
+
 		Scene* getScene() const;
+		AssetManager* getAssetManager() const;
 
 	protected:
 		virtual void registerScriptComponents(ScriptComponentManager* scm) = 0;
@@ -30,6 +35,7 @@ namespace GameEngine {
 		std::unique_ptr<Renderer> m_renderer;
 		std::unique_ptr<Scene> m_scene;
 		std::unique_ptr<ScriptComponentManager> m_scriptComponentManager;
+		std::unique_ptr<AssetManager> m_assetManager;
 		bool m_running = true;
 	};
 

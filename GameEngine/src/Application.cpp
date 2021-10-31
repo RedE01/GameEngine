@@ -4,6 +4,7 @@
 #include "Input.h"
 #include "Scene.h"
 #include "Components/ScriptComponentManager.h"
+#include "Assets/AssetManager.h"
 #include "Events/Event.h"
 
 namespace GameEngine {
@@ -13,6 +14,7 @@ namespace GameEngine {
 		m_renderer = std::make_unique<Renderer>();
 		m_scene = std::make_unique<Scene>();
 		m_scriptComponentManager = std::make_unique<ScriptComponentManager>();
+		m_assetManager = std::make_unique<AssetManager>();
 
 		m_window->setEventFunction(std::bind(&Application::eventHandler, this, std::placeholders::_1));
 	}
@@ -28,8 +30,10 @@ namespace GameEngine {
 			Input::Update(m_window->getWindowSize());
 
 			m_scene->update(m_scriptComponentManager.get());
+			onUpdate();
 
 			m_renderer->renderFrame(m_scene.get());
+			onRender();
 
 			m_window->pollEvents();
 			m_window->swapBuffers();
@@ -40,13 +44,17 @@ namespace GameEngine {
 		return m_scene.get();
 	}
 
+	AssetManager* Application::getAssetManager() const {
+		return m_assetManager.get();
+	}
+
 	void Application::eventHandler(Event* event) {
 		if(event->isInCategory(EventCategory::Input)) {
 			Input::HandleEvent(event);
 		}
 		else if(event->isInCategory(EventCategory::Application)) {
-			switch(event->getEventType()) {
-			case EventType::WindowClose: m_running = false; break;
+			if(event->getEventType() == EventType::WindowClose) {
+				m_running = false;
 			}
 		}
 	}
