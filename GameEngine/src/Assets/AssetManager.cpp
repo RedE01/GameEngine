@@ -51,12 +51,12 @@ namespace GameEngine {
 
 	template<>
 	AssetHandle<Model> AssetManager::load<Model>(const std::string& filepath) {
-		return getResourceCache<Model>().load<ModelLoader>(entt::hashed_string{filepath.c_str()}, filepath);
+		return getResourceCache<Model>().load<ModelLoader>(entt::hashed_string{filepath.c_str()}, filepath, this);
 	}
 
 	template<>
 	AssetHandle<Model> AssetManager::reload<Model>(const std::string& filepath) {
-		return getResourceCache<Model>().reload<ModelLoader>(entt::hashed_string{filepath.c_str()}, filepath);
+		return getResourceCache<Model>().reload<ModelLoader>(entt::hashed_string{filepath.c_str()}, filepath, this);
 	}
 
 	template AssetHandle<Model> AssetManager::getHandle<Model>(const std::string& filepath);
@@ -115,6 +115,27 @@ namespace GameEngine {
 	template bool AssetManager::exists<Texture>(const std::string& filepath);
 	template void AssetManager::clearAssets<Texture>();
 	template size_t AssetManager::numberOfAssets<Texture>();
+
+	// Material
+	template<>
+	entt::resource_cache<Material>& AssetManager::getResourceCache() {
+		return m_materialCache;
+	}
+
+	template<>
+	AssetHandle<Material> AssetManager::load<Material>(const std::string& filepath) {
+		return getResourceCache<Material>().load<MaterialLoader>(entt::hashed_string{filepath.c_str()});
+	}
+
+	template<>
+	AssetHandle<Material> AssetManager::reload<Material>(const std::string& filepath) {
+		return getResourceCache<Material>().reload<MaterialLoader>(entt::hashed_string{filepath.c_str()});
+	}
+
+	template AssetHandle<Material> AssetManager::getHandle<Material>(const std::string& filepath);
+	template bool AssetManager::exists<Material>(const std::string& filepath);
+	template void AssetManager::clearAssets<Material>();
+	template size_t AssetManager::numberOfAssets<Material>();
 
 	// ----
 

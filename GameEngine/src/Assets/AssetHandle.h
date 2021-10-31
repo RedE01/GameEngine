@@ -6,6 +6,7 @@ namespace GameEngine {
 	class Model;
 	class Shader;
 	class Texture;
+	class Material;
 
 	template<typename T>
 	using AssetHandle = entt::resource_handle<T>;
@@ -13,5 +14,6 @@ namespace GameEngine {
 	using ModelAsset = AssetHandle<Model>;
 	using ShaderAsset = AssetHandle<Shader>;
 	using TextureAsset = AssetHandle<Texture>;
+	using MaterialAsset = AssetHandle<Material>;
 
 }

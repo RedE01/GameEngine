@@ -2,6 +2,7 @@
 #include "ModelLoader.h"
 #include "ShaderLoader.h"
 #include "TextureLoader.h"
+#include "MaterialLoader.h"
 #include "AssetHandle.h"
 #include <entt/resource/cache.hpp>
 
@@ -12,8 +13,8 @@ namespace GameEngine {
 		template<typename T, typename ... Args>
 		AssetHandle<T> load(const std::string& filepath, Args...);
 
-		template<typename T>
-		AssetHandle<T> reload(const std::string& filepath);
+		template<typename T, typename ... Args>
+		AssetHandle<T> reload(const std::string& filepath, Args...);
 
 		template<typename T>
 		AssetHandle<T> getHandle(const std::string& filepath);
@@ -35,6 +36,7 @@ namespace GameEngine {
 		entt::resource_cache<Model> m_modelCache;
 		entt::resource_cache<Shader> m_shaderCache;
 		entt::resource_cache<Texture> m_textureCache;
+		entt::resource_cache<Material> m_materialCache;
 	};
 
 }

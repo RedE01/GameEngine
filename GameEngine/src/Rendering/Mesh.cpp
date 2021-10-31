@@ -5,7 +5,7 @@
 
 namespace GameEngine {
 
-	Mesh::Mesh(const std::vector<Vertex>& vertexData, const std::vector<unsigned int>& indexData) {
+	Mesh::Mesh(const std::vector<Vertex>& vertexData, const std::vector<unsigned int>& indexData, MaterialAsset material) : material(material) {
 		m_vao = std::make_unique<VertexArrayObject>();
 		m_vao->bind();
 

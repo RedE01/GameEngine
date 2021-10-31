@@ -1,5 +1,6 @@
 #pragma once
 #include "../Math/Vector.h"
+#include "../Assets/AssetHandle.h"
 #include <vector>
 #include <memory>
 
@@ -18,7 +19,7 @@ namespace GameEngine {
 
 	class Mesh {
 	public:
-		Mesh(const std::vector<Vertex>& vertexData, const std::vector<unsigned int>& indexData);
+		Mesh(const std::vector<Vertex>& vertexData, const std::vector<unsigned int>& indexData, MaterialAsset material);
 		Mesh(const Mesh& mesh) = delete;
 		Mesh(Mesh&& mesh) = delete;
 		~Mesh();
@@ -27,10 +28,12 @@ namespace GameEngine {
 		unsigned int getVertexDataSize() const;
 		unsigned int getIndexCount() const;
 
+	public:
+		MaterialAsset material;
+
 	private:
 		std::unique_ptr<VertexArrayObject> m_vao;
 		std::unique_ptr<VertexBuffer> m_vbo;
 		std::unique_ptr<IndexBuffer> m_ibo;
-		std::shared_ptr<Material> m_material;
 	};
 }

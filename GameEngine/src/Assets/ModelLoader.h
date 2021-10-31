@@ -4,8 +4,10 @@
 
 namespace GameEngine {
 
+	class AssetManager;
+
 	struct ModelLoader final : entt::resource_loader<ModelLoader, Model> {
-		std::shared_ptr<Model> load(const std::string& filepath) const;
+		std::shared_ptr<Model> load(const std::string& filepath, AssetManager* assetManager) const;
 	};
 
 }
