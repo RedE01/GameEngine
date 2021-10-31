@@ -19,17 +19,13 @@ namespace GameEngine {
             if(material->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &diffuseTexturePath) == aiReturn_SUCCESS) {
 				const char* diffuseTexturePathCstr = diffuseTexturePath.C_Str();
 
-				if(diffuseTexturePathCstr[0] == '*') { // If the texture is embedded
-					unsigned int textureIndex = std::stoi(diffuseTexturePathCstr + 1); // Start from the second char of diffuseTexturePathCstr
+				const aiTexture* texture = scene->GetEmbeddedTexture(diffuseTexturePathCstr);
 
-					if(textureIndex < scene->mNumTextures) {
-						aiTexture* texture = scene->mTextures[textureIndex];
+				if(texture) { // If the texture is embedded
+					unsigned int dataLength = texture->mWidth;
+					if(texture->mHeight != 0) dataLength *= texture->mHeight; // If the image is compressed, mHeight = 0 and mWidth is the dataLength
 
-						unsigned int dataLength = texture->mWidth;
-						if(texture->mHeight != 0) dataLength *= texture->mHeight; // If the image is compressed, mHeight = 0 and mWidth is the dataLength
-
-						materialAsset->texture = assetManager->load<Texture>(std::string(texture->mFilename.C_Str()), (unsigned char*)texture->pcData, dataLength);
-					}
+					materialAsset->texture = assetManager->load<Texture>(std::string(texture->mFilename.C_Str()), (unsigned char*)texture->pcData, dataLength);
 				}
 				else { // Texture is not embedded
 					materialAsset->texture = assetManager->load<Texture>(std::string(diffuseTexturePathCstr));
