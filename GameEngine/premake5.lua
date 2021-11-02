@@ -22,6 +22,7 @@ project "GameEngine"
 	}
 
 	warnings "Extra"
+	defines "GLEW_NO_GLU"
 
 	filter "configurations:Debug"
 		defines "GAME_ENGINE_DEBUG"

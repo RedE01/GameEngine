@@ -14,3 +14,4 @@ project "glew"
 	}
 
 	defines "GLEW_STATIC"
+	defines "GLEW_NO_GLU"
