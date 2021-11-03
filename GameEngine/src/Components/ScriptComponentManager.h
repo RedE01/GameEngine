@@ -1,4 +1,5 @@
 #pragma once
+#include "Component.h"
 #include <vector>
 #include <functional>
 #include <entt/entity/registry.hpp>
@@ -14,7 +15,7 @@ namespace GameEngine {
 		}
 	}
 
-	class ScriptComponentManager {
+	class ScriptComponentManager : public Component {
 	public:
 		template<typename T>
 		void registerScriptComponent() {

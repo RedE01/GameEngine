@@ -1,4 +1,5 @@
 #pragma once
+#include "Components/Component.h"
 #include <entt/entity/registry.hpp>
 
 namespace GameEngine {
@@ -9,14 +10,24 @@ namespace GameEngine {
 	public:
 		Entity(const Entity& other) = default;
 
-		template<typename Component, typename... Args>
-		Component& addComponent(Args&&... args) {
-			return m_entityRegistry->emplace<Component>(m_entityID, std::forward<Args>(args)...);
+		template<typename ComponentType, typename... Args>
+		ComponentType& addComponent(Args&&... args) {
+			ComponentType& component = m_entityRegistry->emplace<ComponentType>(m_entityID, std::forward<Args>(args)...);
+			
+			Component* componentPtr = (Component*)&component;
+			componentPtr->m_entity = this;
+			
+			return component;
 		}
 
-		template <class T>
+		template <typename T>
 		void removeComponent() {
 			m_entityRegistry->remove<T>(m_entityID);
+		}
+
+		template <typename T>
+		T& getComponent() {
+			return m_entityRegistry->get<T>(m_entityID);
 		}
 
 		entityid getID() const;
