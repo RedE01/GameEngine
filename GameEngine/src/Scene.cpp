@@ -1,11 +1,16 @@
 #include "Scene.h"
 #include "Components/ScriptComponentManager.h"
+#include "Components/TransformComponent.h"
 
 namespace GameEngine {
 
 	Entity Scene::createEntity() {
 		entt::entity entity = m_entityRegistry.create();
-		return Entity(&m_entityRegistry, entity);
+		
+		Entity e(&m_entityRegistry, entity);
+		e.addComponent<TransformComponent>();
+
+		return e;
 	}
 
 	void Scene::destroyEntity(const Entity& entity) {
