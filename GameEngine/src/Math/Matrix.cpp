@@ -18,11 +18,11 @@ std::ostream& matrixOStream(std::ostream& out, const T* data) {
 }
 
 std::ostream& operator<<(std::ostream& out, const glm::mat2& m) {
-	return matrixOStream<glm::mediump_float, 2>(out, (glm::mediump_float*)&m);
+	return matrixOStream<float, 2>(out, (float*)&m);
 }
 std::ostream& operator<<(std::ostream& out, const glm::mat3& m) {
-	return matrixOStream<glm::mediump_float, 3>(out, (glm::mediump_float*)&m);
+	return matrixOStream<float, 3>(out, (float*)&m);
 }
 std::ostream& operator<<(std::ostream& out, const glm::mat4& m) {
-	return matrixOStream<glm::mediump_float, 4>(out, (glm::mediump_float*)&m);
+	return matrixOStream<float, 4>(out, (float*)&m);
 }
