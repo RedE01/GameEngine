@@ -12,11 +12,11 @@ namespace GameEngine {
 
 	private:
 		void update(ScriptComponentManager* scriptComponentManager);
+		void updateCameras(float windowWidth, float windowHeight);
 
 	private:
 		entt::registry m_entityRegistry;
 
-		friend class Entity;
 		friend class Application;
 		friend class Renderer;
 	};

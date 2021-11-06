@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include "../Scene.h"
+#include "../Components/CameraComponent.h"
 #include "../Components/MeshRendererComponent.h"
 #include "../Components/TransformComponent.h"
 #include "Model.h"
@@ -12,7 +13,13 @@
 
 namespace GameEngine {
 
-	void renderModel(Model& model, TransformComponent& transform);
+	struct CameraMatrices {
+		Matrix4 viewMatrix;
+		Matrix4 projectionMatrix;
+	};
+
+	CameraMatrices getCameraMatrices(entt::registry& registry);
+	void renderModel(Model& model, TransformComponent& transform, CameraMatrices& cameraMatrices);
 
 	Renderer::Renderer() {
 		if(glewInit() != GLEW_OK) return;
@@ -30,19 +37,34 @@ namespace GameEngine {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		if(scene != nullptr) {
-			auto view = scene->m_entityRegistry.view<MeshRendererComponent>();
-			for(auto& entity : view) {
-				auto& meshRendererComponent = view.get<MeshRendererComponent>(entity);
+			CameraMatrices cameraMatrices = getCameraMatrices(scene->m_entityRegistry);
+
+			auto meshRendererView = scene->m_entityRegistry.view<MeshRendererComponent>();
+			for(auto& entity : meshRendererView) {
+				auto& meshRendererComponent = meshRendererView.get<MeshRendererComponent>(entity);
 				auto& transformComponent = scene->m_entityRegistry.get<TransformComponent>(entity);
 
 				if(meshRendererComponent.model) {
-					renderModel(meshRendererComponent.model.get(), transformComponent);
+					renderModel(meshRendererComponent.model.get(), transformComponent, cameraMatrices);
 				}
 			}
 		}
 	}
 
-	void renderModel(Model& model, TransformComponent& transform) {
+	CameraMatrices getCameraMatrices(entt::registry& registry) {
+		auto cameraView = registry.view<CameraComponent>();
+		for(auto& entity : cameraView) {
+			CameraComponent& cameraComponent = cameraView.get<CameraComponent>(entity);
+
+			if(cameraComponent.isActive) {
+				return {cameraComponent.getViewMatrix(), cameraComponent.getProjectionMatrix()};
+			}
+		}
+
+		return {Matrix4(0.0), Matrix4(0.0)};
+	}
+
+	void renderModel(Model& model, TransformComponent& transform, CameraMatrices& cameraMatrices) {
 		for(auto& mesh : model.meshes) {
 			if(mesh && mesh->material && mesh->material->shader) {
 				mesh->material->shader->useShader();
@@ -52,13 +74,11 @@ namespace GameEngine {
 					mesh->material->texture->bind();
 				}
 
-				Matrix4 viewMat = glm::translate(glm::mat4(1.0), Vector3(0.0, 0.0, -10.0));
-				Matrix4 projMat = glm::perspective(45.0f, 64.0f / 48.0f, 0.1f, 100.0f);
 				Matrix4 modelMat = transform.getMatrix();
 
-				mesh->material->shader->setUniformMat4("u_viewMat", viewMat);
-				mesh->material->shader->setUniformMat4("u_projMat", projMat);
-				mesh->material->shader->setUniformMat4("u_modelMat", modelMat);
+				mesh->material->shader->setUniformMat4("u_modelMatrix", modelMat);
+				mesh->material->shader->setUniformMat4("u_viewMatrix", cameraMatrices.viewMatrix);
+				mesh->material->shader->setUniformMat4("u_projectionMatrix", cameraMatrices.projectionMatrix);
 
 				mesh->bind();
 

@@ -62,6 +62,9 @@ namespace GameEngine {
 			if(event->getEventType() == EventType::WindowClose) {
 				m_running = false;
 			}
+			else if(event->getEventType() == EventType::WindowResize) {
+				m_scene->updateCameras(m_window->getWindowSize().x, m_window->getWindowSize().y);
+			}
 		}
 	}
 

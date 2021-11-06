@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include "Components/ScriptComponentManager.h"
 #include "Components/TransformComponent.h"
+#include "Components/CameraComponent.h"
 
 namespace GameEngine {
 
@@ -19,5 +20,15 @@ namespace GameEngine {
 
 	void Scene::update(ScriptComponentManager* scriptComponentManager) {
 		scriptComponentManager->updateScriptComponents(m_entityRegistry);
+	}
+
+	void Scene::updateCameras(float windowWidth, float windowHeight) {
+		auto cameraView = m_entityRegistry.view<CameraComponent>();
+
+		for(auto& entity : cameraView) {
+			CameraComponent& cameraComponent = cameraView.get<CameraComponent>(entity);
+
+			cameraComponent.setSize(Vector2(windowWidth, windowHeight));
+		}
 	}
 }
