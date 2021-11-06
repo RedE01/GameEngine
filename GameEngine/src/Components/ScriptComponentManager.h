@@ -15,7 +15,7 @@ namespace GameEngine {
 		}
 	}
 
-	class ScriptComponentManager : public Component {
+	class ScriptComponentManager {
 	public:
 		template<typename T>
 		void registerScriptComponent() {
