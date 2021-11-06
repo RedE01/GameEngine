@@ -46,6 +46,10 @@ namespace GameEngine {
 		eventHandler(&gameEndEvent);
 	}
 
+	Window* Application::getWindow() const {
+		return m_window.get();
+	}
+
 	Scene* Application::getScene() const {
 		return m_scene.get();
 	}

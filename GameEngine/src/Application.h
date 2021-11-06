@@ -21,6 +21,7 @@ namespace GameEngine {
 		virtual void onUpdate() = 0;
 		virtual void onRender() = 0;
 
+		Window* getWindow() const;
 		Scene* getScene() const;
 		AssetManager* getAssetManager() const;
 
