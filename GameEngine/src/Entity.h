@@ -52,8 +52,6 @@ namespace GameEngine {
 	private:
 		entityid m_entityID = entt::null;
 		entt::registry* m_entityRegistry;
-
-		friend class Scene;
 	};
 
 }
