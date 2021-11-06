@@ -10,12 +10,38 @@ namespace GameEngine {
     public:
         TransformComponent();
 
-        Matrix4 getMatrix();
+        Vector3 getPosition() const;
+        Quaternion getOrientation() const;
+        Vector3 getOrientationEuler() const;
+        Vector3 getScale() const;
 
-    public:
-        Vector3 position;
-        Quaternion rotation;
-        Vector3 scale;
+        void setPosition(Vector3 position);
+        void setOrientation(Quaternion orientation);
+        void setOrientation(Vector3 eulerAngles);
+        void setScale(Vector3 scale);
+
+        void move(Vector3 movement);
+        void moveX(float x);
+        void moveY(float y);
+        void moveZ(float z);
+
+        void rotate(Quaternion quaternion);
+        void rotate(Vector3 rotation);
+        void rotateX(float x);
+        void rotateY(float y);
+        void rotateZ(float z);
+
+        void scale(Vector3 scale);
+        void scaleX(float x);
+        void scaleY(float y);
+        void scaleZ(float z);
+
+        Matrix4 getMatrix() const;
+
+    private:
+        Vector3 m_position;
+        Quaternion m_orientation;
+        Vector3 m_scale;
     };
 
 }
