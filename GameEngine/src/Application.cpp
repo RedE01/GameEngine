@@ -5,7 +5,7 @@
 #include "Scene.h"
 #include "Components/ScriptComponentManager.h"
 #include "Assets/AssetManager.h"
-#include "Events/Event.h"
+#include "Events/ApplicationEvent.h"
 
 namespace GameEngine {
 
@@ -26,6 +26,9 @@ namespace GameEngine {
 	void Application::run() {
 		registerScriptComponents(m_scriptComponentManager.get());
 
+		GameStartEvent gameStartEvent;
+		eventHandler(&gameStartEvent);
+
 		while(m_running) {
 			Input::Update(m_window->getWindowSize());
 
@@ -38,6 +41,9 @@ namespace GameEngine {
 			m_window->pollEvents();
 			m_window->swapBuffers();
 		}
+
+		GameEndEvent gameEndEvent;
+		eventHandler(&gameEndEvent);
 	}
 
 	Scene* Application::getScene() const {

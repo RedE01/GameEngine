@@ -3,6 +3,20 @@
 
 namespace GameEngine {
 
+	class GameStartEvent : public Event {
+	public:
+		virtual EventType getEventType() const override { return EventType::GameStart; }
+		virtual std::string getName() const override { return "GameStart"; }
+		virtual int getCategoryFlags() const override { return (int)EventCategory::Application; }
+	};
+
+	class GameEndEvent : public Event {
+	public:
+		virtual EventType getEventType() const override { return EventType::GameEnd; }
+		virtual std::string getName() const override { return "GameEnd"; }
+		virtual int getCategoryFlags() const override { return (int)EventCategory::Application; }
+	};
+
 	class WindowCloseEvent : public Event {
 	public:
 		virtual EventType getEventType() const override { return EventType::WindowClose; }
