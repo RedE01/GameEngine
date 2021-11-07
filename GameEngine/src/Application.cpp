@@ -39,6 +39,7 @@ namespace GameEngine {
 
 		while(m_running) {
 			Input::Update(m_window->getWindowSize());
+			m_window->pollEvents();
 
 			#ifndef GAME_ENGINE_EDITOR
 			m_scene->update(m_scriptComponentManager.get());
@@ -54,7 +55,6 @@ namespace GameEngine {
 			m_renderer->renderEntities(m_scene->m_entityRegistry, m_editor->getEditorCamera());
 			#endif
 
-			m_window->pollEvents();
 			m_window->swapBuffers();
 		}
 
