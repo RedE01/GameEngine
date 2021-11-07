@@ -60,7 +60,7 @@ namespace GameEngine {
 	}
 
 	Matrix4 Camera::getViewMatrix() const {
-        Matrix4 matrix = glm::toMat4(- orientation);
+        Matrix4 matrix = glm::toMat4(glm::conjugate(orientation));
         matrix = glm::translate(matrix, - position);
 
         return matrix;
