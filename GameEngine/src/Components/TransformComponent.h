@@ -20,10 +20,10 @@ namespace GameEngine {
         void setOrientation(Vector3 eulerAngles);
         void setScale(Vector3 scale);
 
-        void move(Vector3 movement);
-        void moveX(float x);
-        void moveY(float y);
-        void moveZ(float z);
+        void move(Vector3 movement, bool localSpace = false);
+        void moveX(float x, bool localSpace = false);
+        void moveY(float y, bool localSpace = false);
+        void moveZ(float z, bool localSpace = false);
 
         void rotate(Quaternion quaternion);
         void rotate(Vector3 rotation);

@@ -40,20 +40,43 @@ namespace GameEngine {
         m_scale = scale;
     }
 
-    void TransformComponent::move(Vector3 movement) {
-        m_position += movement;
+    Quaternion qmul(Quaternion q1, Quaternion q2) {
+        float w1 = q1.w;
+        float x1 = q1.x;
+        float y1 = q1.y;
+        float z1 = q1.z;
+
+        float w2 = q2.w;
+        float x2 = q2.x;
+        float y2 = q2.y;
+        float z2 = q2.z;
+
+        float rw = w1*w2 - x1*x2 - y1*y2 - z1*z2;
+        float rx = w1*x2 + x1*w2 + y1*z2 - z1*y2;
+        float ry = w1*y2 - x1*z2 + y1*w2 + z1*x2;
+        float rz = w1*z2 + x1*y2 - y1*x2 + z1*w2;
+
+        return Quaternion(rw, rx, ry, rz);
     }
 
-    void TransformComponent::moveX(float x) {
-        m_position.x += x;
+    void TransformComponent::move(Vector3 movement, bool localSpace) {
+        if(localSpace) m_position += m_orientation * movement;
+        else m_position += movement;
     }
 
-    void TransformComponent::moveY(float y) {
-        m_position.y += y;
+    void TransformComponent::moveX(float x, bool localSpace) {
+        if(localSpace) m_position += m_orientation * Vector3(x, 0.0, 0.0);
+        else m_position.x += x;
     }
 
-    void TransformComponent::moveZ(float z) {
-        m_position.z += z;
+    void TransformComponent::moveY(float y, bool localSpace) {
+        if(localSpace) m_position += m_orientation * Vector3(0.0, y, 0.0);
+        else m_position.y += y;
+    }
+
+    void TransformComponent::moveZ(float z, bool localSpace) {
+        if(localSpace) m_position += m_orientation * Vector3(0.0, 0.0, z);
+        else m_position.z += z;
     }
 
     void TransformComponent::rotate(Quaternion quaternion) {
@@ -61,7 +84,7 @@ namespace GameEngine {
     }
 
     void TransformComponent::rotate(Vector3 rotation) {
-        m_orientation *= Quaternion(rotation);
+        rotate(Quaternion(rotation));
     }
 
     void TransformComponent::rotateX(float x) {
@@ -78,6 +101,18 @@ namespace GameEngine {
 
     void TransformComponent::scale(Vector3 scale) {
         m_scale *= scale;
+    }
+
+    void TransformComponent::scaleX(float x) {
+        m_scale.x *= x;
+    }
+
+    void TransformComponent::scaleY(float y) {
+        m_scale.y *= y;
+    }
+
+    void TransformComponent::scaleZ(float z) {
+        m_scale.z *= z;
     }
 
     Matrix4 TransformComponent::getMatrix() const {
