@@ -1,5 +1,4 @@
 #include "Renderer.h"
-#include "../Scene.h"
 #include "../Components/MeshRendererComponent.h"
 #include "../Components/TransformComponent.h"
 #include "Model.h"
@@ -27,18 +26,20 @@ namespace GameEngine {
 		glEnable(GL_FRAMEBUFFER_SRGB); // Temporary
 	}
 
-	void Renderer::renderFrame(Scene* scene, Camera* camera) {
+	void Renderer::beginFrame() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
 
-		if(scene != nullptr && camera != nullptr) {
-			auto meshRendererView = scene->m_entityRegistry.view<MeshRendererComponent>();
-			for(auto& entity : meshRendererView) {
-				auto& meshRendererComponent = meshRendererView.get<MeshRendererComponent>(entity);
-				auto& transformComponent = scene->m_entityRegistry.get<TransformComponent>(entity);
+	void Renderer::renderEntities(entt::registry& entityRegistry, Camera* camera) {
+		if(camera == nullptr) return;
 
-				if(meshRendererComponent.model) {
-					renderModel(meshRendererComponent.model.get(), transformComponent, camera);
-				}
+		auto meshRendererView = entityRegistry.view<MeshRendererComponent>();
+		for(auto& entity : meshRendererView) {
+			auto& meshRendererComponent = meshRendererView.get<MeshRendererComponent>(entity);
+			auto& transformComponent = entityRegistry.get<TransformComponent>(entity);
+
+			if(meshRendererComponent.model) {
+				renderModel(meshRendererComponent.model.get(), transformComponent, camera);
 			}
 		}
 	}

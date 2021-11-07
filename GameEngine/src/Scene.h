@@ -21,7 +21,6 @@ namespace GameEngine {
 		entt::registry m_entityRegistry;
 
 		friend class Application;
-		friend class Renderer;
 	};
 
 }

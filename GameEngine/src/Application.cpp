@@ -35,7 +35,8 @@ namespace GameEngine {
 			m_scene->update(m_scriptComponentManager.get());
 			onUpdate();
 
-			m_renderer->renderFrame(m_scene.get(), m_scene->getActiveCamera());
+			m_renderer->beginFrame();
+			m_renderer->renderEntities(m_scene->m_entityRegistry, m_scene->getActiveCamera());
 			onRender();
 
 			m_window->pollEvents();
