@@ -7,6 +7,10 @@
 #include "Assets/AssetManager.h"
 #include "Events/ApplicationEvent.h"
 
+#ifdef GAME_ENGINE_EDITOR
+#include "Editor/Editor.h"
+#endif
+
 namespace GameEngine {
 
 	Application::Application(const std::string& name) {
@@ -15,6 +19,10 @@ namespace GameEngine {
 		m_scene = std::make_unique<Scene>();
 		m_scriptComponentManager = std::make_unique<ScriptComponentManager>();
 		m_assetManager = std::make_unique<AssetManager>();
+
+		#ifdef GAME_ENGINE_EDITOR
+		m_editor = std::make_unique<Editor>(getWindow()->getWindowSize());
+		#endif
 
 		m_window->setEventFunction(std::bind(&Application::eventHandler, this, std::placeholders::_1));
 	}
@@ -32,12 +40,19 @@ namespace GameEngine {
 		while(m_running) {
 			Input::Update(m_window->getWindowSize());
 
+			#ifndef GAME_ENGINE_EDITOR
 			m_scene->update(m_scriptComponentManager.get());
 			onUpdate();
 
 			m_renderer->beginFrame();
 			m_renderer->renderEntities(m_scene->m_entityRegistry, m_scene->getActiveCamera());
 			onRender();
+			#else
+			m_editor->update();
+
+			m_renderer->beginFrame();
+			m_renderer->renderEntities(m_scene->m_entityRegistry, m_editor->getEditorCamera());
+			#endif
 
 			m_window->pollEvents();
 			m_window->swapBuffers();
@@ -70,6 +85,10 @@ namespace GameEngine {
 			else if(event->getEventType() == EventType::WindowResize) {
 				m_renderer->setViewportSize(getWindow()->getWindowSize());
 				m_scene->updateCameras(m_window->getWindowSize().x, m_window->getWindowSize().y);
+
+				#ifdef GAME_ENGINE_EDITOR
+				m_editor->updateEditorCameraViewportSize(getWindow()->getWindowSize());
+				#endif
 			}
 		}
 	}
