@@ -4,7 +4,7 @@
 namespace GameEngine {
 
     TransformComponent::TransformComponent() 
-        : m_position(0.0, 0.0, 0.0), m_orientation(0.0, 0.0, 0.0, 1.0), m_scale(1.0, 1.0, 1.0) {
+        : m_position(0.0, 0.0, 0.0), m_orientation(1.0, 0.0, 0.0, 0.0), m_scale(1.0, 1.0, 1.0) {
 
     }
 
