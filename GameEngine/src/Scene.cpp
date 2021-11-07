@@ -5,6 +5,8 @@
 
 namespace GameEngine {
 
+	CameraComponent* getActiveCameraComponent(entt::registry& registry);
+
 	Entity Scene::createEntity() {
 		entt::entity entity = m_entityRegistry.create();
 		
@@ -18,8 +20,18 @@ namespace GameEngine {
 		m_entityRegistry.destroy(entity.getID());
 	}
 
+	Camera* Scene::getActiveCamera() {
+		CameraComponent* cameraComponent = getActiveCameraComponent(m_entityRegistry);
+
+		if(cameraComponent != nullptr) return &(cameraComponent->getCamera());
+		return nullptr;
+	}
+
 	void Scene::update(ScriptComponentManager* scriptComponentManager) {
 		scriptComponentManager->updateScriptComponents(m_entityRegistry);
+
+		CameraComponent* cameraComponent = getActiveCameraComponent(m_entityRegistry);
+		if(cameraComponent != nullptr) cameraComponent->updateCamera();
 	}
 
 	void Scene::updateCameras(float windowWidth, float windowHeight) {
@@ -28,7 +40,21 @@ namespace GameEngine {
 		for(auto& entity : cameraView) {
 			CameraComponent& cameraComponent = cameraView.get<CameraComponent>(entity);
 
-			cameraComponent.setSize(Vector2(windowWidth, windowHeight));
+			cameraComponent.getCamera().setSize(Vector2(windowWidth, windowHeight));
 		}
+	}
+
+	CameraComponent* getActiveCameraComponent(entt::registry& registry) {
+		auto cameraView = registry.view<CameraComponent>();
+
+		for(auto& entity : cameraView) {
+			CameraComponent& cameraComponent = cameraView.get<CameraComponent>(entity);
+
+			if(cameraComponent.getCamera().isActive) {
+				return &cameraComponent;
+			}
+		}
+
+		return nullptr;
 	}
 }
