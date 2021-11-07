@@ -14,7 +14,7 @@ namespace GameEngine {
 
 	void renderModel(Model& model, TransformComponent& transform, Camera* camera);
 
-	Renderer::Renderer() {
+	Renderer::Renderer(Vector2 viewportSize) {
 		if(glewInit() != GLEW_OK) return;
 
 		glEnable(GL_CULL_FACE);
@@ -24,6 +24,8 @@ namespace GameEngine {
 		glEnable(GL_DEPTH_TEST);
 
 		glEnable(GL_FRAMEBUFFER_SRGB); // Temporary
+
+		setViewportSize(viewportSize);
 	}
 
 	void Renderer::beginFrame() {
@@ -42,6 +44,10 @@ namespace GameEngine {
 				renderModel(meshRendererComponent.model.get(), transformComponent, camera);
 			}
 		}
+	}
+
+	void Renderer::setViewportSize(Vector2 viewportSize) {
+		glViewport(0, 0, viewportSize.x, viewportSize.y);
 	}
 
 	void renderModel(Model& model, TransformComponent& transform, Camera* camera) {

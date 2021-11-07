@@ -11,7 +11,7 @@ namespace GameEngine {
 
 	Application::Application(const std::string& name) {
 		m_window = std::make_unique<Window>(name, 640, 480);
-		m_renderer = std::make_unique<Renderer>();
+		m_renderer = std::make_unique<Renderer>(getWindow()->getWindowSize());
 		m_scene = std::make_unique<Scene>();
 		m_scriptComponentManager = std::make_unique<ScriptComponentManager>();
 		m_assetManager = std::make_unique<AssetManager>();
@@ -68,6 +68,7 @@ namespace GameEngine {
 				m_running = false;
 			}
 			else if(event->getEventType() == EventType::WindowResize) {
+				m_renderer->setViewportSize(getWindow()->getWindowSize());
 				m_scene->updateCameras(m_window->getWindowSize().x, m_window->getWindowSize().y);
 			}
 		}
