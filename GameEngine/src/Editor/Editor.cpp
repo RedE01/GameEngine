@@ -2,6 +2,7 @@
 #include "../Entity.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/CameraComponent.h"
+#include "Components/CameraController.h"
 #include <cassert>
 
 namespace GameEngine {
@@ -10,6 +11,7 @@ namespace GameEngine {
 		Entity cameraEntity = Entity(&m_editorEntityRegistry, m_editorEntityRegistry.create());
 		cameraEntity.addComponent<TransformComponent>();
 		cameraEntity.addComponent<CameraComponent>(ProjectionType::Perspective, glm::radians(45.0f), viewportSize);
+		cameraEntity.addComponent<CameraController>();
 	}
 
 	Editor::~Editor() {
@@ -17,11 +19,13 @@ namespace GameEngine {
 	}
 
 	void Editor::update() {
-		auto cameraView = m_editorEntityRegistry.view<CameraComponent>();
-		for(auto entity : cameraView) {
-			CameraComponent& cameraComponent = cameraView.get<CameraComponent>(entity);
+		m_editorEntityRegistry.view<CameraController>().each([](CameraController& cameraController){
+			cameraController.update();
+		});
+
+		m_editorEntityRegistry.view<CameraComponent>().each([](CameraComponent& cameraComponent){
 			cameraComponent.updateCamera();
-		}
+		});
 	}
 
 	Camera* Editor::getEditorCamera() {
