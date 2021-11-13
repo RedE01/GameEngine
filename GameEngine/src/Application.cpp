@@ -38,7 +38,7 @@ namespace GameEngine {
 		eventHandler(&gameStartEvent);
 
 		while(m_running) {
-			Input::Update(m_window->getWindowSize());
+			Input::Update(m_window.get());
 			m_window->pollEvents();
 
 			#ifndef GAME_ENGINE_EDITOR

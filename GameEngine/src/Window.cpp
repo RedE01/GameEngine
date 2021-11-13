@@ -53,6 +53,23 @@ namespace GameEngine {
 		m_data.eventFunction = eventFunction;
 	}
 
+	void Window::setCursorMode(CursorMode cursorMode) {
+		int cursorModeInt;
+		switch(cursorMode) {
+		case CursorMode::Normal: cursorModeInt = GLFW_CURSOR_NORMAL; break;
+		case CursorMode::Hidden: cursorModeInt = GLFW_CURSOR_HIDDEN; break;
+		case CursorMode::Disabled: cursorModeInt = GLFW_CURSOR_DISABLED; break;
+		}
+
+		glfwSetInputMode(m_window, GLFW_CURSOR, cursorModeInt);
+		
+		m_cursorMode = cursorMode;
+	}
+
+	CursorMode Window::getCursorMode() const {
+		return m_cursorMode;
+	}
+
 	void Window::setEventCallbackFunctions() {
 		glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
 			windowData& data = *(windowData*)glfwGetWindowUserPointer(window);

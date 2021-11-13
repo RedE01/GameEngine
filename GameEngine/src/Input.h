@@ -23,9 +23,9 @@ namespace GameEngine {
 		float GetMouseDeltaX();
 		float GetMouseDeltaY();
 
-		void SetCursorMode(const int& cursorMode);
+		void SetCursorMode(CursorMode cursorMode);
 
 		void HandleEvent(Event* e);
-		void Update(Vector2i viewportSize);
+		void Update(Window* window);
 	}
 }

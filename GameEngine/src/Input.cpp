@@ -3,7 +3,6 @@
 #include "Events/MouseEvent.h"
 #include "Window.h"
 
-#include <GLFW/glfw3.h>
 #include <algorithm>
 #include <cstring>
 
@@ -21,7 +20,7 @@ namespace GameEngine {
 	bool g_mouseKeys[toInt(MOUSE_BUTTON_LAST) + 1] = { false };
 	bool g_mouseKeysPrevious[toInt(MOUSE_BUTTON_LAST) + 1] = { false };
 	Vector2i g_viewportSize = Vector2i(0, 0);
-	Window* m_window = nullptr;
+	CursorMode g_cursorMode = CursorMode::Normal;
 
 	bool Input::GetKeyDown(const Key& key) {
 		return g_keys[toInt(key)] && !g_keysPrevious[toInt(key)];
@@ -75,8 +74,8 @@ namespace GameEngine {
 		return g_mousePos.y - g_prevMousePos.y;
 	}
 
-	void Input::SetCursorMode(const int& cursorMode) {
-		glfwSetInputMode(m_window->getWindow(), GLFW_CURSOR, cursorMode);
+	void Input::SetCursorMode(CursorMode cursorMode) {
+		g_cursorMode = cursorMode;
 	}
 
 	void Input::HandleEvent(Event* e) {
@@ -109,8 +108,14 @@ namespace GameEngine {
 		}
 	}
 
-	void Input::Update(Vector2i viewportSize) {
-		g_viewportSize = viewportSize;
+	void Input::Update(Window* window) {
+		if(window == nullptr) return;
+
+		if(window->getCursorMode() != g_cursorMode) {
+			window->setCursorMode(g_cursorMode);
+		}
+
+		g_viewportSize = window->getWindowSize();
 
 		std::memcpy(g_keysPrevious, g_keys, toInt(KEY_LAST));
 		std::memcpy(g_mouseKeysPrevious, g_mouseKeys, toInt(MOUSE_BUTTON_LAST));

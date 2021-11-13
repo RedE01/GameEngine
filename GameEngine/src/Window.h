@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Vector.h"
+#include "InputDefines.h"
 #include <string>
 #include <functional>
 
@@ -21,6 +22,8 @@ namespace GameEngine {
 
 		GLFWwindow* getWindow() const; 
 		void setEventFunction(std::function<void(Event*)> eventFunction);
+		void setCursorMode(CursorMode cursorMode);
+		CursorMode getCursorMode() const;
 		
 	private:
 		void setEventCallbackFunctions();
@@ -36,5 +39,6 @@ namespace GameEngine {
 		};
 
 		windowData m_data;
+		CursorMode m_cursorMode = CursorMode::Normal;
 	};
 }

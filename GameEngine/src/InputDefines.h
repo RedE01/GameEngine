@@ -29,7 +29,7 @@ namespace GameEngine {
 	};
 	#define MOUSE_BUTTON_LAST MouseButton::MB8
 
-	enum class CursorType {
+	enum class CursorMode {
 		Normal, Hidden, Disabled
 	};
 }
