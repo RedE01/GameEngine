@@ -1,5 +1,6 @@
 #pragma once
 #include "Event.h"
+#include "../InputDefines.h"
 
 namespace GameEngine {
 
@@ -15,24 +16,25 @@ namespace GameEngine {
 		double xpos, ypos;
 	};
 
-	class MouseButton : public Event {
+	class MouseButtonEvent : public Event {
 	public:
-		MouseButton(int button, int mod) : button(button), mod(mod) {}
+		MouseButtonEvent(MouseButton button, int mod) : button(button), mod(mod) {}
 	public:
-		int button, mod;
+		MouseButton button;
+		int mod;
 	};
 
-	class MouseButtonPressed : public MouseButton {
+	class MouseButtonPressed : public MouseButtonEvent {
 	public:
-		MouseButtonPressed(int button, int mod) : MouseButton(button, mod) {}
+		MouseButtonPressed(MouseButton button, int mod) : MouseButtonEvent(button, mod) {}
 		virtual EventType getEventType() const override { return EventType::MouseButtonPressed; }
 		virtual std::string getName() const override { return "MouseButtonPressed"; }
 		virtual int getCategoryFlags() const override { return (int)EventCategory::Input + (int)EventCategory::Mouse + (int)EventCategory::MouseButton; }
 	};
 
-	class MouseButtonReleased : public MouseButton {
+	class MouseButtonReleased : public MouseButtonEvent {
 	public:
-		MouseButtonReleased(int button, int mod) : MouseButton(button, mod) {}
+		MouseButtonReleased(MouseButton button, int mod) : MouseButtonEvent(button, mod) {}
 		virtual EventType getEventType() const override { return EventType::MouseButtonReleased; }
 		virtual std::string getName() const override { return "MouseButtonReleased"; }
 		virtual int getCategoryFlags() const override { return (int)EventCategory::Input + (int)EventCategory::Mouse + (int)EventCategory::MouseButton; }

@@ -1,19 +1,21 @@
 #pragma once
 #include "Event.h"
+#include "../InputDefines.h"
 
 namespace GameEngine {
 
 	class KeyboardEvent : public Event {
 	public:
-		KeyboardEvent(int keycode, int scancode, int mod) : keycode(keycode), scancode(scancode), mod(mod) {}
+		KeyboardEvent(Key key, int scancode, int mod) : key(key), scancode(scancode), mod(mod) {}
 
 	public:
-		int keycode, scancode, mod;
+		Key key;
+		int scancode, mod;
 	};
 
 	class KeyPress : public KeyboardEvent {
 	public:
-		KeyPress(int keycode, int scancode, int mod) : KeyboardEvent(keycode, scancode, mod) {}
+		KeyPress(Key key, int scancode, int mod) : KeyboardEvent(key, scancode, mod) {}
 
 		virtual EventType getEventType() const override { return EventType::KeyPress; }
 		virtual std::string getName() const override { return "KeyPress"; }
@@ -22,7 +24,7 @@ namespace GameEngine {
 
 	class KeyReleased : public KeyboardEvent {
 	public:
-		KeyReleased(int keycode, int scancode, int mod) : KeyboardEvent(keycode, scancode, mod) {}
+		KeyReleased(Key key, int scancode, int mod) : KeyboardEvent(key, scancode, mod) {}
 
 		virtual EventType getEventType() const override { return EventType::KeyReleased; }
 		virtual std::string getName() const override { return "KeyReleased"; }
@@ -31,7 +33,7 @@ namespace GameEngine {
 
 	class KeyTyped : public KeyboardEvent {
 	public:
-		KeyTyped(int keycode, int scancode, int mod) : KeyboardEvent(keycode, scancode, mod) {}
+		KeyTyped(Key key, int scancode, int mod) : KeyboardEvent(key, scancode, mod) {}
 
 		virtual EventType getEventType() const override { return EventType::KeyTyped; }
 		virtual std::string getName() const override { return "KeyTyped"; }

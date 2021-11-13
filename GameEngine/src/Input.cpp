@@ -9,51 +9,38 @@
 
 namespace GameEngine {
 
-	bool g_keys[KEY_LAST + 1] = { false };
-	bool g_keysPrevious[KEY_LAST + 1] = { false };
+	template <typename T>
+	constexpr int toInt(T v) noexcept {
+		return static_cast<int>(v);
+	}
+
+	bool g_keys[toInt(KEY_LAST) + 1] = { false };
+	bool g_keysPrevious[toInt(KEY_LAST) + 1] = { false };
 	Vector2 g_mousePos = Vector2(0, 0);
 	Vector2 g_prevMousePos = Vector2(0, 0);
-	bool g_mouseKeys[MOUSE_BUTTON_LAST + 1] = { false };
-	bool g_mouseKeysPrevious[MOUSE_BUTTON_LAST + 1] = { false };
+	bool g_mouseKeys[toInt(MOUSE_BUTTON_LAST) + 1] = { false };
+	bool g_mouseKeysPrevious[toInt(MOUSE_BUTTON_LAST) + 1] = { false };
 	Vector2i g_viewportSize = Vector2i(0, 0);
 	Window* m_window = nullptr;
 
-	bool Input::GetKeyDown(const int& keycode) {
-		if(keycode < 0 || keycode > KEY_LAST) {
-			return false;
-		}
-
-		return g_keys[keycode] && !g_keysPrevious[keycode];
+	bool Input::GetKeyDown(const Key& key) {
+		return g_keys[toInt(key)] && !g_keysPrevious[toInt(key)];
 	}
 
-	bool Input::GetKey(const int& keycode) {
-		if(keycode < 0 || keycode > KEY_LAST) {
-			return false;
-		}
-
-		return g_keys[keycode];
+	bool Input::GetKey(const Key& key) {
+		return g_keys[toInt(key)];
 	}
 
-	bool Input::GetKeyUp(const int& keycode) {
-		if (keycode < 0 || keycode > KEY_LAST) {
-			return false;
-		}
-
-		return !g_keys[keycode] && g_keysPrevious[keycode];
+	bool Input::GetKeyUp(const Key& key) {
+		return !g_keys[toInt(key)] && g_keysPrevious[toInt(key)];
 	}
 
-	bool Input::GetMouseKeyDown(const int& keycode) {
-		if(keycode < 0 || keycode > MOUSE_BUTTON_LAST) {
-			return false;
-		}
-		return g_mouseKeys[keycode] && !g_mouseKeysPrevious[keycode];
+	bool Input::GetMouseButtonDown(const MouseButton& button) {
+		return g_mouseKeys[toInt(button)] && !g_mouseKeysPrevious[toInt(button)];
 	}
 
-	bool Input::GetMouseKey(const int& keycode) {
-		if(keycode < 0 || keycode > MOUSE_BUTTON_LAST) {
-			return false;
-		}
-		return g_mouseKeys[keycode];
+	bool Input::GetMouseButton(const MouseButton& button) {
+		return g_mouseKeys[toInt(button)];
 	}
 
 	Vector2 Input::GetMousePosition() {
@@ -95,15 +82,12 @@ namespace GameEngine {
 	void Input::HandleEvent(Event* e) {
 		if(e->isInCategory(EventCategory::Keyboard)) {
 			KeyboardEvent* keyEvent = (KeyboardEvent*)e;
-			if(keyEvent->keycode < 0 || keyEvent->keycode > KEY_LAST) {
-				return;
-			}
 
 			if(keyEvent->getEventType() == EventType::KeyPress) {
-				g_keys[keyEvent->keycode] = 1;
+				g_keys[toInt(keyEvent->key)] = 1;
 			}
 			else if(keyEvent->getEventType() == EventType::KeyReleased) {
-				g_keys[keyEvent->keycode] = 0;
+				g_keys[toInt(keyEvent->key)] = 0;
 			}
 		}
 		else if(e->isInCategory(EventCategory::Mouse)) {
@@ -114,12 +98,12 @@ namespace GameEngine {
 				g_mousePos.y = mouseMovedEvent->ypos;
 			}
 			else if(e->isInCategory(EventCategory::MouseButton)) {
-				MouseButton* mouseEvent = (MouseButton*)e;
+				MouseButtonEvent* mouseEvent = (MouseButtonEvent*)e;
 				if(mouseEvent->getEventType() == EventType::MouseButtonPressed) {
-					g_mouseKeys[mouseEvent->button] = 1;
+					g_mouseKeys[toInt(mouseEvent->button)] = 1;
 				}
 				else if(mouseEvent->getEventType() == EventType::MouseButtonReleased) {
-					g_mouseKeys[mouseEvent->button] = 0;
+					g_mouseKeys[toInt(mouseEvent->button)] = 0;
 				}
 			}
 		}
@@ -128,8 +112,8 @@ namespace GameEngine {
 	void Input::Update(Vector2i viewportSize) {
 		g_viewportSize = viewportSize;
 
-		std::memcpy(g_keysPrevious, g_keys, KEY_LAST);
-		std::memcpy(g_mouseKeysPrevious, g_mouseKeys, MOUSE_BUTTON_LAST);
+		std::memcpy(g_keysPrevious, g_keys, toInt(KEY_LAST));
+		std::memcpy(g_mouseKeysPrevious, g_mouseKeys, toInt(MOUSE_BUTTON_LAST));
 
 		g_prevMousePos = g_mousePos;
 	}

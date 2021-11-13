@@ -1,19 +1,19 @@
 #pragma once
 #include <iostream>
 #include "Math/Vector.h"
-#include "Keycodes.h"
+#include "InputDefines.h"
 
 namespace GameEngine {
 	class Event;
 	class Window;
 
 	namespace Input {
-		bool GetKeyDown(const int& keycode);
-		bool GetKey(const int& keycode);
-		bool GetKeyUp(const int& keycode);
+		bool GetKeyDown(const Key& key);
+		bool GetKey(const Key& key);
+		bool GetKeyUp(const Key& key);
 
-		bool GetMouseKeyDown(const int& keycode);
-		bool GetMouseKey(const int& keycode);
+		bool GetMouseButtonDown(const MouseButton& button);
+		bool GetMouseButton(const MouseButton& button);
 		Vector2 GetMousePosition();
 		Vector2 GetMouseViewportPositon();
 		Vector2 GetMouseDelta();

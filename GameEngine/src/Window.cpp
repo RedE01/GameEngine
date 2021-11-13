@@ -87,8 +87,9 @@ namespace GameEngine {
 			}
 		});
 
-		glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mod) {
+		glfwSetKeyCallback(m_window, [](GLFWwindow* window, int keyInt, int scancode, int action, int mod) {
 			windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+			Key key = static_cast<Key>(keyInt);
 
 			if(data.eventFunction) {
 				if(action == GLFW_PRESS) {
@@ -115,8 +116,9 @@ namespace GameEngine {
 			}
 		});
 
-		glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods) {
+		glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int buttonInt, int action, int mods) {
 			windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+			MouseButton button = static_cast<MouseButton>(buttonInt);
 
 			if(data.eventFunction) {
 				if(action == GLFW_PRESS) {
