@@ -4,6 +4,10 @@
 namespace GameEngine {
 
     class Component {
+    public:
+        virtual void init() {}
+        virtual void update() {}
+
     protected:
         Entity getEntity() const {
             return m_entity;

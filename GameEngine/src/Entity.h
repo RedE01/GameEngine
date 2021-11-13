@@ -22,6 +22,7 @@ namespace GameEngine {
 			ComponentType& component = m_entityRegistry->emplace<ComponentType>(m_entityID, std::forward<Args>(args)...);
 
 			initComponent((Component*)&component);
+			component.init();
 			
 			return component;
 		}
