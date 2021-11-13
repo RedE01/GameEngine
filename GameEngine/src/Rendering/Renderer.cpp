@@ -66,6 +66,8 @@ namespace GameEngine {
 				mesh->material->shader->setUniformMat4("u_viewMatrix", camera->getViewMatrix());
 				mesh->material->shader->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
 
+				mesh->material->shader->setUniform3f("u_cameraPos", camera->position.x, camera->position.y, camera->position.z);
+
 				mesh->bind();
 
 				glDrawElements(GL_TRIANGLES, mesh->getIndexCount(), GL_UNSIGNED_INT, 0);
