@@ -91,6 +91,10 @@ namespace GameEngine {
         bind();
         internal::OpenGLTextureFormats openGLformats = internal::getOpenGLTextureFormats(textureFormat);
 
+        if(textureFormat == TextureFormat::DEPTH_STENCIL) {
+            type = GL_UNSIGNED_INT_24_8;
+        }
+
         glTexImage2D(m_textureTypeID, 0, openGLformats.internalFormat, width, height, 0, openGLformats.format, type, data);
         m_textureFormat = textureFormat;
         m_width = width;
