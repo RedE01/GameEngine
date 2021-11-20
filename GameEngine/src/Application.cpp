@@ -54,6 +54,7 @@ namespace GameEngine {
 			m_renderer->beginFrame();
 			m_renderer->renderEntities(m_scene->m_entityRegistry, m_editor->getEditorCamera());
 			#endif
+			m_renderer->endFrame();
 
 			m_window->swapBuffers();
 		}

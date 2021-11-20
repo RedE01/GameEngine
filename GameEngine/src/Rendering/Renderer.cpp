@@ -5,7 +5,14 @@
 #include "Material.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Framebuffer.h"
+#include "VertexArrayObject.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "Renderbuffer.h"
+#include "RendererData.h"
 #include "Camera.h"
+#include "Debug.h"
 #include <GL/glew.h>
 
 #include <gtc/matrix_transform.hpp>
@@ -17,21 +24,41 @@ namespace GameEngine {
 	Renderer::Renderer(Vector2 viewportSize) {
 		if(glewInit() != GLEW_OK) return;
 
-		glEnable(GL_CULL_FACE);
 		initializeRendererDebugger();
 
+		m_rendererData = std::make_unique<RendererData>();
+
+		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		glFrontFace(GL_CCW);
 
 		glEnable(GL_DEPTH_TEST);
 
-		glEnable(GL_FRAMEBUFFER_SRGB); // Temporary
-
 		setViewportSize(viewportSize);
 	}
 
+	Renderer::~Renderer() {
+	}
+
 	void Renderer::beginFrame() {
+		m_rendererData->getFramebuffer()->bind();
+
+		glClearColor(0.1f, 1.0f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+	}
+
+	void Renderer::endFrame() {
+		m_rendererData->getFramebuffer()->unbind();
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glDisable(GL_DEPTH_TEST);
+
+		m_rendererData->getFrameShader()->useShader();
+		m_rendererData->getRenderQuadVAO()->bind();
+		m_rendererData->getFrameTexture()->bind();
+
+		glDrawElements(GL_TRIANGLES, m_rendererData->getRenderQuadIndexCount(), GL_UNSIGNED_INT, 0);
 	}
 
 	void Renderer::renderEntities(entt::registry& entityRegistry, Camera* camera) {
@@ -57,7 +84,7 @@ namespace GameEngine {
 			if(mesh && mesh->material && mesh->material->shader) {
 				mesh->material->shader->useShader();
 
-				glActiveTexture(0);
+				glActiveTexture(GL_TEXTURE0);
 				if(mesh->material->texture) {
 					mesh->material->texture->bind();
 				}
