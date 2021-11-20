@@ -1,10 +1,11 @@
 #include "Window.h"
-#include <GLFW/glfw3.h>
-#include <iostream>
-
+#include "Rendering/Debug.h"
 #include "Events/ApplicationEvent.h"
 #include "Events/KeyboardEvent.h"
 #include "Events/MouseEvent.h"
+
+#include <GLFW/glfw3.h>
+#include <iostream>
 
 namespace GameEngine {
 
@@ -13,6 +14,8 @@ namespace GameEngine {
 			std::cout << "Could not initialize glfw" << std::endl;
 			exit(EXIT_FAILURE);
 		}
+
+		enableRendererDebugging();
 
 		m_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 		if (!m_window) {

@@ -18,6 +18,8 @@ namespace GameEngine {
 		if(glewInit() != GLEW_OK) return;
 
 		glEnable(GL_CULL_FACE);
+		initializeRendererDebugger();
+
 		glCullFace(GL_BACK);
 		glFrontFace(GL_CCW);
 
