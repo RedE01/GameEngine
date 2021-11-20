@@ -41,7 +41,9 @@ namespace GameEngine {
 		"uniform sampler2D u_frameTexture;\n"
 		"\n"
 		"void main() {\n"
-		"    FragColor = textureCoords.x * texture(u_frameTexture, textureCoords);\n"
+		"    float gamma = 2.2;\n"
+        "    vec3 fragColor = texture(u_frameTexture, textureCoords).rgb;"
+		"    FragColor = vec4(pow(fragColor, vec3(1.0 / gamma)), 1.0);\n"
 		"}\n"
 	);
 
