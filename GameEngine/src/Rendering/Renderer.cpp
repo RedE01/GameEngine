@@ -19,8 +19,6 @@
 
 namespace GameEngine {
 
-	void renderModel(Model& model, TransformComponent& transform, Camera* camera);
-
 	Renderer::Renderer(Vector2 viewportSize) {
 		if(glewInit() != GLEW_OK) return;
 
@@ -41,22 +39,29 @@ namespace GameEngine {
 	}
 
 	void Renderer::beginFrame() {
-		m_rendererData->getFramebuffer()->bind();
+		m_rendererData->getGBuffer()->bind();
 
-		glClearColor(0.1f, 1.0f, 0.1f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 	}
 
 	void Renderer::endFrame() {
-		m_rendererData->getFramebuffer()->unbind();
+		m_rendererData->getGBuffer()->unbind();
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
 
 		m_rendererData->getFrameShader()->useShader();
+		m_rendererData->getFrameShader()->setUniform1i("u_frameTexture", 1);
 		m_rendererData->getRenderQuadVAO()->bind();
-		m_rendererData->getFrameTexture()->bind();
+
+		glActiveTexture(GL_TEXTURE0);
+		m_rendererData->getGBufferPosition()->bind();
+		glActiveTexture(GL_TEXTURE1);
+		m_rendererData->getGBufferNormal()->bind();
+		glActiveTexture(GL_TEXTURE2);
+		m_rendererData->getGBufferAlbedo()->bind();
 
 		glDrawElements(GL_TRIANGLES, m_rendererData->getRenderQuadIndexCount(), GL_UNSIGNED_INT, 0);
 	}
@@ -70,7 +75,7 @@ namespace GameEngine {
 			auto& transformComponent = entityRegistry.get<TransformComponent>(entity);
 
 			if(meshRendererComponent.model) {
-				renderModel(meshRendererComponent.model.get(), transformComponent, camera);
+				renderModel(&meshRendererComponent.model.get(), &transformComponent, camera);
 			}
 		}
 	}
@@ -79,23 +84,21 @@ namespace GameEngine {
 		glViewport(0, 0, viewportSize.x, viewportSize.y);
 	}
 
-	void renderModel(Model& model, TransformComponent& transform, Camera* camera) {
-		for(auto& mesh : model.meshes) {
+	void Renderer::renderModel(Model* model, TransformComponent* transform, Camera* camera) {
+		for(auto& mesh : model->meshes) {
 			if(mesh && mesh->material && mesh->material->shader) {
-				mesh->material->shader->useShader();
+				m_rendererData->getGeometryPassShader()->useShader();
 
 				glActiveTexture(GL_TEXTURE0);
 				if(mesh->material->texture) {
 					mesh->material->texture->bind();
 				}
 
-				Matrix4 modelMat = transform.getMatrix();
+				Matrix4 modelMat = transform->getMatrix();
 
-				mesh->material->shader->setUniformMat4("u_modelMatrix", modelMat);
-				mesh->material->shader->setUniformMat4("u_viewMatrix", camera->getViewMatrix());
-				mesh->material->shader->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
-
-				mesh->material->shader->setUniform3f("u_cameraPos", camera->position.x, camera->position.y, camera->position.z);
+				m_rendererData->getGeometryPassShader()->setUniformMat4("u_modelMatrix", modelMat);
+				m_rendererData->getGeometryPassShader()->setUniformMat4("u_viewMatrix", camera->getViewMatrix());
+				m_rendererData->getGeometryPassShader()->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
 
 				mesh->bind();
 

@@ -24,6 +24,17 @@ namespace GameEngine {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    void Framebuffer::setDrawBuffers(unsigned int* colorAttachments, unsigned int nColorAttachments) {
+        bind();
+        
+        std::vector<unsigned int> glColorAttachments;
+        for(unsigned int i = 0; i < nColorAttachments; ++i) {
+            glColorAttachments.push_back(GL_COLOR_ATTACHMENT0 + colorAttachments[i]);
+        }
+
+        glDrawBuffers(nColorAttachments, glColorAttachments.data());
+    }
+
     void Framebuffer::attachTexture(Texture* texture, FramebufferAttachmentType type) {
         bind();
 

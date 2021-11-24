@@ -7,6 +7,8 @@ namespace GameEngine {
 
 	class Camera;
 	class RendererData;
+	class Model;
+	class TransformComponent;
 
 	class Renderer {
 	public:
@@ -18,6 +20,9 @@ namespace GameEngine {
 		void renderEntities(entt::registry& entityRegistry, Camera* camera);
 
 		void setViewportSize(Vector2 viewportSize);
+
+	private:
+		void renderModel(Model* model, TransformComponent* transform, Camera* camera);
 
 	private:
 		std::unique_ptr<RendererData> m_rendererData;

@@ -20,6 +20,7 @@ namespace GameEngine {
         void bind();
         void unbind();
 
+        void setDrawBuffers(unsigned int* colorAttachments, unsigned int nColorAttachments);
         void attachTexture(Texture* texture, FramebufferAttachmentType type);
         void attachRenderbuffer(Renderbuffer* renderbuffer, FramebufferAttachmentType type);
 
