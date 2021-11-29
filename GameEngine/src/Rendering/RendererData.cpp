@@ -152,9 +152,28 @@ namespace GameEngine {
 		m_gBufferFramebuffer->attachRenderbuffer(m_gBufferDepthStencil.get(), FramebufferAttachmentType::DepthStencil);
 
 		if(!m_gBufferFramebuffer->isComplete()) std::cout << "FRAMEBUFFER NOT COMPLETE!!" << std::endl;
+
+		// Initialize lighting-pass stuff
+		m_lightingFramebuffer = std::make_unique<Framebuffer>();
+		m_lightingFramebuffer->bind();
+
+		m_lightingTexture = std::make_unique<Texture>();
+		m_lightingTexture->textureImage2D(TextureFormat::RGBA16F, 640, 480, (unsigned char*)NULL);
+		m_lightingFramebuffer->attachTexture(m_lightingTexture.get(), FramebufferAttachmentType::Color0);
+
+		m_lightingDepthStencil = std::make_unique<Renderbuffer>();
+		m_lightingDepthStencil->bind();
+		m_lightingDepthStencil->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, 640, 480);
+		m_lightingFramebuffer->attachRenderbuffer(m_lightingDepthStencil.get(), FramebufferAttachmentType::DepthStencil);
+
+		if(!m_lightingFramebuffer->isComplete()) std::cout << "FRAMEBUFEFR NOT COMPLETE!" << std::endl;
 	}
 
 	RendererData::~RendererData() {
+	}
+
+	void RendererData::setDefaultShader(ShaderAsset defaultShader) {
+		m_lightingShader = defaultShader;
 	}
 
 	VertexArrayObject* RendererData::getRenderQuadVAO() const {
@@ -195,6 +214,18 @@ namespace GameEngine {
 
 	Texture* RendererData::getGBufferAlbedo() const {
 		return m_gBufferAlbedo.get();
+	}
+
+	ShaderAsset RendererData::getDefaultLightingShader() const {
+		return m_lightingShader;
+	}
+
+	Framebuffer* RendererData::getLightingFramebuffer() const {
+		return m_lightingFramebuffer.get();
+	}
+
+	Texture* RendererData::getLightingTexture() const {
+		return m_lightingTexture.get();
 	}
 
 }

@@ -41,27 +41,43 @@ namespace GameEngine {
 	void Renderer::beginFrame() {
 		m_rendererData->getGBufferFramebuffer()->bind();
 
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 	}
 
 	void Renderer::endFrame() {
-		m_rendererData->getGBufferFramebuffer()->unbind();
+		// Lighing pass
+		m_rendererData->getLightingFramebuffer()->bind();
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
 
-		m_rendererData->getPostProcessingShader()->useShader();
-		m_rendererData->getPostProcessingShader()->setUniform1i("u_frameTexture", 2);
 		m_rendererData->getRenderQuadVAO()->bind();
 
+		m_rendererData->getDefaultLightingShader()->useShader();
+		m_rendererData->getDefaultLightingShader()->setUniform1i("u_gPosition", 0);
+		m_rendererData->getDefaultLightingShader()->setUniform1i("u_gNormal", 1);
+		m_rendererData->getDefaultLightingShader()->setUniform1i("u_gAlbedo", 2);
 		glActiveTexture(GL_TEXTURE0);
 		m_rendererData->getGBufferPosition()->bind();
 		glActiveTexture(GL_TEXTURE1);
 		m_rendererData->getGBufferNormal()->bind();
 		glActiveTexture(GL_TEXTURE2);
 		m_rendererData->getGBufferAlbedo()->bind();
+
+		glDrawElements(GL_TRIANGLES, m_rendererData->getRenderQuadIndexCount(), GL_UNSIGNED_INT, 0);
+
+
+		// Post processing
+		m_rendererData->getLightingFramebuffer()->unbind();
+		glClear(GL_COLOR_BUFFER_BIT);
+		glDisable(GL_DEPTH_TEST);
+
+		m_rendererData->getPostProcessingShader()->useShader();
+		glActiveTexture(GL_TEXTURE0);
+		m_rendererData->getLightingTexture()->bind();
+		m_rendererData->getPostProcessingShader()->setUniform1i("u_frameTexture", 0);
 
 		glDrawElements(GL_TRIANGLES, m_rendererData->getRenderQuadIndexCount(), GL_UNSIGNED_INT, 0);
 	}
@@ -82,6 +98,10 @@ namespace GameEngine {
 
 	void Renderer::setViewportSize(Vector2 viewportSize) {
 		glViewport(0, 0, viewportSize.x, viewportSize.y);
+	}
+
+	void Renderer::setDefaultShader(ShaderAsset shaderAsset) {
+		m_rendererData->setDefaultShader(shaderAsset);
 	}
 
 	void Renderer::renderModel(Model* model, TransformComponent* transform, Camera* camera) {

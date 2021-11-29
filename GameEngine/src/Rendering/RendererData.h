@@ -1,4 +1,5 @@
 #pragma once
+#include "../Assets/AssetHandle.h"
 #include <memory>
 
 namespace GameEngine {
@@ -16,6 +17,8 @@ namespace GameEngine {
 		RendererData();
 		~RendererData();
 
+		void setDefaultShader(ShaderAsset defaultShader);
+
 		VertexArrayObject* getRenderQuadVAO() const;
 		unsigned int getRenderQuadIndexCount() const;
 
@@ -28,6 +31,10 @@ namespace GameEngine {
 		Texture* getGBufferPosition() const;
 		Texture* getGBufferNormal() const;
 		Texture* getGBufferAlbedo() const;
+
+		ShaderAsset getDefaultLightingShader() const;
+		Framebuffer* getLightingFramebuffer() const;
+		Texture* getLightingTexture() const;
 
 	private:
 		std::unique_ptr<VertexBuffer> m_renderQuadVBO;
@@ -45,6 +52,11 @@ namespace GameEngine {
 		std::unique_ptr<Texture> m_gBufferNormal;
 		std::unique_ptr<Texture> m_gBufferAlbedo;
 		std::unique_ptr<Renderbuffer> m_gBufferDepthStencil;
+
+		ShaderAsset m_lightingShader;
+		std::unique_ptr<Framebuffer> m_lightingFramebuffer;
+		std::unique_ptr<Texture> m_lightingTexture;
+		std::unique_ptr<Renderbuffer> m_lightingDepthStencil;
 	};
 
 }

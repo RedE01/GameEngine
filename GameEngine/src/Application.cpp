@@ -25,6 +25,9 @@ namespace GameEngine {
 		#endif
 
 		m_window->setEventFunction(std::bind(&Application::eventHandler, this, std::placeholders::_1));
+
+		ShaderAsset defaultShader = m_assetManager->load<Shader>("GameEngine/src/assets/shaders/default.glsl");
+		m_renderer->setDefaultShader(defaultShader);
 	}
 
 	Application::~Application() {

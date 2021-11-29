@@ -1,5 +1,6 @@
 #pragma once
 #include "../Math/Vector.h"
+#include "../Assets/AssetHandle.h"
 #include <entt/entity/registry.hpp>
 #include <memory>
 
@@ -20,6 +21,7 @@ namespace GameEngine {
 		void renderEntities(entt::registry& entityRegistry, Camera* camera);
 
 		void setViewportSize(Vector2 viewportSize);
+		void setDefaultShader(ShaderAsset shaderAsset);
 
 	private:
 		void renderModel(Model* model, TransformComponent* transform, Camera* camera);
