@@ -20,7 +20,7 @@ namespace GameEngine {
 		0, 1, 2, 2, 3, 0
 	};
 
-	const char* frameVertexShader = (
+	const char* postProcessingVertexShader = (
 		"#version 430 core\n"
 		"layout (location = 0) in vec2 aPos;\n"
 		"layout (location = 1) in vec2 aTextureCoords;\n"
@@ -33,7 +33,7 @@ namespace GameEngine {
 		"}\n"
 	);
 
-	const char* frameFragmentShader = (
+	const char* postProcessingFragmentShader = (
 		"#version 430 core\n"
 		"\n"
 		"out vec4 FragColor;\n"
@@ -91,25 +91,7 @@ namespace GameEngine {
 	);
 
 	RendererData::RendererData() {
-		m_frameShader = std::make_unique<Shader>(frameVertexShader, frameFragmentShader);
-		m_frameShader->useShader();
-		m_frameShader->setUniform1i("u_frameTexture", 0);
-
-		m_framebuffer = std::make_unique<Framebuffer>();
-		m_framebuffer->bind();
-
-		m_frameTexture = std::make_unique<Texture>();
-		m_frameTexture->bind();
-		m_frameTexture->textureImage2D(TextureFormat::RGBA16F, 640, 480, (unsigned char*)NULL);
-		m_framebuffer->attachTexture(m_frameTexture.get(), FramebufferAttachmentType::Color0);
-
-		m_frameDepthStencilRenderbuffer = std::make_unique<Renderbuffer>();
-		m_frameDepthStencilRenderbuffer->bind();
-		m_frameDepthStencilRenderbuffer->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, 640, 480);
-		m_framebuffer->attachRenderbuffer(m_frameDepthStencilRenderbuffer.get(), FramebufferAttachmentType::DepthStencil);
-
-		if(!m_framebuffer->isComplete()) std::cout << "FRAMEBUFFER NOT COMPLETE!!" << std::endl;
-
+		// Initialize render quad
 		m_renderQuadVAO = std::make_unique<VertexArrayObject>();
 		m_renderQuadVAO->bind();
 		std::vector<VertexAttribute> framebufferAtributes = {VertexAttribute(2, VertexAttributeType::FLOAT, false), VertexAttribute(2, VertexAttributeType::FLOAT, false)};
@@ -122,47 +104,57 @@ namespace GameEngine {
 		m_renderQuadVAO->unbind();
 
 
-		m_geometryPassShader = std::make_unique<Shader>(geometryPassVertexShader, geometryShaderFragmentShader);
+		// Initialize post processing stuff
+		m_postProcessingShader = std::make_unique<Shader>(postProcessingVertexShader, postProcessingFragmentShader);
+		m_postProcessingShader->useShader();
+		m_postProcessingShader->setUniform1i("u_frameTexture", 0);
 
-		m_gBuffer = std::make_unique<Framebuffer>();
-		m_gBuffer->bind();
+		m_postProcessingFramebuffer = std::make_unique<Framebuffer>();
+		m_postProcessingFramebuffer->bind();
+
+		m_postProcessingTexture = std::make_unique<Texture>();
+		m_postProcessingTexture->bind();
+		m_postProcessingTexture->textureImage2D(TextureFormat::RGBA16F, 640, 480, (unsigned char*)NULL);
+		m_postProcessingFramebuffer->attachTexture(m_postProcessingTexture.get(), FramebufferAttachmentType::Color0);
+
+		m_postProcessingDepthStencilRenderbuffer = std::make_unique<Renderbuffer>();
+		m_postProcessingDepthStencilRenderbuffer->bind();
+		m_postProcessingDepthStencilRenderbuffer->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, 640, 480);
+		m_postProcessingFramebuffer->attachRenderbuffer(m_postProcessingDepthStencilRenderbuffer.get(), FramebufferAttachmentType::DepthStencil);
+
+		if(!m_postProcessingFramebuffer->isComplete()) std::cout << "FRAMEBUFFER NOT COMPLETE!!" << std::endl;
+
+
+		// Initialize gBuffer stuff
+		m_gBufferShader = std::make_unique<Shader>(geometryPassVertexShader, geometryShaderFragmentShader);
+
+		m_gBufferFramebuffer = std::make_unique<Framebuffer>();
+		m_gBufferFramebuffer->bind();
 
 		m_gBufferPosition = std::make_unique<Texture>();
 		m_gBufferPosition->textureImage2D(TextureFormat::RGBA16F, 640, 480, (float*)NULL);
-		m_gBuffer->attachTexture(m_gBufferPosition.get(), FramebufferAttachmentType::Color0);
+		m_gBufferFramebuffer->attachTexture(m_gBufferPosition.get(), FramebufferAttachmentType::Color0);
 
 		m_gBufferNormal = std::make_unique<Texture>();
 		m_gBufferNormal->textureImage2D(TextureFormat::RGBA16F, 640, 480, (float*)NULL);
-		m_gBuffer->attachTexture(m_gBufferNormal.get(), FramebufferAttachmentType::Color1);
+		m_gBufferFramebuffer->attachTexture(m_gBufferNormal.get(), FramebufferAttachmentType::Color1);
 
 		m_gBufferAlbedo = std::make_unique<Texture>();
 		m_gBufferAlbedo->textureImage2D(TextureFormat::RGBA, 640, 480, (unsigned char*)NULL);
-		m_gBuffer->attachTexture(m_gBufferAlbedo.get(), FramebufferAttachmentType::Color2);
+		m_gBufferFramebuffer->attachTexture(m_gBufferAlbedo.get(), FramebufferAttachmentType::Color2);
 
 		unsigned int drawbuffers[] = {0, 1, 2};
-		m_gBuffer->setDrawBuffers(drawbuffers, 3);
+		m_gBufferFramebuffer->setDrawBuffers(drawbuffers, 3);
 
 		m_gBufferDepthStencil = std::make_unique<Renderbuffer>();
 		m_gBufferDepthStencil->bind();
 		m_gBufferDepthStencil->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, 640, 480);
-		m_gBuffer->attachRenderbuffer(m_gBufferDepthStencil.get(), FramebufferAttachmentType::DepthStencil);
+		m_gBufferFramebuffer->attachRenderbuffer(m_gBufferDepthStencil.get(), FramebufferAttachmentType::DepthStencil);
 
-		if(!m_gBuffer->isComplete()) std::cout << "FRAMEBUFFER NOT COMPLETE!!" << std::endl;
+		if(!m_gBufferFramebuffer->isComplete()) std::cout << "FRAMEBUFFER NOT COMPLETE!!" << std::endl;
 	}
 
 	RendererData::~RendererData() {
-	}
-
-	Framebuffer* RendererData::getFramebuffer() const {
-		return m_framebuffer.get();
-	}
-
-	Shader* RendererData::getFrameShader() const {
-		return m_frameShader.get();
-	}
-
-	Texture* RendererData::getFrameTexture() const {
-		return m_frameTexture.get();
 	}
 
 	VertexArrayObject* RendererData::getRenderQuadVAO() const {
@@ -173,12 +165,24 @@ namespace GameEngine {
 		return m_renderQuadIBO->getIndexCount();
 	}
 
-	Shader* RendererData::getGeometryPassShader() const {
-		return m_geometryPassShader.get();
+	Shader* RendererData::getPostProcessingShader() const {
+		return m_postProcessingShader.get();
 	}
 
-	Framebuffer* RendererData::getGBuffer() const {
-		return m_gBuffer.get();
+	Framebuffer* RendererData::getPostProcessingFramebuffer() const {
+		return m_postProcessingFramebuffer.get();
+	}
+
+	Texture* RendererData::getPostProcessingTexture() const {
+		return m_postProcessingTexture.get();
+	}
+
+	Shader* RendererData::getGeometryPassShader() const {
+		return m_gBufferShader.get();
+	}
+
+	Framebuffer* RendererData::getGBufferFramebuffer() const {
+		return m_gBufferFramebuffer.get();
 	}
 
 	Texture* RendererData::getGBufferPosition() const {

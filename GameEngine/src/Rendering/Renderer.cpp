@@ -39,7 +39,7 @@ namespace GameEngine {
 	}
 
 	void Renderer::beginFrame() {
-		m_rendererData->getGBuffer()->bind();
+		m_rendererData->getGBufferFramebuffer()->bind();
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -47,13 +47,13 @@ namespace GameEngine {
 	}
 
 	void Renderer::endFrame() {
-		m_rendererData->getGBuffer()->unbind();
+		m_rendererData->getGBufferFramebuffer()->unbind();
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
 
-		m_rendererData->getFrameShader()->useShader();
-		m_rendererData->getFrameShader()->setUniform1i("u_frameTexture", 1);
+		m_rendererData->getPostProcessingShader()->useShader();
+		m_rendererData->getPostProcessingShader()->setUniform1i("u_frameTexture", 2);
 		m_rendererData->getRenderQuadVAO()->bind();
 
 		glActiveTexture(GL_TEXTURE0);
