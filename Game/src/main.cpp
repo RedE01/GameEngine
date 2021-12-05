@@ -44,5 +44,8 @@ int main() {
     comp2.model = game.getAssetManager()->load<Model>("Game/assets/models/sphere.fbx");
     ent2.addComponent<TestScript>();
 
+    Entity directionalLightEntity = game.getScene()->createEntity();
+    directionalLightEntity.addComponent<LightComponent>().lightType = LightType::DirectionalLight;
+
 	game.run();
 }

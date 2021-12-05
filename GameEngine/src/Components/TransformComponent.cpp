@@ -124,5 +124,9 @@ namespace GameEngine {
 
         return matrix;
     }
+    
+    Vector3 TransformComponent::getForwardVector() const {
+        return m_orientation * Vector3(0.0, 0.0, -1.0);
+    }
 
 }

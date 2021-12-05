@@ -37,6 +37,7 @@ namespace GameEngine {
         void scaleZ(float z);
 
         Matrix4 getMatrix() const;
+        Vector3 getForwardVector() const;
 
     private:
         Vector3 m_position;
