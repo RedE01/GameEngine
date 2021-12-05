@@ -92,7 +92,7 @@ namespace GameEngine {
 		"}\n"
 	);
 
-	RendererData::RendererData() {
+	RendererData::RendererData(Vector2i viewportSize) {
 		// Initialize render quad
 		m_renderQuadVAO = std::make_unique<VertexArrayObject>();
 		m_renderQuadVAO->bind();
@@ -115,13 +115,11 @@ namespace GameEngine {
 		m_postProcessingFramebuffer->bind();
 
 		m_postProcessingTexture = std::make_unique<Texture>();
-		m_postProcessingTexture->bind();
-		m_postProcessingTexture->textureImage2D(TextureFormat::RGBA16F, 640, 480, (unsigned char*)NULL);
+		m_postProcessingTexture->textureImage2D(TextureFormat::RGBA16F, viewportSize.x, viewportSize.y, (unsigned char*)NULL);
 		m_postProcessingFramebuffer->attachTexture(m_postProcessingTexture.get(), FramebufferAttachmentType::Color0);
 
 		m_postProcessingDepthStencilRenderbuffer = std::make_unique<Renderbuffer>();
-		m_postProcessingDepthStencilRenderbuffer->bind();
-		m_postProcessingDepthStencilRenderbuffer->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, 640, 480);
+		m_postProcessingDepthStencilRenderbuffer->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, viewportSize.x, viewportSize.y);
 		m_postProcessingFramebuffer->attachRenderbuffer(m_postProcessingDepthStencilRenderbuffer.get(), FramebufferAttachmentType::DepthStencil);
 
 		if(!m_postProcessingFramebuffer->isComplete()) std::cout << "FRAMEBUFFER NOT COMPLETE!!" << std::endl;
@@ -134,23 +132,22 @@ namespace GameEngine {
 		m_gBufferFramebuffer->bind();
 
 		m_gBufferPosition = std::make_unique<Texture>();
-		m_gBufferPosition->textureImage2D(TextureFormat::RGBA16F, 640, 480, (float*)NULL);
+		m_gBufferPosition->textureImage2D(TextureFormat::RGBA16F, viewportSize.x, viewportSize.y, (float*)NULL);
 		m_gBufferFramebuffer->attachTexture(m_gBufferPosition.get(), FramebufferAttachmentType::Color0);
 
 		m_gBufferNormal = std::make_unique<Texture>();
-		m_gBufferNormal->textureImage2D(TextureFormat::RGBA16F, 640, 480, (float*)NULL);
+		m_gBufferNormal->textureImage2D(TextureFormat::RGBA16F, viewportSize.x, viewportSize.y, (float*)NULL);
 		m_gBufferFramebuffer->attachTexture(m_gBufferNormal.get(), FramebufferAttachmentType::Color1);
 
 		m_gBufferAlbedo = std::make_unique<Texture>();
-		m_gBufferAlbedo->textureImage2D(TextureFormat::RGBA, 640, 480, (unsigned char*)NULL);
+		m_gBufferAlbedo->textureImage2D(TextureFormat::RGBA, viewportSize.x, viewportSize.y, (unsigned char*)NULL);
 		m_gBufferFramebuffer->attachTexture(m_gBufferAlbedo.get(), FramebufferAttachmentType::Color2);
 
 		unsigned int drawbuffers[] = {0, 1, 2};
 		m_gBufferFramebuffer->setDrawBuffers(drawbuffers, 3);
 
 		m_gBufferDepthStencil = std::make_unique<Renderbuffer>();
-		m_gBufferDepthStencil->bind();
-		m_gBufferDepthStencil->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, 640, 480);
+        m_gBufferDepthStencil->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, viewportSize.x, viewportSize.y);
 		m_gBufferFramebuffer->attachRenderbuffer(m_gBufferDepthStencil.get(), FramebufferAttachmentType::DepthStencil);
 
 		if(!m_gBufferFramebuffer->isComplete()) std::cout << "FRAMEBUFFER NOT COMPLETE!!" << std::endl;
@@ -160,12 +157,11 @@ namespace GameEngine {
 		m_lightingFramebuffer->bind();
 
 		m_lightingTexture = std::make_unique<Texture>();
-		m_lightingTexture->textureImage2D(TextureFormat::RGBA16F, 640, 480, (unsigned char*)NULL);
+		m_lightingTexture->textureImage2D(TextureFormat::RGBA16F, viewportSize.x, viewportSize.y, (unsigned char*)NULL);
 		m_lightingFramebuffer->attachTexture(m_lightingTexture.get(), FramebufferAttachmentType::Color0);
 
 		m_lightingDepthStencil = std::make_unique<Renderbuffer>();
-		m_lightingDepthStencil->bind();
-		m_lightingDepthStencil->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, 640, 480);
+		m_lightingDepthStencil->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, viewportSize.x, viewportSize.y);
 		m_lightingFramebuffer->attachRenderbuffer(m_lightingDepthStencil.get(), FramebufferAttachmentType::DepthStencil);
 
 		if(!m_lightingFramebuffer->isComplete()) std::cout << "FRAMEBUFEFR NOT COMPLETE!" << std::endl;
@@ -190,6 +186,19 @@ namespace GameEngine {
 	void RendererData::setDefaultShader(ShaderAsset defaultShader) {
 		m_lightingShader = defaultShader;
 	}
+
+    void RendererData::setViewportSize(Vector2i viewportSize) {
+		m_postProcessingDepthStencilRenderbuffer->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, viewportSize.x, viewportSize.y);
+		m_postProcessingTexture->textureImage2D(TextureFormat::RGBA16F, viewportSize.x, viewportSize.y, (unsigned char*)NULL);
+
+        m_gBufferDepthStencil->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, viewportSize.x, viewportSize.y);
+		m_gBufferAlbedo->textureImage2D(TextureFormat::RGBA, viewportSize.x, viewportSize.y, (unsigned char*)NULL);
+		m_gBufferNormal->textureImage2D(TextureFormat::RGBA16F, viewportSize.x, viewportSize.y, (float*)NULL);
+		m_gBufferPosition->textureImage2D(TextureFormat::RGBA16F, viewportSize.x, viewportSize.y, (float*)NULL);
+
+		m_lightingDepthStencil->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, viewportSize.x, viewportSize.y);
+		m_lightingTexture->textureImage2D(TextureFormat::RGBA16F, viewportSize.x, viewportSize.y, (unsigned char*)NULL);
+    }
 
 	VertexArrayObject* RendererData::getRenderQuadVAO() const {
 		return m_renderQuadVAO.get();

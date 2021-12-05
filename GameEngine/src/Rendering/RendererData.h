@@ -1,4 +1,5 @@
 #pragma once
+#include "../Math/Vector.h"
 #include "../Assets/AssetHandle.h"
 #include <memory>
 
@@ -14,10 +15,11 @@ namespace GameEngine {
 
 	class RendererData {
 	public:
-		RendererData();
+		RendererData(Vector2i viewportSize);
 		~RendererData();
 
 		void setDefaultShader(ShaderAsset defaultShader);
+        void setViewportSize(Vector2i viewportSize);
 
 		VertexArrayObject* getRenderQuadVAO() const;
 		unsigned int getRenderQuadIndexCount() const;

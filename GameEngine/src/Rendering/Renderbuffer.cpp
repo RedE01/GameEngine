@@ -16,6 +16,7 @@ namespace GameEngine {
 	}
 
 	void Renderbuffer::createRenderbufferStorage(TextureFormat format, unsigned int width, unsigned int height) {
+        bind();
 		internal::OpenGLTextureFormats openglformats = internal::getOpenGLTextureFormats(format);
 		glRenderbufferStorage(GL_RENDERBUFFER, openglformats.internalFormat, width, height);
 	}

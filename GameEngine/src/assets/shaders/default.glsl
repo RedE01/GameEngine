@@ -36,9 +36,10 @@ uniform float u_attenuationLinear;
 uniform float u_attenuationQuadratic;
 
 uniform vec3 u_cameraPos;
+uniform vec2 u_viewportSize;
 
 void main() {
-    vec2 textureCoords = gl_FragCoord.xy / vec2(640.0, 480.0);
+    vec2 textureCoords = gl_FragCoord.xy / u_viewportSize;
     vec3 fragPos = texture(u_gPosition, textureCoords).xyz;
     vec3 normal = texture(u_gNormal, textureCoords).xyz;
     vec3 albedo = texture(u_gAlbedo, textureCoords).rgb;

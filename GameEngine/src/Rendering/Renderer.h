@@ -13,14 +13,14 @@ namespace GameEngine {
 
 	class Renderer {
 	public:
-		Renderer(Vector2 viewportSize);
+		Renderer(Vector2i viewportSize);
 		~Renderer();
 
 		void beginFrame();
         void endFrame(entt::registry& entityRegistry, Camera* camera);
 		void renderEntities(entt::registry& entityRegistry, Camera* camera);
 
-		void setViewportSize(Vector2 viewportSize);
+		void setViewportSize(Vector2i viewportSize);
 		void setDefaultShader(ShaderAsset shaderAsset);
 
 	private:
@@ -29,6 +29,7 @@ namespace GameEngine {
 
 	private:
 		std::unique_ptr<RendererData> m_rendererData;
+        Vector2i m_viewportSize;
 	};
 
 }

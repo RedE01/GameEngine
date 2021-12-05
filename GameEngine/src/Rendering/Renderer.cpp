@@ -20,12 +20,12 @@
 
 namespace GameEngine {
 
-	Renderer::Renderer(Vector2 viewportSize) {
+	Renderer::Renderer(Vector2i viewportSize) : m_viewportSize(viewportSize) {
 		if(glewInit() != GLEW_OK) return;
 
 		initializeRendererDebugger();
 
-		m_rendererData = std::make_unique<RendererData>();
+		m_rendererData = std::make_unique<RendererData>(viewportSize);
 
 		glEnable(GL_CULL_FACE);
 		glFrontFace(GL_CCW);
@@ -77,7 +77,9 @@ namespace GameEngine {
 		}
 	}
 
-	void Renderer::setViewportSize(Vector2 viewportSize) {
+	void Renderer::setViewportSize(Vector2i viewportSize) {
+        m_viewportSize = viewportSize;
+        m_rendererData->setViewportSize(viewportSize);
 		glViewport(0, 0, viewportSize.x, viewportSize.y);
 	}
 
@@ -129,6 +131,7 @@ namespace GameEngine {
         m_rendererData->getDefaultLightingShader()->setUniformMat4("u_viewMatrix", camera->getViewMatrix());
         m_rendererData->getDefaultLightingShader()->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
         m_rendererData->getDefaultLightingShader()->setUniform3f("u_cameraPos", camera->position.x, camera->position.y, camera->position.z);
+        m_rendererData->getDefaultLightingShader()->setUniform2f("u_viewportSize", m_viewportSize.x, m_viewportSize.y);
 
         m_rendererData->getSphereVAO()->bind();
         auto lightComponentView = entityRegistry.view<LightComponent>();
