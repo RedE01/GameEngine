@@ -41,5 +41,6 @@ Makefile
 
 # vim
 .ccls
+.ccls-cache
 .color_coded
 .vimspector.json
