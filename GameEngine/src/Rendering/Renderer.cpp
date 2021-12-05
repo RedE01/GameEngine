@@ -28,11 +28,7 @@ namespace GameEngine {
 		m_rendererData = std::make_unique<RendererData>();
 
 		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
 		glFrontFace(GL_CCW);
-
-		glEnable(GL_DEPTH_TEST);
-
 		setViewportSize(viewportSize);
 	}
 
@@ -44,6 +40,8 @@ namespace GameEngine {
 
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glCullFace(GL_BACK);
 		glEnable(GL_DEPTH_TEST);
 	}
 
@@ -54,6 +52,7 @@ namespace GameEngine {
 		m_rendererData->getLightingFramebuffer()->unbind();
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
+		glCullFace(GL_BACK);
 
 		m_rendererData->getRenderQuadVAO()->bind();
 		m_rendererData->getPostProcessingShader()->useShader();
@@ -114,6 +113,7 @@ namespace GameEngine {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
+        glCullFace(GL_FRONT);
 
 		m_rendererData->getDefaultLightingShader()->useShader();
 		m_rendererData->getDefaultLightingShader()->setUniform1i("u_gPosition", 0);
@@ -129,19 +129,18 @@ namespace GameEngine {
         m_rendererData->getDefaultLightingShader()->setUniformMat4("u_viewMatrix", camera->getViewMatrix());
         m_rendererData->getDefaultLightingShader()->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
         m_rendererData->getDefaultLightingShader()->setUniform3f("u_cameraPos", camera->position.x, camera->position.y, camera->position.z);
-        m_rendererData->getDefaultLightingShader()->setUniform1f("u_attenuationConstant", 1.0f);
-        m_rendererData->getDefaultLightingShader()->setUniform1f("u_attenuationLinear", 0.7f);
-        m_rendererData->getDefaultLightingShader()->setUniform1f("u_attenuationQuadratic", 1.8f);
 
         m_rendererData->getSphereVAO()->bind();
         auto lightComponentView = entityRegistry.view<LightComponent>();
         for(auto& entity : lightComponentView) {
-            //auto& lightComponent = lightComponentView.get<LightComponent>(entity);
+            auto& lightComponent = lightComponentView.get<LightComponent>(entity);
 			auto& transformComponent = entityRegistry.get<TransformComponent>(entity);
 
             Vector3 lightPos = transformComponent.getPosition();
             m_rendererData->getDefaultLightingShader()->setUniform3f("u_lightPos", lightPos.x, lightPos.y, lightPos.z);
-            m_rendererData->getDefaultLightingShader()->setUniform1f("u_lightRadius", 2.0f);
+            m_rendererData->getDefaultLightingShader()->setUniform1f("u_attenuationConstant", lightComponent.attenuationConstant);
+            m_rendererData->getDefaultLightingShader()->setUniform1f("u_attenuationLinear", lightComponent.attenuationLinear);
+            m_rendererData->getDefaultLightingShader()->setUniform1f("u_attenuationQuadratic", lightComponent.attenuationQuadratic);
 
             glDrawElements(GL_TRIANGLES, m_rendererData->getSphereIndexCount(), GL_UNSIGNED_INT, 0);
 

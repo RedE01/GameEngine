@@ -7,10 +7,17 @@ uniform mat4 u_viewMatrix;
 uniform mat4 u_projectionMatrix;
 
 uniform vec3 u_lightPos;
-uniform float u_lightRadius;
+uniform float u_attenuationConstant;
+uniform float u_attenuationLinear;
+uniform float u_attenuationQuadratic;
+
+float calculateCutoffDistance(float constant, float linear, float quadratic, float cutoffVal) {
+    return (sqrt(linear * linear - 4.0 * quadratic * (constant - 1.0 / cutoffVal)) - linear) / (2 * quadratic);
+}
 
 void main() {
-    vec3 pos = aPos * u_lightRadius + u_lightPos;
+    float cutoffDistance = calculateCutoffDistance(u_attenuationConstant, u_attenuationLinear, u_attenuationQuadratic, 0.02);
+    vec3 pos = aPos * cutoffDistance + u_lightPos;
     gl_Position = u_projectionMatrix * u_viewMatrix * vec4(pos, 1.0);
 }
 
@@ -24,11 +31,11 @@ uniform sampler2D u_gNormal;
 uniform sampler2D u_gAlbedo;
 
 uniform vec3 u_lightPos;
-uniform float u_lightRadius;
-uniform vec3 u_cameraPos;
 uniform float u_attenuationConstant;
 uniform float u_attenuationLinear;
 uniform float u_attenuationQuadratic;
+
+uniform vec3 u_cameraPos;
 
 void main() {
     vec2 textureCoords = gl_FragCoord.xy / vec2(640.0, 480.0);
@@ -54,5 +61,5 @@ void main() {
 
     float brightness = ambient + diffuse + specular;
 
-    FragColor = vec4(fragPos * brightness * attenuation, 1.0);
+    FragColor = vec4(albedo * brightness * attenuation, 1.0);
 }
