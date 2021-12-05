@@ -38,3 +38,8 @@ Makefile
 
 # Visual Studio Code
 .vscode/
+
+# vim
+.ccls
+.color_coded
+.vimspector.json
