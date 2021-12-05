@@ -17,7 +17,7 @@ namespace GameEngine {
 		~Renderer();
 
 		void beginFrame();
-		void endFrame();
+        void endFrame(entt::registry& entityRegistry, Camera* camera);
 		void renderEntities(entt::registry& entityRegistry, Camera* camera);
 
 		void setViewportSize(Vector2 viewportSize);
@@ -25,6 +25,7 @@ namespace GameEngine {
 
 	private:
 		void renderModel(Model* model, TransformComponent* transform, Camera* camera);
+        void renderLights(entt::registry& entityRegistry, Camera* camera);
 
 	private:
 		std::unique_ptr<RendererData> m_rendererData;

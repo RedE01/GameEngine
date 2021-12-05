@@ -51,13 +51,14 @@ namespace GameEngine {
 			m_renderer->beginFrame();
 			m_renderer->renderEntities(m_scene->m_entityRegistry, m_scene->getActiveCamera());
 			onRender();
+			m_renderer->endFrame(m_scene->m_entityRegistry, m_scene->getActiveCamera());
 			#else
 			m_editor->update();
 
 			m_renderer->beginFrame();
 			m_renderer->renderEntities(m_scene->m_entityRegistry, m_editor->getEditorCamera());
+			m_renderer->endFrame(m_scene->m_entityRegistry, m_editor->getEditorCamera());
 			#endif
-			m_renderer->endFrame();
 
 			m_window->swapBuffers();
 		}

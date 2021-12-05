@@ -7,6 +7,8 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 
+#include "../assets/models/sphere.h"
+
 namespace GameEngine {
 
 	float frameVBOdata[] = {
@@ -167,6 +169,19 @@ namespace GameEngine {
 		m_lightingFramebuffer->attachRenderbuffer(m_lightingDepthStencil.get(), FramebufferAttachmentType::DepthStencil);
 
 		if(!m_lightingFramebuffer->isComplete()) std::cout << "FRAMEBUFEFR NOT COMPLETE!" << std::endl;
+
+		// Initialize sphere
+        m_sphereVAO = std::make_unique<VertexArrayObject>();
+        m_sphereVAO->bind();
+        std::vector<VertexAttribute> sphereAttributes = {VertexAttribute(3, VertexAttributeType::FLOAT, false)};
+        m_sphereVBO = std::make_unique<VertexBuffer>(sphereAttributes);
+        m_sphereVBO->bind();
+        m_sphereVBO->setData(sphereVertexData, sizeof(sphereVertexData), BufferDataUsage::STATIC_DRAW);
+        m_sphereIBO = std::make_unique<IndexBuffer>();
+        m_sphereIBO->bind();
+        m_sphereIBO->setData(sphereIndexData, sizeof(sphereIndexData), BufferDataUsage::STATIC_DRAW);
+        m_sphereVAO->unbind();
+
 	}
 
 	RendererData::~RendererData() {
@@ -227,5 +242,13 @@ namespace GameEngine {
 	Texture* RendererData::getLightingTexture() const {
 		return m_lightingTexture.get();
 	}
+
+    VertexArrayObject* RendererData::getSphereVAO() const {
+        return m_sphereVAO.get();
+    }
+
+    unsigned int RendererData::getSphereIndexCount() const {
+        return m_sphereIBO->getIndexCount();
+    }
 
 }
