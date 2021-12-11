@@ -13,9 +13,7 @@ namespace GameEngine {
         LightType lightType = LightType::PointLight;
         
         // Point light stuff
-        float attenuationConstant = 1.0f;
-        float attenuationLinear = 0.7f;
-        float attenuationQuadratic = 1.8f;
+        float pointLightRange = 5.0f;
 
         // Directional light stuff
         float intensity = 0.5f;

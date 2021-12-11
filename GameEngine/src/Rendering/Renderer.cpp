@@ -51,7 +51,8 @@ namespace GameEngine {
 
 		// Post processing
 		m_rendererData->getLightingFramebuffer()->unbind();
-		glClear(GL_COLOR_BUFFER_BIT);
+		//glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		//glClear(GL_COLOR_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
 		glCullFace(GL_BACK);
         glDisable(GL_BLEND);
@@ -114,7 +115,7 @@ namespace GameEngine {
 
     void Renderer::renderLights(entt::registry& entityRegistry, Camera* camera) {
 		m_rendererData->getLightingFramebuffer()->bind();
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
@@ -148,9 +149,7 @@ namespace GameEngine {
 
                 Vector3 lightPos = transformComponent.getPosition();
                 m_rendererData->getDefaultLightingShader()->setUniform3f("u_lightPos", lightPos.x, lightPos.y, lightPos.z);
-                m_rendererData->getDefaultLightingShader()->setUniform1f("u_attenuationConstant", lightComponent.attenuationConstant);
-                m_rendererData->getDefaultLightingShader()->setUniform1f("u_attenuationLinear", lightComponent.attenuationLinear);
-                m_rendererData->getDefaultLightingShader()->setUniform1f("u_attenuationQuadratic", lightComponent.attenuationQuadratic);
+                m_rendererData->getDefaultLightingShader()->setUniform1f("u_pointLightRange", lightComponent.pointLightRange);
 
                 glDrawElements(GL_TRIANGLES, m_rendererData->getSphereIndexCount(), GL_UNSIGNED_INT, 0);
             }
