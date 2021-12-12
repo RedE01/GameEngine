@@ -88,7 +88,10 @@ namespace GameEngine {
 		"void main() {\n"
 		"	gPosition = fragPos;\n"
 		"	gNormal = normal;\n"
-		"	gAlbedo = texture(u_diffuseTexture, textureCoords).xyz;\n"
+        "   \n"
+		"	vec4 albedo = texture(u_diffuseTexture, textureCoords).rgba;\n"
+        "   gAlbedo = albedo.rgb;\n"
+        "   if(albedo.a < 0.1) discard;\n"
 		"}\n"
 	);
 
