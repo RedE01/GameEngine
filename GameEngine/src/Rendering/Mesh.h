@@ -15,6 +15,7 @@ namespace GameEngine {
 		Vector3 position;
 		Vector3 normal;
 		Vector2 textureCoords;
+        Vector3 tangent;
 	};
 
 	class Mesh {

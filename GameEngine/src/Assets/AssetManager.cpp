@@ -92,23 +92,23 @@ namespace GameEngine {
 	}
 
 	template<>
-	AssetHandle<Texture> AssetManager::load<Texture>(const std::string& filepath) {
-		return getResourceCache<Texture>().load<TextureLoader>(entt::hashed_string{filepath.c_str()}, filepath);
+	AssetHandle<Texture> AssetManager::load<Texture>(const std::string& filepath, bool srgb) {
+		return getResourceCache<Texture>().load<TextureLoader>(entt::hashed_string{filepath.c_str()}, filepath, srgb);
 	}
 
 	template<>
-	AssetHandle<Texture> AssetManager::reload<Texture>(const std::string& filepath) {
-		return getResourceCache<Texture>().reload<TextureLoader>(entt::hashed_string{filepath.c_str()}, filepath);
+	AssetHandle<Texture> AssetManager::reload<Texture>(const std::string& filepath, bool srgb) {
+		return getResourceCache<Texture>().reload<TextureLoader>(entt::hashed_string{filepath.c_str()}, filepath, srgb);
 	}
 
 	template<>
-	AssetHandle<Texture> AssetManager::load<Texture>(const std::string& identifier, unsigned char* data, unsigned int dataLength) {
-		return getResourceCache<Texture>().load<TextureLoader>(entt::hashed_string{identifier.c_str()}, identifier, data, dataLength);
+	AssetHandle<Texture> AssetManager::load<Texture>(const std::string& identifier, unsigned char* data, unsigned int dataLength, bool srgb) {
+		return getResourceCache<Texture>().load<TextureLoader>(entt::hashed_string{identifier.c_str()}, identifier, data, dataLength, srgb);
 	}
 
 	template<>
-	AssetHandle<Texture> AssetManager::reload<Texture>(const std::string& identifier, unsigned char* data, unsigned int dataLength) {
-		return getResourceCache<Texture>().reload<TextureLoader>(entt::hashed_string{identifier.c_str()}, identifier, data, dataLength);
+	AssetHandle<Texture> AssetManager::reload<Texture>(const std::string& identifier, unsigned char* data, unsigned int dataLength, bool srgb) {
+		return getResourceCache<Texture>().reload<TextureLoader>(entt::hashed_string{identifier.c_str()}, identifier, data, dataLength, srgb);
 	}
 
 	template AssetHandle<Texture> AssetManager::getHandle<Texture>(const std::string& filepath);

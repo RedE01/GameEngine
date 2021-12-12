@@ -6,7 +6,8 @@ namespace GameEngine {
 	class Material {
 	public:
 		ShaderAsset shader;
-		TextureAsset texture;
+		TextureAsset diffuseTexture;
+        TextureAsset normalTexture;
 	};
 
 }

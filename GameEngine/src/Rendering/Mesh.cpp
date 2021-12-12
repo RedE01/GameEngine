@@ -9,7 +9,12 @@ namespace GameEngine {
 		m_vao = std::make_unique<VertexArrayObject>();
 		m_vao->bind();
 
-		std::vector<VertexAttribute> vertexAttributes = {VertexAttribute(3, VertexAttributeType::FLOAT, false), VertexAttribute(3, VertexAttributeType::FLOAT, false), VertexAttribute(2, VertexAttributeType::FLOAT, false)};
+		std::vector<VertexAttribute> vertexAttributes = {
+            VertexAttribute(3, VertexAttributeType::FLOAT, false), // Position
+            VertexAttribute(3, VertexAttributeType::FLOAT, false), // Normal
+            VertexAttribute(2, VertexAttributeType::FLOAT, false), // TextureCoords
+            VertexAttribute(3, VertexAttributeType::FLOAT, false)  // Tangent
+        };
 		m_vbo = std::make_unique<VertexBuffer>(vertexAttributes);
 		m_vbo->bind();
 		m_vbo->setData((void*)vertexData.data(), vertexData.size() * sizeof(Vertex), BufferDataUsage::STATIC_DRAW);

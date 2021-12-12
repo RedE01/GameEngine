@@ -7,13 +7,13 @@
 
 namespace GameEngine {
 
-	std::shared_ptr<Texture> loadTexture(unsigned char* data, int imageWidth, int imageHeight, int channels, const std::string& identifier) {
+	std::shared_ptr<Texture> loadTexture(unsigned char* data, int imageWidth, int imageHeight, int channels, const std::string& identifier, bool srgb) {
 		TextureFormat textureFormat;
 		switch(channels) {
 		case 1: textureFormat = TextureFormat::R; break;
 		case 2: textureFormat = TextureFormat::RG; break;
-		case 3: textureFormat = TextureFormat::SRGB; break;
-		case 4: textureFormat = TextureFormat::SRGBA; break;
+        case 3: textureFormat = srgb ? TextureFormat::SRGB : TextureFormat::RGB; break;
+        case 4: textureFormat = srgb ? TextureFormat::SRGBA : TextureFormat::RGBA; break;
 		default:
 			std::cout << "Number of texture channels unsuported for texture: " << identifier << std::endl;
 			stbi_image_free(data);
@@ -32,7 +32,7 @@ namespace GameEngine {
 		return texture;		
 	}
 
-	std::shared_ptr<Texture> TextureLoader::load(const std::string& filepath) const {
+	std::shared_ptr<Texture> TextureLoader::load(const std::string& filepath, bool srgb) const {
 		stbi_set_flip_vertically_on_load(true);
 
 		int imageWidth;
@@ -44,11 +44,11 @@ namespace GameEngine {
 			return std::shared_ptr<Texture>();
 		}
 
-		return loadTexture(data, imageWidth, imageHeight, channels, filepath);
+		return loadTexture(data, imageWidth, imageHeight, channels, filepath, srgb);
 
 	}
 
-	std::shared_ptr<Texture> TextureLoader::load(const std::string& identifier, unsigned char* textureData, unsigned int dataLength) const {
+	std::shared_ptr<Texture> TextureLoader::load(const std::string& identifier, unsigned char* textureData, unsigned int dataLength, bool srgb) const {
 		stbi_set_flip_vertically_on_load(true);
 
 		int imageWidth;
@@ -60,7 +60,7 @@ namespace GameEngine {
 			return std::shared_ptr<Texture>();
 		}
 
-		return loadTexture(data, imageWidth, imageHeight, channels, identifier);
+		return loadTexture(data, imageWidth, imageHeight, channels, identifier, srgb);
 	}
 
 }

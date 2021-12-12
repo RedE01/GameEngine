@@ -94,10 +94,17 @@ namespace GameEngine {
 		for(auto& mesh : model->meshes) {
 			if(mesh) {
 				m_rendererData->getGeometryPassShader()->useShader();
+				m_rendererData->getGeometryPassShader()->setUniform1i("u_diffuseTexture", 0);
+				m_rendererData->getGeometryPassShader()->setUniform1i("u_normalTexture", 1);
 
-				glActiveTexture(GL_TEXTURE0);
                 if(mesh->material && mesh->material->texture) {
+                    glActiveTexture(GL_TEXTURE0);
                     mesh->material->texture->bind();
+                }
+
+                if(mesh->material && mesh->material->normalTexture) {
+                    glActiveTexture(GL_TEXTURE1);
+                    mesh->material->normalTexture->bind();
                 }
 
 				Matrix4 modelMat = transform->getMatrix();
