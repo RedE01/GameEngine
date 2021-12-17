@@ -16,3 +16,6 @@
 [submodule "GameEngine/vendor/glm/glm"]
 	path = GameEngine/vendor/glm/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "GameEngine/vendor/imgui/imgui"]
+	path = GameEngine/vendor/imgui/imgui
+	url = git@github.com:ocornut/imgui.git
