@@ -22,6 +22,7 @@ namespace GameEngine {
 
 		#ifdef GAME_ENGINE_EDITOR
 		m_editor = std::make_unique<Editor>(getWindow());
+        m_editor->setViewportTexture(m_renderer->getFrameTexture());
 		#endif
 
 		m_window->setEventFunction(std::bind(&Application::eventHandler, this, std::placeholders::_1));
@@ -52,12 +53,14 @@ namespace GameEngine {
 			m_renderer->renderEntities(m_scene->m_entityRegistry, m_scene->getActiveCamera());
 			onRender();
 			m_renderer->endFrame(m_scene->m_entityRegistry, m_scene->getActiveCamera());
+            m_renderer->renderFrameToDefaultFramebuffer();
 			#else
 			m_editor->update();
 
 			m_renderer->beginFrame();
 			m_renderer->renderEntities(m_scene->m_entityRegistry, m_editor->getEditorCamera());
-			m_renderer->endFrame(m_scene->m_entityRegistry, m_editor->getEditorCamera());
+            m_renderer->endFrame(m_scene->m_entityRegistry, m_editor->getEditorCamera());
+            m_editor->render();
 			#endif
 
 			m_window->swapBuffers();

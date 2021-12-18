@@ -50,21 +50,37 @@ namespace GameEngine {
         renderLights(entityRegistry, camera);
 
 		// Post processing
-		m_rendererData->getLightingFramebuffer()->unbind();
-		//glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		//glClear(GL_COLOR_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
 		glCullFace(GL_BACK);
         glDisable(GL_BLEND);
 
+        m_rendererData->getPostProcessingFramebuffer()->bind();
+        m_rendererData->getRenderQuadVAO()->bind();
+        m_rendererData->getPostProcessingShader()->useShader();
+        glActiveTexture(GL_TEXTURE0);
+        m_rendererData->getLightingTexture()->bind();
+        m_rendererData->getPostProcessingShader()->setUniform1i("u_frameTexture", 0);
+
+        glDrawElements(GL_TRIANGLES, m_rendererData->getRenderQuadIndexCount(), GL_UNSIGNED_INT, 0);
+
+        m_rendererData->getPostProcessingFramebuffer()->unbind();
+	}
+
+    void Renderer::renderFrameToDefaultFramebuffer() {
+		glDisable(GL_DEPTH_TEST);
+		glCullFace(GL_BACK);
+        glDisable(GL_BLEND);
+
+		m_rendererData->getPostProcessingFramebuffer()->unbind();
 		m_rendererData->getRenderQuadVAO()->bind();
-		m_rendererData->getPostProcessingShader()->useShader();
+		m_rendererData->getFinalRenderShader()->useShader();
 		glActiveTexture(GL_TEXTURE0);
-		m_rendererData->getLightingTexture()->bind();
+        m_rendererData->getFrameTexture()->bind();
 		m_rendererData->getPostProcessingShader()->setUniform1i("u_frameTexture", 0);
 
 		glDrawElements(GL_TRIANGLES, m_rendererData->getRenderQuadIndexCount(), GL_UNSIGNED_INT, 0);
-	}
+
+    }
 
 	void Renderer::renderEntities(entt::registry& entityRegistry, Camera* camera) {
 		if(camera == nullptr) return;
@@ -90,6 +106,10 @@ namespace GameEngine {
 		m_rendererData->setDefaultShader(shaderAsset);
 	}
 
+    std::shared_ptr<Texture> Renderer::getFrameTexture() {
+        return m_rendererData->getFrameTexture();
+    }
+
 	void Renderer::renderModel(Model* model, TransformComponent* transform, Camera* camera) {
 		for(auto& mesh : model->meshes) {
 			if(mesh) {
@@ -97,9 +117,9 @@ namespace GameEngine {
 				m_rendererData->getGeometryPassShader()->setUniform1i("u_diffuseTexture", 0);
 				m_rendererData->getGeometryPassShader()->setUniform1i("u_normalTexture", 1);
 
-                if(mesh->material && mesh->material->texture) {
+                if(mesh->material && mesh->material->diffuseTexture) {
                     glActiveTexture(GL_TEXTURE0);
-                    mesh->material->texture->bind();
+                    mesh->material->diffuseTexture->bind();
                 }
 
                 if(mesh->material && mesh->material->normalTexture) {

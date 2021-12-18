@@ -18,10 +18,13 @@ namespace GameEngine {
 
 		void beginFrame();
         void endFrame(entt::registry& entityRegistry, Camera* camera);
+        void renderFrameToDefaultFramebuffer();
 		void renderEntities(entt::registry& entityRegistry, Camera* camera);
 
 		void setViewportSize(Vector2i viewportSize);
 		void setDefaultShader(ShaderAsset shaderAsset);
+
+        std::shared_ptr<Texture> getFrameTexture();
 
 	private:
 		void renderModel(Model* model, TransformComponent* transform, Camera* camera);

@@ -22,7 +22,7 @@ namespace GameEngine {
 		0, 1, 2, 2, 3, 0
 	};
 
-	const char* postProcessingVertexShader = (
+	const char* renderToTextureVertexShader = (
 		"#version 430 core\n"
 		"layout (location = 0) in vec2 aPos;\n"
 		"layout (location = 1) in vec2 aTextureCoords;\n"
@@ -46,6 +46,19 @@ namespace GameEngine {
 		"    float gamma = 2.2;\n"
         "    vec3 fragColor = texture(u_frameTexture, textureCoords).rgb;"
 		"    FragColor = vec4(pow(fragColor, vec3(1.0 / gamma)), 1.0);\n"
+		"}\n"
+	);
+
+	const char* finalRenderFragmentShader = (
+		"#version 430 core\n"
+		"\n"
+		"out vec4 FragColor;\n"
+		"in vec2 textureCoords;\n"
+		"uniform sampler2D u_frameTexture;\n"
+		"\n"
+		"void main() {\n"
+        "    vec3 fragColor = texture(u_frameTexture, textureCoords).rgb;"
+		"    FragColor = vec4(fragColor, 1.0);\n"
 		"}\n"
 	);
 
@@ -121,16 +134,16 @@ namespace GameEngine {
 
 
 		// Initialize post processing stuff
-		m_postProcessingShader = std::make_unique<Shader>(postProcessingVertexShader, postProcessingFragmentShader);
+		m_postProcessingShader = std::make_unique<Shader>(renderToTextureVertexShader, postProcessingFragmentShader);
 		m_postProcessingShader->useShader();
 		m_postProcessingShader->setUniform1i("u_frameTexture", 0);
 
 		m_postProcessingFramebuffer = std::make_unique<Framebuffer>();
 		m_postProcessingFramebuffer->bind();
 
-		m_postProcessingTexture = std::make_unique<Texture>();
-		m_postProcessingTexture->textureImage2D(TextureFormat::RGBA16F, viewportSize.x, viewportSize.y, (unsigned char*)NULL);
-		m_postProcessingFramebuffer->attachTexture(m_postProcessingTexture.get(), FramebufferAttachmentType::Color0);
+		m_frameTexture = std::make_unique<Texture>();
+		m_frameTexture->textureImage2D(TextureFormat::RGBA16F, viewportSize.x, viewportSize.y, (unsigned char*)NULL);
+		m_postProcessingFramebuffer->attachTexture(m_frameTexture.get(), FramebufferAttachmentType::Color0);
 
 		m_postProcessingDepthStencilRenderbuffer = std::make_unique<Renderbuffer>();
 		m_postProcessingDepthStencilRenderbuffer->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, viewportSize.x, viewportSize.y);
@@ -180,6 +193,8 @@ namespace GameEngine {
 
 		if(!m_lightingFramebuffer->isComplete()) std::cout << "FRAMEBUFEFR NOT COMPLETE!" << std::endl;
 
+        m_finalRenderShader = std::make_unique<Shader>(renderToTextureVertexShader, finalRenderFragmentShader);
+
 		// Initialize sphere
         m_sphereVAO = std::make_unique<VertexArrayObject>();
         m_sphereVAO->bind();
@@ -203,7 +218,7 @@ namespace GameEngine {
 
     void RendererData::setViewportSize(Vector2i viewportSize) {
 		m_postProcessingDepthStencilRenderbuffer->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, viewportSize.x, viewportSize.y);
-		m_postProcessingTexture->textureImage2D(TextureFormat::RGBA16F, viewportSize.x, viewportSize.y, (unsigned char*)NULL);
+		m_frameTexture->textureImage2D(TextureFormat::RGBA16F, viewportSize.x, viewportSize.y, (unsigned char*)NULL);
 
         m_gBufferDepthStencil->createRenderbufferStorage(TextureFormat::DEPTH_STENCIL, viewportSize.x, viewportSize.y);
 		m_gBufferAlbedo->textureImage2D(TextureFormat::RGBA, viewportSize.x, viewportSize.y, (unsigned char*)NULL);
@@ -230,8 +245,8 @@ namespace GameEngine {
 		return m_postProcessingFramebuffer.get();
 	}
 
-	Texture* RendererData::getPostProcessingTexture() const {
-		return m_postProcessingTexture.get();
+    std::shared_ptr<Texture> RendererData::getFrameTexture() const {
+		return m_frameTexture;
 	}
 
 	Shader* RendererData::getGeometryPassShader() const {
@@ -265,6 +280,10 @@ namespace GameEngine {
 	Texture* RendererData::getLightingTexture() const {
 		return m_lightingTexture.get();
 	}
+
+    Shader* RendererData::getFinalRenderShader() const {
+        return m_finalRenderShader.get();
+    }
 
     VertexArrayObject* RendererData::getSphereVAO() const {
         return m_sphereVAO.get();

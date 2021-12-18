@@ -26,7 +26,7 @@ namespace GameEngine {
 
 		Shader* getPostProcessingShader() const;
 		Framebuffer* getPostProcessingFramebuffer() const;
-		Texture* getPostProcessingTexture() const;
+        std::shared_ptr<Texture> getFrameTexture() const;
 
 		Shader* getGeometryPassShader() const;
 		Framebuffer* getGBufferFramebuffer() const;
@@ -38,6 +38,8 @@ namespace GameEngine {
 		Framebuffer* getLightingFramebuffer() const;
 		Texture* getLightingTexture() const;
 
+        Shader* getFinalRenderShader() const;
+
 		VertexArrayObject* getSphereVAO() const;
 		unsigned int getSphereIndexCount() const;
 
@@ -48,7 +50,7 @@ namespace GameEngine {
 
 		std::unique_ptr<Shader> m_postProcessingShader;
 		std::unique_ptr<Framebuffer> m_postProcessingFramebuffer;
-		std::unique_ptr<Texture> m_postProcessingTexture;
+		std::shared_ptr<Texture> m_frameTexture;
 		std::unique_ptr<Renderbuffer> m_postProcessingDepthStencilRenderbuffer;
 
 		std::unique_ptr<Shader> m_gBufferShader;
@@ -62,6 +64,8 @@ namespace GameEngine {
 		std::unique_ptr<Framebuffer> m_lightingFramebuffer;
 		std::unique_ptr<Texture> m_lightingTexture;
 		std::unique_ptr<Renderbuffer> m_lightingDepthStencil;
+
+		std::unique_ptr<Shader> m_finalRenderShader;
 
 		std::unique_ptr<VertexArrayObject> m_sphereVAO;
 		std::unique_ptr<VertexBuffer> m_sphereVBO;
