@@ -7,6 +7,7 @@ workspace "Game"
 include "GameEngine/vendor/glfw"
 include "GameEngine/vendor/glew"
 include "GameEngine/vendor/assimp"
+include "GameEngine/vendor/imgui"
 
 include "GameEngine"
 include "Game"

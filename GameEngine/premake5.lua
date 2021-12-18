@@ -15,10 +15,11 @@ project "GameEngine"
 	sysincludedirs {
 		"vendor/glfw/glfw/include",
 		"vendor/glew/glew/include",
-		"vendor/glm/glm/glm/",
+		"vendor/glm/glm/glm",
 		"vendor/entt/src",
 		"vendor/assimp/assimp/include",
-		"vendor/stb/"
+		"vendor/stb",
+        "vendor/imgui/imgui"
 	}
 
 	warnings "Extra"
@@ -26,6 +27,7 @@ project "GameEngine"
 
 	filter "configurations:Debug"
 		defines "GAME_ENGINE_DEBUG"
+		defines "GAME_ENGINE_EDITOR"
 		symbols "On"
 		runtime "Debug"
 
