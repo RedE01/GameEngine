@@ -21,7 +21,7 @@ namespace GameEngine {
 		m_assetManager = std::make_unique<AssetManager>();
 
 		#ifdef GAME_ENGINE_EDITOR
-		m_editor = std::make_unique<Editor>(getWindow()->getWindowSize());
+		m_editor = std::make_unique<Editor>(getWindow());
 		#endif
 
 		m_window->setEventFunction(std::bind(&Application::eventHandler, this, std::placeholders::_1));
