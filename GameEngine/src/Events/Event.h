@@ -9,7 +9,8 @@ namespace GameEngine {
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		KeyPress, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
-		GameStart, GameEnd, SaveScene, GameFocused, GameUnfocused
+		GameStart, GameEnd, SaveScene, GameFocused, GameUnfocused,
+        EditorViewportResize
 	};
 
 	enum class EventCategory {

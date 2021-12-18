@@ -6,6 +6,7 @@
 #include "Components/ScriptComponentManager.h"
 #include "Assets/AssetManager.h"
 #include "Events/ApplicationEvent.h"
+#include "Events/EditorEvents.h"
 
 #ifdef GAME_ENGINE_EDITOR
 #include "Editor/Editor.h"
@@ -23,6 +24,7 @@ namespace GameEngine {
 		#ifdef GAME_ENGINE_EDITOR
 		m_editor = std::make_unique<Editor>(getWindow());
         m_editor->setViewportTexture(m_renderer->getFrameTexture());
+        m_editor->setEventFunction(std::bind(&Application::eventHandler, this, std::placeholders::_1));
 		#endif
 
 		m_window->setEventFunction(std::bind(&Application::eventHandler, this, std::placeholders::_1));
@@ -91,14 +93,22 @@ namespace GameEngine {
 				m_running = false;
 			}
 			else if(event->getEventType() == EventType::WindowResize) {
+				#ifndef GAME_ENGINE_EDITOR
 				m_renderer->setViewportSize(getWindow()->getWindowSize());
 				m_scene->updateCameras(m_window->getWindowSize().x, m_window->getWindowSize().y);
-
-				#ifdef GAME_ENGINE_EDITOR
-				m_editor->updateEditorCameraViewportSize(getWindow()->getWindowSize());
-				#endif
+                #endif
 			}
 		}
+        else if(event->isInCategory(EventCategory::Editor)) {
+            #ifdef GAME_ENGINE_EDITOR
+            if(event->getEventType() == EventType::EditorViewportResize) {
+                Vector2i viewportSize = dynamic_cast<EditorViewportResizeEvent*>(event)->viewportSize;
+                m_renderer->setViewportSize(viewportSize);
+				m_scene->updateCameras(viewportSize.x, viewportSize.y);
+				m_editor->updateEditorCameraViewportSize(viewportSize);
+            }
+            #endif
+        }
 	}
 
 }

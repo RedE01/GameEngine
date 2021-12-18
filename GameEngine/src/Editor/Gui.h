@@ -24,6 +24,7 @@ namespace GameEngine {
             std::size_t typeHash = typeid(T).hash_code();
 
             std::unique_ptr<T> newWindow = std::make_unique<T>(args...);
+            newWindow->setEventFunction(m_eventFunction);
             T* newWindowPtr = newWindow.get();
             m_windows[typeHash].push_back(std::move(newWindow));
             return newWindowPtr;
@@ -45,12 +46,15 @@ namespace GameEngine {
             return windows;
         }
 
+		void setEventFunction(std::function<void(Event*)> eventFunction);
+
 	private:
 		void init(Window* window);
 
 	private:
         int m_windowFlags;
         std::unordered_map<std::size_t, std::vector<std::unique_ptr<GuiWindow>>> m_windows;
+        std::function<void(Event*)> m_eventFunction;
 	};
 
 }

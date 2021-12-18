@@ -7,6 +7,7 @@
 namespace GameEngine {
 
     class Editor;
+    class Event;
 
 	class GuiWindow {
 	public:
@@ -21,10 +22,15 @@ namespace GameEngine {
 
         void setOpen(bool isOpen);
         void setWindowFlags(int windowFlags);
+		void setEventFunction(std::function<void(Event*)> eventFunction);
+
+    protected:
+        void dispatchEvent(Event* e) const;
 
 	private:
         bool m_focused = false;
 		bool m_open = true;
 		int m_windowFlags = 0;
+        std::function<void(Event*)> m_eventFunction;
 	};
 }

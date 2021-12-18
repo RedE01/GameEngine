@@ -45,6 +45,10 @@ namespace GameEngine {
 		return &(cameraView.get<CameraComponent>(cameraView[0]).getCamera());
 	}
 
+    void Editor::setEventFunction(std::function<void(Event*)> eventFunction) {
+        m_editorGui.setEventFunction(eventFunction);
+    }
+
     void Editor::setViewportTexture(std::shared_ptr<Texture> viewportTexture) {
         std::vector<ViewportWindow*> viewportWindows = m_editorGui.getWindows<ViewportWindow>();
         for(auto viewportWindow : viewportWindows) {

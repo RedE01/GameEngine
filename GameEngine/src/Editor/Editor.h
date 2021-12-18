@@ -7,6 +7,7 @@ namespace GameEngine {
 
 	class Camera;
     class Texture;
+    class Event;
 
 	class Editor {
 	public:
@@ -17,6 +18,7 @@ namespace GameEngine {
         void render();
 
 		Camera* getEditorCamera();
+		void setEventFunction(std::function<void(Event*)> eventFunction);
         void setViewportTexture(std::shared_ptr<Texture> viewportTexture);
 		void updateEditorCameraViewportSize(Vector2 viewportSize);
 

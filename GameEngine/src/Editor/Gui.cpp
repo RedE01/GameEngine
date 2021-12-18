@@ -94,6 +94,16 @@ namespace GameEngine {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
+    void Gui::setEventFunction(std::function<void(Event*)> eventFunction) {
+        m_eventFunction = eventFunction;
+
+        for(auto& windowList : m_windows) {
+            for(auto& window : windowList.second) {
+                window->setEventFunction(eventFunction);
+            }
+        }
+    }
+
     void Gui::init(Window* window) {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();

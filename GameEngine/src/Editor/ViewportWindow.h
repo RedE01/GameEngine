@@ -18,6 +18,7 @@ namespace GameEngine {
 
     private:
         std::shared_ptr<Texture> m_viewportTexture;
+        Vector2i m_viewportSize;
     };
 
 

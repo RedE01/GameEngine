@@ -25,4 +25,14 @@ namespace GameEngine {
         m_windowFlags = windowFlags;
     }
 
+    void GuiWindow::setEventFunction(std::function<void(Event*)> eventFunction) {
+        m_eventFunction = eventFunction;
+    }
+
+    void GuiWindow::dispatchEvent(Event* e) const {
+        if(m_eventFunction) {
+            m_eventFunction(e);
+        }
+    }
+
 }
