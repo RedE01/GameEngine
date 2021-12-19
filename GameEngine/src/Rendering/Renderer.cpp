@@ -23,7 +23,7 @@ namespace GameEngine {
 	Renderer::Renderer(Vector2i viewportSize) : m_viewportSize(viewportSize) {
 		if(glewInit() != GLEW_OK) return;
 
-		initializeRendererDebugger();
+        initializeRendererDebugger();
 
 		m_rendererData = std::make_unique<RendererData>(viewportSize);
 
@@ -36,6 +36,8 @@ namespace GameEngine {
 	}
 
 	void Renderer::beginFrame() {
+        if(m_viewportSize.x == 0 || m_viewportSize.y == 0) return;
+
         m_rendererData->getGBufferFramebuffer()->bind();
 
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -47,6 +49,8 @@ namespace GameEngine {
 	}
 
     void Renderer::endFrame(entt::registry& entityRegistry, Camera* camera) {
+        if(m_viewportSize.x == 0 || m_viewportSize.y == 0) return;
+
         renderLights(entityRegistry, camera);
 
 		// Post processing
@@ -83,7 +87,7 @@ namespace GameEngine {
     }
 
 	void Renderer::renderEntities(entt::registry& entityRegistry, Camera* camera) {
-		if(camera == nullptr) return;
+		if(m_viewportSize.x == 0 || m_viewportSize.y == 0 || camera == nullptr) return;
 
 		auto meshRendererView = entityRegistry.view<MeshRendererComponent>();
 		for(auto& entity : meshRendererView) {
@@ -97,9 +101,12 @@ namespace GameEngine {
 	}
 
 	void Renderer::setViewportSize(Vector2i viewportSize) {
+        if(viewportSize.x < 0) viewportSize.x = 0;
+        if(viewportSize.y < 0) viewportSize.y = 0;
+
         m_viewportSize = viewportSize;
         m_rendererData->setViewportSize(viewportSize);
-		glViewport(0, 0, viewportSize.x, viewportSize.y);
+        glViewport(0, 0, viewportSize.x, viewportSize.y);
 	}
 
 	void Renderer::setDefaultShader(ShaderAsset shaderAsset) {
