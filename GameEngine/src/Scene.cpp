@@ -1,16 +1,18 @@
 #include "Scene.h"
 #include "Components/ScriptComponentManager.h"
 #include "Components/TransformComponent.h"
+#include "Components/NameComponent.h"
 #include "Components/CameraComponent.h"
 
 namespace GameEngine {
 
 	CameraComponent* getActiveCameraComponent(entt::registry& registry);
 
-	Entity Scene::createEntity() {
+	Entity Scene::createEntity(const std::string& name) {
 		entt::entity entity = m_entityRegistry.create();
 		
 		Entity e(&m_entityRegistry, entity);
+		e.addComponent<NameComponent>(name);
 		e.addComponent<TransformComponent>();
 
 		return e;

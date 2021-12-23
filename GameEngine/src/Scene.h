@@ -9,7 +9,7 @@ namespace GameEngine {
 
 	class Scene {
 	public:
-		Entity createEntity();
+		Entity createEntity(const std::string& name);
 		void destroyEntity(const Entity& entity);
 
         void each(std::function<void(Entity)> callback) {
