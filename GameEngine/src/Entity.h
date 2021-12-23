@@ -44,8 +44,8 @@ namespace GameEngine {
 		bool isValid() const;
 		entityid getID() const;
 
-		bool operator==(const Entity& other);
-		bool operator!=(const Entity& other);
+		bool operator==(const Entity& other) const;
+		bool operator!=(const Entity& other) const;
 
 	private:
 		void initComponent(Component* component);

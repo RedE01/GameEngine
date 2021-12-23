@@ -20,11 +20,11 @@ namespace GameEngine {
 		return m_entityID;
 	}
 
-	bool Entity::operator==(const Entity& other) {
+	bool Entity::operator==(const Entity& other) const {
 		return getID() == other.getID();
 	}
 
-	bool Entity::operator!=(const Entity& other) {
+	bool Entity::operator!=(const Entity& other) const {
 		return getID() != other.getID();
 	}
 
