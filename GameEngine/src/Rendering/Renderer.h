@@ -1,7 +1,6 @@
 #pragma once
 #include "../Math/Vector.h"
 #include "../Assets/AssetHandle.h"
-#include <entt/entity/registry.hpp>
 #include <memory>
 
 namespace GameEngine {
@@ -10,6 +9,7 @@ namespace GameEngine {
 	class RendererData;
 	class Model;
 	class TransformComponent;
+    class Scene;
 
 	class Renderer {
 	public:
@@ -17,9 +17,9 @@ namespace GameEngine {
 		~Renderer();
 
 		void beginFrame();
-        void endFrame(entt::registry& entityRegistry, Camera* camera);
+        void endFrame(Scene* scene, Camera* camera);
         void renderFrameToDefaultFramebuffer();
-		void renderEntities(entt::registry& entityRegistry, Camera* camera);
+		void renderEntities(Scene* scene, Camera* camera);
 
 		void setViewportSize(Vector2i viewportSize);
 		void setDefaultShader(ShaderAsset shaderAsset);
@@ -28,7 +28,7 @@ namespace GameEngine {
 
 	private:
 		void renderModel(Model* model, TransformComponent* transform, Camera* camera);
-        void renderLights(entt::registry& entityRegistry, Camera* camera);
+        void renderLights(Scene* scene, Camera* camera);
 
 	private:
 		std::unique_ptr<RendererData> m_rendererData;

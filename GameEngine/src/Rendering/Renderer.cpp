@@ -2,6 +2,7 @@
 #include "../Components/MeshRendererComponent.h"
 #include "../Components/LightComponent.h"
 #include "../Components/TransformComponent.h"
+#include "../Scene.h"
 #include "Model.h"
 #include "Material.h"
 #include "Shader.h"
@@ -48,10 +49,10 @@ namespace GameEngine {
         glDisable(GL_BLEND);
 	}
 
-    void Renderer::endFrame(entt::registry& entityRegistry, Camera* camera) {
+    void Renderer::endFrame(Scene* scene, Camera* camera) {
         if(m_viewportSize.x == 0 || m_viewportSize.y == 0) return;
 
-        renderLights(entityRegistry, camera);
+        renderLights(scene, camera);
 
 		// Post processing
 		glDisable(GL_DEPTH_TEST);
@@ -86,18 +87,14 @@ namespace GameEngine {
 
     }
 
-	void Renderer::renderEntities(entt::registry& entityRegistry, Camera* camera) {
+	void Renderer::renderEntities(Scene* scene, Camera* camera) {
 		if(m_viewportSize.x == 0 || m_viewportSize.y == 0 || camera == nullptr) return;
 
-		auto meshRendererView = entityRegistry.view<MeshRendererComponent>();
-		for(auto& entity : meshRendererView) {
-			auto& meshRendererComponent = meshRendererView.get<MeshRendererComponent>(entity);
-			auto& transformComponent = entityRegistry.get<TransformComponent>(entity);
-
+        scene->eachInGroup<TransformComponent, MeshRendererComponent>([&](TransformComponent& transformComponent, MeshRendererComponent& meshRendererComponent){
 			if(meshRendererComponent.model) {
 				renderModel(&meshRendererComponent.model.get(), &transformComponent, camera);
 			}
-		}
+        });
 	}
 
 	void Renderer::setViewportSize(Vector2i viewportSize) {
@@ -147,7 +144,7 @@ namespace GameEngine {
 		}
 	}
 
-    void Renderer::renderLights(entt::registry& entityRegistry, Camera* camera) {
+    void Renderer::renderLights(Scene* scene, Camera* camera) {
 		m_rendererData->getLightingFramebuffer()->bind();
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -171,10 +168,8 @@ namespace GameEngine {
         m_rendererData->getDefaultLightingShader()->setUniform3f("u_cameraPos", camera->position.x, camera->position.y, camera->position.z);
         m_rendererData->getDefaultLightingShader()->setUniform2f("u_viewportSize", m_viewportSize.x, m_viewportSize.y);
 
-        auto lightComponentView = entityRegistry.view<LightComponent>();
-        for(auto& entity : lightComponentView) {
-            auto& lightComponent = lightComponentView.get<LightComponent>(entity);
-			auto& transformComponent = entityRegistry.get<TransformComponent>(entity);
+        scene->each<LightComponent>([&](Entity entity, LightComponent& lightComponent){
+			auto& transformComponent = entity.getComponent<TransformComponent>();
 
             m_rendererData->getDefaultLightingShader()->setUniform1ui("u_lightType", static_cast<unsigned int>(lightComponent.lightType));
             if(lightComponent.lightType == LightType::PointLight) {
@@ -198,8 +193,8 @@ namespace GameEngine {
                 glDrawElements(GL_TRIANGLES, m_rendererData->getRenderQuadIndexCount(), GL_UNSIGNED_INT, 0);
             }
 
+        });
 
-        }
     }
 
 
