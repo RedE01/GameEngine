@@ -1,4 +1,5 @@
 #include "Gui.h"
+#include "../Application.h"
 #include "../Window.h"
 
 #include <imgui.h>
@@ -7,12 +8,12 @@
 
 namespace GameEngine {
 
-    Gui::Gui(Window* window) {
+    Gui::Gui(Application* application, Editor* editor) : m_application(application), m_editor(editor) {
         m_windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar 
                 | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus 
                 | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
 
-        init(window);
+        init();
     }
 
     void Gui::OnGuiRender() {
@@ -104,14 +105,14 @@ namespace GameEngine {
         }
     }
 
-    void Gui::init(Window* window) {
+    void Gui::init() {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
 
         ImGui::StyleColorsDark();
 
-        GLFWwindow* glfwWindow = window->getWindow();
+        GLFWwindow* glfwWindow = m_application->getWindow()->getWindow();
         ImGui_ImplGlfw_InitForOpenGL(glfwWindow, true);
         ImGui_ImplOpenGL3_Init(NULL);
 

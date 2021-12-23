@@ -2,7 +2,7 @@
 
 namespace GameEngine {
     
-    GuiWindow::GuiWindow() {
+    GuiWindow::GuiWindow(Application* application, Editor* editor) : m_application(application), m_editor(editor) {
 
     }
 
@@ -33,6 +33,14 @@ namespace GameEngine {
         if(m_eventFunction) {
             m_eventFunction(e);
         }
+    }
+
+    Application* GuiWindow::getApplication() const {
+        return m_application;
+    }
+
+    Editor* GuiWindow::getEditor() const {
+        return m_editor;
     }
 
 }

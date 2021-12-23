@@ -6,7 +6,7 @@
 
 namespace GameEngine {
 
-    ViewportWindow::ViewportWindow() : GuiWindow() {
+    ViewportWindow::ViewportWindow(Application* application, Editor* editor) : GuiWindow(application, editor) {
     }
 
     ViewportWindow::~ViewportWindow() {

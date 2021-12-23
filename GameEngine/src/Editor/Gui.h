@@ -9,12 +9,12 @@
 
 namespace GameEngine {
 
-    class Window;
     class Editor;
+    class Application;
 
 	class Gui {
 	public:
-		Gui(Window* window);
+		Gui(Application* application, Editor* editor);
 
 		void OnGuiRender();
 
@@ -23,7 +23,7 @@ namespace GameEngine {
             static_assert(std::is_base_of<GuiWindow, T>::value, "Can not add window of type that is not derived from GuiWindow");
             std::size_t typeHash = typeid(T).hash_code();
 
-            std::unique_ptr<T> newWindow = std::make_unique<T>(args...);
+            std::unique_ptr<T> newWindow = std::make_unique<T>(m_application, m_editor, args...);
             newWindow->setEventFunction(m_eventFunction);
             T* newWindowPtr = newWindow.get();
             m_windows[typeHash].push_back(std::move(newWindow));
@@ -49,11 +49,13 @@ namespace GameEngine {
 		void setEventFunction(std::function<void(Event*)> eventFunction);
 
 	private:
-		void init(Window* window);
+		void init();
 
 	private:
         int m_windowFlags;
         std::unordered_map<std::size_t, std::vector<std::unique_ptr<GuiWindow>>> m_windows;
+        Application* const m_application;
+        Editor* const m_editor;
         std::function<void(Event*)> m_eventFunction;
 	};
 

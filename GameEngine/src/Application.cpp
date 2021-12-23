@@ -22,7 +22,7 @@ namespace GameEngine {
 		m_assetManager = std::make_unique<AssetManager>();
 
 		#ifdef GAME_ENGINE_EDITOR
-		m_editor = std::make_unique<Editor>(getWindow());
+		m_editor = std::make_unique<Editor>(this);
         m_editor->setViewportTexture(m_renderer->getFrameTexture());
         m_editor->setEventFunction(std::bind(&Application::eventHandler, this, std::placeholders::_1));
 		#endif

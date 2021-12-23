@@ -8,7 +8,7 @@ namespace GameEngine {
 
     class ViewportWindow : public GuiWindow {
     public:
-        ViewportWindow();
+        ViewportWindow(Application* application, Editor* editor);
         ~ViewportWindow();
 
         void setTexture(std::shared_ptr<Texture> texture);

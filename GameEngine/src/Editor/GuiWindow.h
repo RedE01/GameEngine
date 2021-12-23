@@ -8,10 +8,11 @@ namespace GameEngine {
 
     class Editor;
     class Event;
+    class Application;
 
 	class GuiWindow {
 	public:
-		GuiWindow();
+		GuiWindow(Application* application, Editor* editor);
 
 		virtual const char* getWindowName() = 0;
 		virtual void renderWindow() = 0;
@@ -26,11 +27,15 @@ namespace GameEngine {
 
     protected:
         void dispatchEvent(Event* e) const;
+        Application* getApplication() const;
+        Editor* getEditor() const;
 
 	private:
         bool m_focused = false;
 		bool m_open = true;
 		int m_windowFlags = 0;
         std::function<void(Event*)> m_eventFunction;
+        Application* const m_application;
+        Editor* const m_editor;
 	};
 }

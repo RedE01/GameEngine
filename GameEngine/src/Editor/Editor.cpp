@@ -1,7 +1,9 @@
 #include "Editor.h"
 #include "../Entity.h"
 #include "../Window.h"
+#include "../Application.h"
 #include "ViewportWindow.h"
+#include "SceneWindow.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/CameraComponent.h"
 #include "Components/CameraController.h"
@@ -11,13 +13,14 @@
 
 namespace GameEngine {
 
-	Editor::Editor(Window* window) : m_editorGui(window) {
+	Editor::Editor(Application* application) : m_application(application), m_editorGui(application, this) {
 		Entity cameraEntity = Entity(&m_editorEntityRegistry, m_editorEntityRegistry.create());
 		cameraEntity.addComponent<TransformComponent>();
-		cameraEntity.addComponent<CameraComponent>(ProjectionType::Perspective, glm::radians(45.0f), window->getWindowSize());
+		cameraEntity.addComponent<CameraComponent>(ProjectionType::Perspective, glm::radians(45.0f), m_application->getWindow()->getWindowSize());
 		cameraEntity.addComponent<CameraController>();
 
         m_editorGui.addWindow<ViewportWindow>();
+        m_editorGui.addWindow<SceneWindow>();
 	}
 
 	Editor::~Editor() {
@@ -45,6 +48,10 @@ namespace GameEngine {
 		return &(cameraView.get<CameraComponent>(cameraView[0]).getCamera());
 	}
 
+    Entity Editor::getSelectedEntity() {
+        return m_selectedEntity;
+    }
+
     void Editor::setEventFunction(std::function<void(Event*)> eventFunction) {
         m_editorGui.setEventFunction(eventFunction);
     }
@@ -60,5 +67,9 @@ namespace GameEngine {
 		getEditorCamera()->setSize(viewportSize);
 	}
 
+
+    void Editor::selectEntity(Entity entity) {
+        m_selectedEntity = entity;
+    }
 
 }
