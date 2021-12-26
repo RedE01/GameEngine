@@ -8,9 +8,7 @@
 #include "Events/ApplicationEvent.h"
 #include "Events/EditorEvents.h"
 
-#ifdef GAME_ENGINE_EDITOR
 #include "Editor/Editor.h"
-#endif
 
 namespace GameEngine {
 

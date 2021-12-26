@@ -39,9 +39,7 @@ namespace GameEngine {
 		std::unique_ptr<ScriptComponentManager> m_scriptComponentManager;
 		std::unique_ptr<AssetManager> m_assetManager;
 
-		#ifdef GAME_ENGINE_EDITOR
 		std::unique_ptr<Editor> m_editor;
-		#endif
 
 		bool m_running = true;
 	};
