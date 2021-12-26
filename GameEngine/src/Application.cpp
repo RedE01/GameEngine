@@ -16,7 +16,6 @@ namespace GameEngine {
 		m_window = std::make_unique<Window>(name, 640, 480);
 		m_renderer = std::make_unique<Renderer>(getWindow()->getWindowSize());
 		m_scene = std::make_unique<Scene>();
-		m_scriptComponentManager = std::make_unique<ScriptComponentManager>();
 		m_assetManager = std::make_unique<AssetManager>();
 
 		#ifdef GAME_ENGINE_EDITOR
@@ -36,8 +35,6 @@ namespace GameEngine {
 	}
 
 	void Application::run() {
-		registerScriptComponents(m_scriptComponentManager.get());
-
 		GameStartEvent gameStartEvent;
 		eventHandler(&gameStartEvent);
 
@@ -46,7 +43,7 @@ namespace GameEngine {
 			m_window->pollEvents();
 
 			#ifndef GAME_ENGINE_EDITOR
-			m_scene->update(m_scriptComponentManager.get());
+			m_scene->update();
 			onUpdate();
 
 			m_renderer->beginFrame();

@@ -29,8 +29,10 @@ namespace GameEngine {
 		return nullptr;
 	}
 
-	void Scene::update(ScriptComponentManager* scriptComponentManager) {
-		scriptComponentManager->updateScriptComponents(m_entityRegistry);
+	void Scene::update() {
+        ScriptComponentManager::eachComponent(m_entityRegistry, [](Component& component){
+            component.update();
+        });
 
 		CameraComponent* cameraComponent = getActiveCameraComponent(m_entityRegistry);
 		if(cameraComponent != nullptr) cameraComponent->updateCamera();

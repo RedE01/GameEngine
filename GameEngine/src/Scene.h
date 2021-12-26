@@ -49,7 +49,7 @@ namespace GameEngine {
 		Camera* getActiveCamera();
 
 	private:
-		void update(ScriptComponentManager* scriptComponentManager);
+		void update();
 		void updateCameras(float windowWidth, float windowHeight);
 
 	private:

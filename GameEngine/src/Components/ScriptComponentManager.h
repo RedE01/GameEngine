@@ -6,33 +6,33 @@
 
 namespace GameEngine {
 
-	namespace ScriptComponentManagerInternal {
-		template <class T>
-		void updateComponentsOfType(entt::registry& registry) {
-			registry.view<T>().each([](T& component){
-				component.update();
-			});
-		}
-	}
-
 	class ScriptComponentManager {
 	public:
+        ScriptComponentManager() = delete;
+
 		template<typename T>
-		void registerScriptComponent() {
-			m_scriptComponentUpdateFunctions.push_back(ScriptComponentManagerInternal::updateComponentsOfType<T>);
+		static void registerScriptComponent() {
+            m_eachComponentFunction.push_back([](entt::registry& registry, std::function<void(Component&)> function){
+                registry.view<T>().each([&](T& component){
+                    function(component);
+                });
+            });
+
+            m_eachComponentOfEntityFunction.push_back([](Entity entity, std::function<void(Component&)> function){
+                if(entity.hasComponent<T>()) {
+                    function(entity.getComponent<T>());
+                }
+            });
 		}
 
-	private:
-		void updateScriptComponents(entt::registry& registry) {
-			for(auto& updateFn : m_scriptComponentUpdateFunctions) {
-				updateFn(registry);
-			}
-		}
+		static void eachComponent(entt::registry& registry, std::function<void(Component&)> function);
+		static void eachComponent(Entity entity, std::function<void(Component&)> function);
 
 	private:
-		std::vector<std::function<void(entt::registry&)>> m_scriptComponentUpdateFunctions;
-
-		friend class Scene;
+        using eachComponentFunctionType = std::function<void(entt::registry&, std::function<void(Component&)>)>;
+        using eachComponentOfEntityFunctionType = std::function<void(Entity, std::function<void(Component&)>)>;
+		static std::vector<eachComponentFunctionType> m_eachComponentFunction;
+		static std::vector<eachComponentOfEntityFunctionType> m_eachComponentOfEntityFunction;
 	};
 
 }
