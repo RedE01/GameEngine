@@ -41,6 +41,13 @@ namespace GameEngine {
 			return m_entityRegistry->get<T>(m_entityID);
 		}
 
+        template <typename T>
+        bool hasComponent() {
+            assert(isValid());
+
+            return m_entityRegistry->all_of<T>(getID());
+        }
+
 		bool isValid() const;
 		entityid getID() const;
 
