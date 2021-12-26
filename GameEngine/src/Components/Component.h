@@ -5,6 +5,7 @@ namespace GameEngine {
 
     class Component {
     public:
+        virtual ~Component() = default;
         virtual void init() {}
         virtual void update() {}
 

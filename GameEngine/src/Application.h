@@ -15,7 +15,7 @@ namespace GameEngine {
 	class Application {
 	public:
 		Application(const std::string& name);
-		~Application();
+		virtual ~Application();
 
 		void run();
 

@@ -9,7 +9,7 @@ namespace GameEngine {
     class Buffer {
     public:
         Buffer();
-        ~Buffer();
+        virtual ~Buffer();
         Buffer(const Buffer& other) = delete;
         Buffer(Buffer&& other) = delete;
 

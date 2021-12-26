@@ -13,6 +13,7 @@ namespace GameEngine {
 	class GuiWindow {
 	public:
 		GuiWindow(Application* application, Editor* editor);
+        virtual ~GuiWindow() = default;
 
 		virtual const char* getWindowName() = 0;
 		virtual void renderWindow() = 0;
