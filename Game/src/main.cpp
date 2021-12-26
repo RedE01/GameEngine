@@ -9,7 +9,7 @@ using namespace GameEngine;
 class Game : public Application {
 public:
     Game(const std::string& name) : Application(name) {
-
+        ScriptComponentManager::registerScriptComponent<TestScript>();
 	}
 
 	virtual void onUpdate() override {
@@ -19,24 +19,20 @@ public:
 	virtual void onRender() override {
 
 	}
-
-	virtual void registerScriptComponents(ScriptComponentManager* scm) override {
-		scm->registerScriptComponent<TestScript>();
-	}
 };
 
 int main() {
 	Game game("Test Game");
 
-    Entity cameraEntity = game.getScene()->createEntity();
+    Entity cameraEntity = game.getScene()->createEntity("Camera");
 	CameraComponent& camera = cameraEntity.addComponent<CameraComponent>(ProjectionType::Perspective, glm::radians(45.0), game.getWindow()->getWindowSize());
 	cameraEntity.getComponent<TransformComponent>().setPosition(Vector3(0.0, 0.0, 10.0));
 
-	Entity entity1 = game.getScene()->createEntity();
+	Entity entity1 = game.getScene()->createEntity("Entity1");
 	MeshRendererComponent& component1 = entity1.addComponent<MeshRendererComponent>();
     component1.model = game.getAssetManager()->load<Model>("Game/assets/models/test.fbx");
 
-    Entity ent2 = game.getScene()->createEntity();
+    Entity ent2 = game.getScene()->createEntity("Light entity");
     ent2.getComponent<TransformComponent>().setScale(Vector3(0.1, 0.1, 0.1));
     ent2.getComponent<TransformComponent>().setPosition(Vector3(2.0, 0.0, 0.0));
     ent2.addComponent<LightComponent>();
@@ -44,7 +40,7 @@ int main() {
     comp2.model = game.getAssetManager()->load<Model>("Game/assets/models/sphere.fbx");
     ent2.addComponent<TestScript>();
 
-    Entity directionalLightEntity = game.getScene()->createEntity();
+    Entity directionalLightEntity = game.getScene()->createEntity("Directional light entity");
     directionalLightEntity.addComponent<LightComponent>().lightType = LightType::DirectionalLight;
 
 	game.run();

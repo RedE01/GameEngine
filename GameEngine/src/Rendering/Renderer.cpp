@@ -50,7 +50,7 @@ namespace GameEngine {
 	}
 
     void Renderer::endFrame(Scene* scene, Camera* camera) {
-        if(m_viewportSize.x == 0 || m_viewportSize.y == 0) return;
+        if(m_viewportSize.x == 0 || m_viewportSize.y == 0 || camera == nullptr) return;
 
         renderLights(scene, camera);
 
