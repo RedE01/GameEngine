@@ -5,7 +5,8 @@ namespace GameEngine {
 
 	class CameraController : public Component {
 	public:
-		void update();
+        virtual std::string getName() const override { return "Camera Controller"; }
+		virtual void update() override;
 	};
 
 }

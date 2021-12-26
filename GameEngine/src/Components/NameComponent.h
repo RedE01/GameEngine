@@ -1,7 +1,6 @@
 #pragma once
 #include "Component.h"
 #include <string>
-#include <string_view>
 
 namespace GameEngine {
 
@@ -10,7 +9,7 @@ namespace GameEngine {
         NameComponent(const char* name) : m_name(name) {}
         NameComponent(const std::string& name) : m_name(name) {}
 
-        std::string_view getName() const { return m_name; }
+        virtual std::string getName() const override { return m_name; }
         const char* getNameCStr() const { return m_name.c_str(); }
 
     private:

@@ -6,6 +6,7 @@ namespace GameEngine {
     class Component {
     public:
         virtual ~Component() = default;
+        virtual std::string getName() const = 0;
         virtual void init() {}
         virtual void update() {}
 

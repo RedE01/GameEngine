@@ -10,6 +10,7 @@ namespace GameEngine {
 
 	class LightComponent : public Component {
 	public:
+        virtual std::string getName() const override { return "Light"; }
         LightType lightType = LightType::PointLight;
         
         // Point light stuff

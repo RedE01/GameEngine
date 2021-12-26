@@ -9,7 +9,9 @@ using namespace GameEngine;
 
 class TestScript : public Component {
 public:
-	void update() {
+    virtual std::string getName() const override { return "TestScript"; }
+
+	void update() override {
 		TransformComponent& t = getEntity().getComponent<TransformComponent>();
 
         Vector3 p = t.getPosition();
