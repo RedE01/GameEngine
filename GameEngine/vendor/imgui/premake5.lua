@@ -8,7 +8,8 @@ project "imgui"
 	files {
 		"imgui/*.cpp",
         "imgui/backends/imgui_impl_glfw.cpp",
-        "imgui/backends/imgui_impl_opengl3.cpp"
+        "imgui/backends/imgui_impl_opengl3.cpp",
+        "imgui/misc/cpp/imgui_stdlib.cpp"
 	}
 
     includedirs {
