@@ -82,10 +82,10 @@ namespace GameEngine {
             }
         }
 
-        static void visit(const std::string& name, PublicEnum& var) {
+        static void visit(const std::string& name, int* selection, std::vector<std::string>& options) {
             std::vector<const char*> optionsCharPtr;
-            for(auto& option : var.options) optionsCharPtr.push_back(option.c_str());
-            ImGui::Combo(name.c_str(), &(var.selection), optionsCharPtr.data(), optionsCharPtr.size());
+            for(auto& option : options) optionsCharPtr.push_back(option.c_str());
+            ImGui::Combo(name.c_str(), selection, optionsCharPtr.data(), optionsCharPtr.size());
         }
     };
 
@@ -95,7 +95,7 @@ namespace GameEngine {
         ImGui::Text("%s", cName.c_str());
 
         for(size_t i = 0; i < component.getPublicVariableCount(); ++i) {
-            component.getPublicVariable(i).visit<PublicVariableVisitor>();
+            component.getPublicVariable(i).visit<PublicVariableVisitor>(component);
         }
 
         ImGui::Separator();

@@ -10,6 +10,11 @@ namespace GameEngine {
 
 	class LightComponent : public Component {
 	public:
+        LightComponent() {
+            registerPublicVariable("lightType", &LightComponent::lightType, {"PointLight", "DirectionalLight"});
+            registerPublicVariable("pointLightRange", &LightComponent::pointLightRange);
+            registerPublicVariable("intensity", &LightComponent::intensity);
+        }
         virtual std::string getName() const override { return "Light"; }
         LightType lightType = LightType::PointLight;
         

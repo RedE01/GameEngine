@@ -22,13 +22,14 @@ namespace GameEngine {
             return m_entity;
         }
 
-        template <typename T>
-        void registerPublicVariable(const std::string& name, T& variable) {
+        template <typename VariableType, class ComponentType>
+        void registerPublicVariable(const std::string& name, VariableType ComponentType::* variable) {
             m_publicVariables.emplace_back(PublicVariable(name, variable));
         }
 
-        template <typename T>
-        void registerPublicVariable(const std::string& name, T& variable, const std::vector<std::string>& options) {
+        template <typename EnumType, class ComponentType>
+            requires std::is_enum<EnumType>::value
+        void registerPublicVariable(const std::string& name, EnumType ComponentType::* variable, const std::vector<std::string>& options) {
             m_publicVariables.emplace_back(PublicVariable(name, variable, options));
         }
 
