@@ -4,6 +4,7 @@
 #include <vector>
 #include "../Math/Vector.h"
 #include "../Math/Quaternion.h"
+#include "../Assets/AssetHandle.h"
 
 namespace GameEngine {
 
@@ -38,7 +39,6 @@ namespace GameEngine {
         }
 
     private:
-
         struct PublicEnum {
         public:
             PublicEnum(int Component::* selection, const std::vector<std::string>& options) : selection(selection), options(options) {}
@@ -48,7 +48,7 @@ namespace GameEngine {
 
         std::string m_name;
         template <typename... Ts> using variantType = std::variant<Ts Component::*..., PublicEnum>;
-        variantType<int, float, double, bool, char, std::string, Vector2, Vector3, Vector4, Vector2i, Vector3i, Vector4i, Quaternion> m_data;
+        variantType<int, float, double, bool, char, std::string, Vector2, Vector3, Vector4, Vector2i, Vector3i, Vector4i, Quaternion, ModelAsset, ShaderAsset, TextureAsset, MaterialAsset> m_data;
     };
 
 }

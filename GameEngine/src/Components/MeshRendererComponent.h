@@ -6,6 +6,10 @@ namespace GameEngine {
 
 	class MeshRendererComponent : public Component {
 	public:
+        MeshRendererComponent() {
+            registerPublicVariable("model", &MeshRendererComponent::model);
+        }
+
         virtual std::string getName() const override { return "Mesh Renderer"; }
 		ModelAsset model;
 	};

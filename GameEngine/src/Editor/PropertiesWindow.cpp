@@ -14,6 +14,8 @@
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
+#include "../Rendering/Model.h"
+
 namespace GameEngine {
 
     template <typename T>
@@ -86,6 +88,22 @@ namespace GameEngine {
             std::vector<const char*> optionsCharPtr;
             for(auto& option : options) optionsCharPtr.push_back(option.c_str());
             ImGui::Combo(name.c_str(), selection, optionsCharPtr.data(), optionsCharPtr.size());
+        }
+
+        static void visit(const std::string& name, ModelAsset* modelAsset) {
+            ImGui::Text("name: %s", name.c_str());
+        }
+
+        static void visit(const std::string& name, ShaderAsset* shaderAsset) {
+            ImGui::Text("name: %s", name.c_str());
+        }
+
+        static void visit(const std::string& name, TextureAsset* textureAsset) {
+            ImGui::Text("name: %s", name.c_str());
+        }
+
+        static void visit(const std::string& name, MaterialAsset* materialAsset) {
+            ImGui::Text("name: %s", name.c_str());
         }
     };
 
