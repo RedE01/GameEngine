@@ -30,8 +30,8 @@ project "assimp"
 	}
 
     prebuildcommands {
-        "cp 'generated headers/config.h' assimp/include/assimp/config.h",
-        "cp 'generated headers/revision.h' assimp/revision.h"
+        "cp -u 'generated headers/config.h' assimp/include/assimp/config.h",
+        "cp -u 'generated headers/revision.h' assimp/revision.h"
     }
 
     cleancommands {
