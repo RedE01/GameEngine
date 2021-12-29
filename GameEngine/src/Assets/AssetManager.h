@@ -1,8 +1,4 @@
 #pragma once
-#include "ModelLoader.h"
-#include "ShaderLoader.h"
-#include "TextureLoader.h"
-#include "MaterialLoader.h"
 #include "AssetHandle.h"
 #include "AssetCache.h"
 #include <functional>
