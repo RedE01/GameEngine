@@ -10,7 +10,7 @@ namespace GameEngine {
     template<class AssetType>
     class AssetCache {
     public:
-        using IDtype = uint32_t;
+        using IDtype = typename AssetHandle<AssetType>::IDtype;
 
     private:
         struct AssetData {
@@ -27,7 +27,7 @@ namespace GameEngine {
             auto search = m_assets.find(id);
             if(search == m_assets.end()) {
                 Loader loader;
-                AssetHandle<AssetType> assetHandle(loader.load(std::forward<Args>(args)...));
+                AssetHandle<AssetType> assetHandle(id, loader.load(std::forward<Args>(args)...));
                 m_assets.insert({id, AssetData(name, filepath, assetHandle)});
                 return assetHandle;
             }
@@ -42,10 +42,22 @@ namespace GameEngine {
             return load<Loader>(id, name, filepath, args...);
         }
 
-        AssetHandle<AssetType> handle(IDtype id) {
+        AssetHandle<AssetType> getHandle(IDtype id) {
             auto search = m_assets.find(id);
             if(search == m_assets.end()) return {};
             return search->second.asset;
+        }
+
+        const char* getName(IDtype id) {
+            auto search = m_assets.find(id);
+            if(search == m_assets.end()) return "";
+            return search->second.name.c_str();
+        }
+
+        const char* getFilepath(IDtype id) {
+            auto search = m_assets.find(id);
+            if(search == m_assets.end()) return "";
+            return search->second.filepath.c_str();
         }
 
         std::size_t size() const {
@@ -76,19 +88,7 @@ namespace GameEngine {
             }
         }
 
-        void each(std::function<void(AssetHandle<AssetType>, const std::string&, const std::string)> func) const {
-            auto begin = m_assets.begin();
-            auto end = m_assets.end();
-
-            while(begin != end) {
-                auto curr = begin++;
-
-                func(curr->second.asset, curr->second.name, curr->second.filepath);
-            }
-        }
-
     private:
-
         std::unordered_map<IDtype, AssetData> m_assets;
     };
 

@@ -33,10 +33,11 @@ namespace GameEngine {
         float windowVisible = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
 
         int n = 0;
-        assetManager->each<T>([&](AssetHandle<T> asset, const std::string& name, const std::string&){
+        assetManager->each<T>([&](AssetHandle<T> asset){
             ImGui::PushID(n);
             ImGui::BeginGroup();
 
+            std::string name = std::string(assetManager->getName(asset));
             std::string nameStr;
             if(name.size() > 16) nameStr = name.substr(0, 16 - 3) + "...";
             else nameStr = name;
@@ -45,6 +46,9 @@ namespace GameEngine {
             ImGui::Dummy({std::max(0.0f, (textWidth - size.x)) / 2, size.y});
             ImGui::SameLine();
             showAsset(asset, size);
+
+            ImGui::Dummy({std::max(0.0f, (size.x - textWidth)) / 2, size.y});
+            ImGui::SameLine();
             ImGui::Text("%s", nameStr.c_str());
 
             ImGui::EndGroup();

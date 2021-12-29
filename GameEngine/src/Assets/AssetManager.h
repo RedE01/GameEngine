@@ -20,6 +20,12 @@ namespace GameEngine {
         bool exists(const std::string& filepath);
 
         template<typename T>
+        const char* getName(AssetHandle<T> asset);
+
+        template<typename T>
+        const char* getFilepath(AssetHandle<T> asset);
+
+        template<typename T>
         void clearAssets();
 
         template<typename T>
@@ -27,9 +33,6 @@ namespace GameEngine {
 
         template<typename T>
         void each(std::function<void(AssetHandle<T>)> func);
-
-        template<typename T>
-        void each(std::function<void(AssetHandle<T>, const std::string& name, const std::string& filename)> func);
 
 	private:
         template<typename T>

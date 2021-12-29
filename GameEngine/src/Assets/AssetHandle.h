@@ -11,10 +11,13 @@ namespace GameEngine {
     template<typename AssetType>
     class AssetHandle {
     public:
-        AssetHandle() : m_asset() { }
+        using IDtype = uint32_t;
 
-        AssetHandle(std::shared_ptr<AssetType> asset) 
-            : m_asset(std::move(asset)) {
+    public:
+        AssetHandle() : m_id(0), m_asset() { }
+
+        AssetHandle(IDtype id, std::shared_ptr<AssetType> asset) 
+            : m_id(id), m_asset(std::move(asset)) {
         }
 
         const AssetType& get() const {
@@ -23,6 +26,10 @@ namespace GameEngine {
 
         AssetType& get() {
             return *m_asset;
+        }
+
+        IDtype ID() {
+            return m_id;
         }
 
         std::size_t use_count() const {
@@ -58,6 +65,7 @@ namespace GameEngine {
         }
         
     private:
+        IDtype m_id;
         std::shared_ptr<AssetType> m_asset;
     };
 
