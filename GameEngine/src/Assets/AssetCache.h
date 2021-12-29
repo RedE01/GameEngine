@@ -28,6 +28,8 @@ namespace GameEngine {
             if(search == m_assets.end()) {
                 Loader loader;
                 AssetHandle<AssetType> assetHandle(id, loader.load(std::forward<Args>(args)...));
+                if(!assetHandle) return AssetHandle<AssetType>();
+
                 m_assets.insert({id, AssetData(name, filepath, assetHandle)});
                 return assetHandle;
             }
