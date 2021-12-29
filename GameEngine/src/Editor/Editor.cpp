@@ -5,6 +5,7 @@
 #include "ViewportWindow.h"
 #include "SceneWindow.h"
 #include "PropertiesWindow.h"
+#include "AssetWindow.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/CameraComponent.h"
 #include "Components/CameraController.h"
@@ -23,6 +24,7 @@ namespace GameEngine {
         m_editorGui.addWindow<ViewportWindow>();
         m_editorGui.addWindow<SceneWindow>();
         m_editorGui.addWindow<PropertiesWindow>();
+        m_editorGui.addWindow<AssetWindow>();
 	}
 
 	Editor::~Editor() {

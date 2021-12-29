@@ -47,6 +47,11 @@ namespace GameEngine {
     }
 
     template<typename T>
+    void AssetManager::each(std::function<void(AssetHandle<T>, const std::string& name, const std::string& filename)> func) {
+        return getResourceCache<T>()->each(func);
+    }
+
+    template<typename T>
     AssetCache<T>* AssetManager::getResourceCache() {
         assert(false);
         return nullptr;
@@ -83,6 +88,7 @@ namespace GameEngine {
     template void AssetManager::clearAssets<Model>();
     template size_t AssetManager::numberOfAssets<Model>();
     template void AssetManager::each(std::function<void(AssetHandle<Model>)> func);
+    template void AssetManager::each(std::function<void(AssetHandle<Model>, const std::string&, const std::string&)> func);
 
     // Shader
     template<>
@@ -105,6 +111,7 @@ namespace GameEngine {
     template void AssetManager::clearAssets<Shader>();
     template size_t AssetManager::numberOfAssets<Shader>();
     template void AssetManager::each(std::function<void(AssetHandle<Shader>)> func);
+    template void AssetManager::each(std::function<void(AssetHandle<Shader>, const std::string&, const std::string&)> func);
 
     // Texture
     template<>
@@ -137,6 +144,7 @@ namespace GameEngine {
     template void AssetManager::clearAssets<Texture>();
     template size_t AssetManager::numberOfAssets<Texture>();
     template void AssetManager::each(std::function<void(AssetHandle<Texture>)> func);
+    template void AssetManager::each(std::function<void(AssetHandle<Texture>, const std::string&, const std::string&)> func);
 
     // Material
     template<>
@@ -159,6 +167,7 @@ namespace GameEngine {
     template void AssetManager::clearAssets<Material>();
     template size_t AssetManager::numberOfAssets<Material>();
     template void AssetManager::each(std::function<void(AssetHandle<Material>)> func);
+    template void AssetManager::each(std::function<void(AssetHandle<Material>, const std::string&, const std::string&)> func);
 
 	// ----
 

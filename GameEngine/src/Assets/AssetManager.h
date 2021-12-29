@@ -28,6 +28,9 @@ namespace GameEngine {
         template<typename T>
         void each(std::function<void(AssetHandle<T>)> func);
 
+        template<typename T>
+        void each(std::function<void(AssetHandle<T>, const std::string& name, const std::string& filename)> func);
+
 	private:
         template<typename T>
         AssetCache<T>* getResourceCache();

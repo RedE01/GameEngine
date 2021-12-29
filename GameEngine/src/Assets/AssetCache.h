@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <memory>
 #include <string>
+#include <functional>
 
 namespace GameEngine {
 
@@ -64,8 +65,7 @@ namespace GameEngine {
             return m_assets.contains(id);
         }
 
-        template <typename Func>
-        void each(Func func) const {
+        void each(std::function<void(AssetHandle<AssetType>)> func) const {
             auto begin = m_assets.begin();
             auto end = m_assets.end();
 
@@ -73,6 +73,17 @@ namespace GameEngine {
                 auto curr = begin++;
 
                 func(curr->second.asset);
+            }
+        }
+
+        void each(std::function<void(AssetHandle<AssetType>, const std::string&, const std::string)> func) const {
+            auto begin = m_assets.begin();
+            auto end = m_assets.end();
+
+            while(begin != end) {
+                auto curr = begin++;
+
+                func(curr->second.asset, curr->second.name, curr->second.filepath);
             }
         }
 
