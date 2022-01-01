@@ -25,7 +25,8 @@ project "Game"
 		"glfw",
 		"glew",
 		"assimp",
-        "imgui"
+        "imgui",
+        "yaml"
 	}
 
 	filter "system:linux"

@@ -19,7 +19,8 @@ project "GameEngine"
 		"vendor/entt/src",
 		"vendor/assimp/assimp/include",
 		"vendor/stb",
-        "vendor/imgui/imgui"
+        "vendor/imgui/imgui",
+        "vendor/yaml/yaml-cpp/include"
 	}
 
 	warnings "Extra"
