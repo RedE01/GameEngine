@@ -19,3 +19,6 @@
 [submodule "GameEngine/vendor/imgui/imgui"]
 	path = GameEngine/vendor/imgui/imgui
 	url = git@github.com:ocornut/imgui.git
+[submodule "GameEngine/vendor/yaml/yaml-cpp"]
+	path = GameEngine/vendor/yaml/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp
