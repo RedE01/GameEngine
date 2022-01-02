@@ -25,15 +25,15 @@ namespace GameEngine {
 
         std::string getName() const { return m_name; }
 
-        template <template <typename P> class Visitor>
-        void visit(Component& component) {
+        template <template <typename P> class Visitor, typename... Args>
+        void visit(Component& component, Args&&... args) {
             std::visit([&](auto&& arg){
                 using T = std::decay_t<decltype(arg)>;
                 if constexpr (std::is_same<T, PublicEnum>()) {
-                    Visitor<T>::visit(getName(), &(component.*(arg.selection)), arg.options);
+                    Visitor<T>::visit(getName(), &(component.*(arg.selection)), arg.options, std::forward<Args>(args)...);
                 }
                 else {
-                    Visitor<T>::visit(getName(), &(component.*arg));
+                    Visitor<T>::visit(getName(), &(component.*arg), std::forward<Args>(args)...);
                 }
             }, m_data);
         }
