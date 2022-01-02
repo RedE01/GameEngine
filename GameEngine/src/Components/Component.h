@@ -13,8 +13,15 @@ namespace GameEngine {
         virtual void update() {}
 
         size_t getPublicVariableCount() const { return m_publicVariables.size(); }
-        PublicVariable& getPublicVariable(size_t index) {
-            return m_publicVariables[index];
+
+        PublicVariable* getPublicVariable(const std::string& name) {
+            auto search = m_publicVariables.find(name);
+            if(search != m_publicVariables.end()) return &(search->second);
+            return nullptr;
+        }
+
+        void eachPublicVariable(std::function<void(const std::string&, PublicVariable&)> function) {
+            for(auto& pv : m_publicVariables) function(pv.first, pv.second);
         }
 
     protected:
@@ -24,18 +31,18 @@ namespace GameEngine {
 
         template <typename VariableType, class ComponentType>
         void registerPublicVariable(const std::string& name, VariableType ComponentType::* variable) {
-            m_publicVariables.emplace_back(PublicVariable(name, variable));
+            m_publicVariables.insert({name, PublicVariable(variable)});
         }
 
         template <typename EnumType, class ComponentType>
             requires std::is_enum<EnumType>::value
         void registerPublicVariable(const std::string& name, EnumType ComponentType::* variable, const std::vector<std::string>& options) {
-            m_publicVariables.emplace_back(PublicVariable(name, variable, options));
+            m_publicVariables.insert({name, PublicVariable(variable, options)});
         }
 
     private:
         Entity m_entity;
-        std::vector<PublicVariable> m_publicVariables;
+        std::unordered_map<std::string, PublicVariable> m_publicVariables;
 
         friend class Entity;
     };

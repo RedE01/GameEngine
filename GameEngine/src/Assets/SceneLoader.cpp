@@ -14,82 +14,82 @@ namespace GameEngine {
 
     template <typename T>
     struct PublicVariableSerializeVisitor {
-        static void visit(const std::string& name, int* var, YAML::Emitter& emitter) {
+        static void visit(int* var, YAML::Emitter& emitter) {
             emitter << *var;
         }
 
-        static void visit(const std::string& name, float* var, YAML::Emitter& emitter) {
+        static void visit(float* var, YAML::Emitter& emitter) {
             emitter << *var;
         }
 
-        static void visit(const std::string& name, double* var, YAML::Emitter& emitter) {
+        static void visit(double* var, YAML::Emitter& emitter) {
             emitter << *var;
         }
 
-        static void visit(const std::string& name, bool* var, YAML::Emitter& emitter) {
+        static void visit(bool* var, YAML::Emitter& emitter) {
             emitter << *var;
         }
 
-        static void visit(const std::string& name, char* var, YAML::Emitter& emitter) {
+        static void visit(char* var, YAML::Emitter& emitter) {
             emitter << *var;
         }
 
-        static void visit(const std::string& name, std::string* var, YAML::Emitter& emitter) {
+        static void visit(std::string* var, YAML::Emitter& emitter) {
             emitter << *var;
         }
 
-        static void visit(const std::string& name, Vector2* var, YAML::Emitter& emitter) {
+        static void visit(Vector2* var, YAML::Emitter& emitter) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << YAML::EndSeq;
         }
 
-        static void visit(const std::string& name, Vector3* var, YAML::Emitter& emitter) {
+        static void visit(Vector3* var, YAML::Emitter& emitter) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << (*var)[2] << YAML::EndSeq;
         }
 
-        static void visit(const std::string& name, Vector4* var, YAML::Emitter& emitter) {
+        static void visit(Vector4* var, YAML::Emitter& emitter) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << (*var)[2] << (*var)[3] << YAML::EndSeq;
         }
 
-        static void visit(const std::string& name, Vector2i* var, YAML::Emitter& emitter) {
+        static void visit(Vector2i* var, YAML::Emitter& emitter) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << YAML::EndSeq;
         }
 
-        static void visit(const std::string& name, Vector3i* var, YAML::Emitter& emitter) {
+        static void visit(Vector3i* var, YAML::Emitter& emitter) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << (*var)[2] << YAML::EndSeq;
         }
 
-        static void visit(const std::string& name, Vector4i* var, YAML::Emitter& emitter) {
+        static void visit(Vector4i* var, YAML::Emitter& emitter) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << (*var)[2] << (*var)[3] << YAML::EndSeq;
         }
 
-        static void visit(const std::string& name, Quaternion* var, YAML::Emitter& emitter) {
+        static void visit(Quaternion* var, YAML::Emitter& emitter) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << (*var)[2] << (*var)[3] << YAML::EndSeq;
         }
 
-        static void visit(const std::string& name, int* selection, std::vector<std::string>& options, YAML::Emitter& emitter) {
+        static void visit(int* selection, std::vector<std::string>&, YAML::Emitter& emitter) {
             emitter << *selection;
         }
 
-        static void visit(const std::string& name, ModelAsset* modelAsset, YAML::Emitter& emitter) {
+        static void visit(ModelAsset* modelAsset, YAML::Emitter& emitter) {
             emitter << modelAsset->ID();
         }
 
-        static void visit(const std::string& name, ShaderAsset* shaderAsset, YAML::Emitter& emitter) {
+        static void visit(ShaderAsset* shaderAsset, YAML::Emitter& emitter) {
             emitter << shaderAsset->ID();
         }
 
-        static void visit(const std::string& name, TextureAsset* textureAsset, YAML::Emitter& emitter) {
+        static void visit(TextureAsset* textureAsset, YAML::Emitter& emitter) {
             emitter << textureAsset->ID();
         }
 
-        static void visit(const std::string& name, MaterialAsset* materialAsset, YAML::Emitter& emitter) {
+        static void visit(MaterialAsset* materialAsset, YAML::Emitter& emitter) {
             emitter << materialAsset->ID();
         }
     };
@@ -126,12 +126,12 @@ namespace GameEngine {
                 emitter << YAML::Key << "publicVariables";
                 emitter << YAML::Value << YAML::BeginMap;
 
-                for(size_t i = 0; i < component.getPublicVariableCount(); ++i) {
-                    emitter << YAML::Key << component.getPublicVariable(i).getName();
+                component.eachPublicVariable([&](const std::string& pvName, PublicVariable& pv){
+                    emitter << YAML::Key << pvName;
 
                     emitter << YAML::Value;
-                    component.getPublicVariable(i).visit<PublicVariableSerializeVisitor>(component, emitter);
-                }
+                    pv.visit<PublicVariableSerializeVisitor>(component, emitter);
+                });
                 emitter << YAML::EndMap;
 
                 emitter << YAML::EndMap;

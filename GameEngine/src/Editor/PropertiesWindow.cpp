@@ -16,23 +16,23 @@ namespace GameEngine {
 
     template <typename T>
     struct PublicVariablePropertiesVisitor {
-        static void visit(const std::string& name, int* var) {
+        static void visit(int* var, const std::string& name) {
             ImGui::DragInt(name.c_str(), var);
         }
 
-        static void visit(const std::string& name, float* var) {
+        static void visit(float* var, const std::string& name) {
             ImGui::DragFloat(name.c_str(), var);
         }
 
-        static void visit(const std::string& name, double* var) {
+        static void visit(double* var, const std::string& name) {
             ImGui::InputDouble(name.c_str(), var);
         }
 
-        static void visit(const std::string& name, bool* var) {
+        static void visit(bool* var, const std::string& name) {
             ImGui::Checkbox(name.c_str(), var);
         }
 
-        static void visit(const std::string& name, char* var) {
+        static void visit(char* var, const std::string& name) {
             char buff[2] = {*var, 0};
             ImGui::PushItemWidth(16);
             if(ImGui::InputText(name.c_str(), buff, 2)) {
@@ -41,35 +41,35 @@ namespace GameEngine {
             ImGui::PopItemWidth();
         }
 
-        static void visit(const std::string& name, std::string* var) {
+        static void visit(std::string* var, const std::string& name) {
             ImGui::InputText(name.c_str(), var);
         }
 
-        static void visit(const std::string& name, Vector2* var) {
+        static void visit(Vector2* var, const std::string& name) {
             ImGui::DragFloat2(name.c_str(), &((*var)[0]));
         }
 
-        static void visit(const std::string& name, Vector3* var) {
+        static void visit(Vector3* var, const std::string& name) {
             ImGui::DragFloat3(name.c_str(), &((*var)[0]));
         }
 
-        static void visit(const std::string& name, Vector4* var) {
+        static void visit(Vector4* var, const std::string& name) {
             ImGui::DragFloat4(name.c_str(), &((*var)[0]));
         }
 
-        static void visit(const std::string& name, Vector2i* var) {
+        static void visit(Vector2i* var, const std::string& name) {
             ImGui::DragInt2(name.c_str(), &((*var)[0]));
         }
 
-        static void visit(const std::string& name, Vector3i* var) {
+        static void visit(Vector3i* var, const std::string& name) {
             ImGui::DragInt3(name.c_str(), &((*var)[0]));
         }
 
-        static void visit(const std::string& name, Vector4i* var) {
+        static void visit(Vector4i* var, const std::string& name) {
             ImGui::DragInt4(name.c_str(), &((*var)[0]));
         }
 
-        static void visit(const std::string& name, Quaternion* var) {
+        static void visit(Quaternion* var, const std::string& name) {
             Vector3 eulerAnglesPrev = glm::degrees(glm::eulerAngles(*var));
             Vector3 eulerAngles = eulerAnglesPrev;
             if(ImGui::DragFloat3(name.c_str(), &(eulerAngles[0]))) {
@@ -80,45 +80,26 @@ namespace GameEngine {
             }
         }
 
-        static void visit(const std::string& name, int* selection, std::vector<std::string>& options) {
+        static void visit(int* selection, std::vector<std::string>& options, const std::string& name) {
             std::vector<const char*> optionsCharPtr;
             for(auto& option : options) optionsCharPtr.push_back(option.c_str());
             ImGui::Combo(name.c_str(), selection, optionsCharPtr.data(), optionsCharPtr.size());
         }
 
-        static void visit(const std::string& name, ModelAsset*) {
+        static void visit(ModelAsset*, const std::string& name) {
             ImGui::Text("name: %s", name.c_str());
         }
 
-        static void visit(const std::string& name, ShaderAsset*) {
+        static void visit(ShaderAsset*, const std::string& name) {
             ImGui::Text("name: %s", name.c_str());
         }
 
-        static void visit(const std::string& name, TextureAsset*) {
+        static void visit(TextureAsset*, const std::string& name) {
             ImGui::Text("name: %s", name.c_str());
         }
 
-        static void visit(const std::string& name, MaterialAsset*) {
+        static void visit(MaterialAsset*, const std::string& name) {
             ImGui::Text("name: %s", name.c_str());
-        }
-    };
-
-
-    void showComponentData(Component& component) {
-        std::string cName = component.getName();
-        ImGui::Text("%s", cName.c_str());
-
-        for(size_t i = 0; i < component.getPublicVariableCount(); ++i) {
-            component.getPublicVariable(i).visit<PublicVariablePropertiesVisitor>(component);
-        }
-
-        ImGui::Separator();
-    }
-
-    template<class T>
-    void showComponentData(Entity entity) {
-        if(entity.hasComponent<T>()) {
-            showComponentData(entity.getComponent<T>());
         }
     };
 
@@ -135,9 +116,9 @@ namespace GameEngine {
                 std::string cName = component.getName();
                 ImGui::Text("%s", cName.c_str());
 
-                for(size_t i = 0; i < component.getPublicVariableCount(); ++i) {
-                    component.getPublicVariable(i).visit<PublicVariablePropertiesVisitor>(component);
-                }
+                component.eachPublicVariable([&](const std::string& pvName, PublicVariable& pv){
+                    pv.visit<PublicVariablePropertiesVisitor>(component, pvName);
+                });
 
                 ImGui::Separator();
             });
