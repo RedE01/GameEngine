@@ -51,6 +51,8 @@ namespace GameEngine {
 		bool isValid() const;
 		entityid getID() const;
 
+        void eachComponent(std::function<void(Component&)> function);
+
 		bool operator==(const Entity& other) const;
 		bool operator!=(const Entity& other) const;
 

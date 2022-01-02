@@ -6,10 +6,6 @@
 #include "../Components/ScriptComponentManager.h"
 
 #include "../Components/NameComponent.h"
-#include "../Components/TransformComponent.h"
-#include "../Components/CameraComponent.h"
-#include "../Components/LightComponent.h"
-#include "../Components/MeshRendererComponent.h"
 
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
@@ -19,7 +15,7 @@
 namespace GameEngine {
 
     template <typename T>
-    struct PublicVariableVisitor {
+    struct PublicVariablePropertiesVisitor {
         static void visit(const std::string& name, int* var) {
             ImGui::DragInt(name.c_str(), var);
         }
@@ -90,19 +86,19 @@ namespace GameEngine {
             ImGui::Combo(name.c_str(), selection, optionsCharPtr.data(), optionsCharPtr.size());
         }
 
-        static void visit(const std::string& name, ModelAsset* modelAsset) {
+        static void visit(const std::string& name, ModelAsset*) {
             ImGui::Text("name: %s", name.c_str());
         }
 
-        static void visit(const std::string& name, ShaderAsset* shaderAsset) {
+        static void visit(const std::string& name, ShaderAsset*) {
             ImGui::Text("name: %s", name.c_str());
         }
 
-        static void visit(const std::string& name, TextureAsset* textureAsset) {
+        static void visit(const std::string& name, TextureAsset*) {
             ImGui::Text("name: %s", name.c_str());
         }
 
-        static void visit(const std::string& name, MaterialAsset* materialAsset) {
+        static void visit(const std::string& name, MaterialAsset*) {
             ImGui::Text("name: %s", name.c_str());
         }
     };
@@ -113,7 +109,7 @@ namespace GameEngine {
         ImGui::Text("%s", cName.c_str());
 
         for(size_t i = 0; i < component.getPublicVariableCount(); ++i) {
-            component.getPublicVariable(i).visit<PublicVariableVisitor>(component);
+            component.getPublicVariable(i).visit<PublicVariablePropertiesVisitor>(component);
         }
 
         ImGui::Separator();
@@ -132,17 +128,18 @@ namespace GameEngine {
     void PropertiesWindow::renderWindow() {
         Entity entity = getEditor()->getSelectedEntity();
         if(entity.isValid()) {
-
-            showComponentData<NameComponent>(entity);
+            ImGui::Text("%s", entity.getComponent<NameComponent>().getNameCStr());
             ImGui::Separator();
 
-            showComponentData<TransformComponent>(entity);
-            showComponentData<CameraComponent>(entity);
-            showComponentData<LightComponent>(entity);
-            showComponentData<MeshRendererComponent>(entity);
+            entity.eachComponent([](Component& component){
+                std::string cName = component.getName();
+                ImGui::Text("%s", cName.c_str());
 
-            ScriptComponentManager::eachComponent(getEditor()->getSelectedEntity(), [](Component& component){
-                showComponentData(component);
+                for(size_t i = 0; i < component.getPublicVariableCount(); ++i) {
+                    component.getPublicVariable(i).visit<PublicVariablePropertiesVisitor>(component);
+                }
+
+                ImGui::Separator();
             });
         }
     }
