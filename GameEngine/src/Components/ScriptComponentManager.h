@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "../Entity.h"
 #include <vector>
 #include <functional>
 #include <entt/entity/registry.hpp>
@@ -23,16 +24,27 @@ namespace GameEngine {
                     function(entity.getComponent<T>());
                 }
             });
+
+            T instance;
+            m_createComponentFunctions.insert({
+                instance.getName(),
+                [](Entity& entity) -> Component* {
+                    return static_cast<Component*>(&(entity.addComponent<T>()));
+                }
+            });
 		}
 
 		static void eachComponent(entt::registry& registry, std::function<void(Component&)> function);
 		static void eachComponent(Entity entity, std::function<void(Component&)> function);
+        static Component* createComponent(const std::string& componentTypeName, Entity& entity);
 
 	private:
         using eachComponentFunctionType = std::function<void(entt::registry&, std::function<void(Component&)>)>;
         using eachComponentOfEntityFunctionType = std::function<void(Entity, std::function<void(Component&)>)>;
+        using createComponentFunctionType = std::function<Component*(Entity&)>;
 		static std::vector<eachComponentFunctionType> m_eachComponentFunction;
 		static std::vector<eachComponentOfEntityFunctionType> m_eachComponentOfEntityFunction;
+        static std::unordered_map<std::string, createComponentFunctionType> m_createComponentFunctions;
 	};
 
 }
