@@ -26,11 +26,12 @@ namespace GameEngine {
         void visit(Component& component, Args&&... args) {
             std::visit([&](auto&& arg){
                 using T = std::decay_t<decltype(arg)>;
+                Visitor<T> visitor(std::forward<Args>(args)...);
                 if constexpr (std::is_same<T, PublicEnum>()) {
-                    Visitor<T>::visit(&(component.*(arg.selection)), arg.options, std::forward<Args>(args)...);
+                    visitor.visit(&(component.*(arg.selection)), arg.options);
                 }
                 else {
-                    Visitor<T>::visit(&(component.*arg), std::forward<Args>(args)...);
+                    visitor.visit(&(component.*arg));
                 }
             }, m_data);
         }

@@ -14,112 +14,120 @@ namespace GameEngine {
 
     template <typename T>
     struct PublicVariableLoadVisitor {
-        static void visit(int* var, const YAML::Node& node) { *var = node.as<int>(*var); }
-        static void visit(float* var, const YAML::Node& node) { *var = node.as<float>(*var); }
-        static void visit(double* var, const YAML::Node& node) { *var = node.as<double>(*var); }
-        static void visit(bool* var, const YAML::Node& node) { *var = node.as<bool>(*var); }
-        static void visit(char* var, const YAML::Node& node) { *var = node.as<char>(*var); }
-        static void visit(std::string* var, const YAML::Node& node) { *var = node.as<std::string>(*var); }
+        PublicVariableLoadVisitor(const YAML::Node& node) : node(node) {}
 
-        static void visit(Vector2* var, const YAML::Node& node) {
+        void visit(int* var) { *var = node.as<int>(*var); }
+        void visit(float* var) { *var = node.as<float>(*var); }
+        void visit(double* var) { *var = node.as<double>(*var); }
+        void visit(bool* var) { *var = node.as<bool>(*var); }
+        void visit(char* var) { *var = node.as<char>(*var); }
+        void visit(std::string* var) { *var = node.as<std::string>(*var); }
+
+        void visit(Vector2* var) {
             if(node.IsSequence() && node.size() == 2) {
                 *var = Vector2(node[0].as<float>((*var)[0]), node[1].as<float>((*var)[1]));
             }
         }
 
-        static void visit(Vector3* var, const YAML::Node& node) {
+        void visit(Vector3* var) {
             if(node.IsSequence() && node.size() == 3) {
                 *var = Vector3(node[0].as<float>((*var)[0]), node[1].as<float>((*var)[1]), node[2].as<float>((*var)[2]));
             }
         }
 
-        static void visit(Vector4* var, const YAML::Node& node) {
+        void visit(Vector4* var) {
             if(node.IsSequence() && node.size() == 4) {
                 *var = Vector4(node[0].as<float>((*var)[0]), node[1].as<float>((*var)[1]), node[2].as<float>((*var)[2]), node[3].as<float>((*var)[3]));
             }
         }
 
-        static void visit(Vector2i* var, const YAML::Node& node) {
+        void visit(Vector2i* var) {
             if(node.IsSequence() && node.size() == 2) {
                 *var = Vector2i(node[0].as<int>((*var)[0]), node[1].as<int>((*var)[1]));
             }
         }
 
-        static void visit(Vector3i* var, const YAML::Node& node) {
+        void visit(Vector3i* var) {
             if(node.IsSequence() && node.size() == 3) {
                 *var = Vector3i(node[0].as<int>((*var)[0]), node[1].as<int>((*var)[1]), node[2].as<int>((*var)[2]));
             }
         }
 
-        static void visit(Vector4i* var, const YAML::Node& node) {
+        void visit(Vector4i* var) {
             if(node.IsSequence() && node.size() == 4) {
                 *var = Vector4i(node[0].as<int>((*var)[0]), node[1].as<int>((*var)[1]), node[2].as<int>((*var)[2]), node[3].as<int>((*var)[3]));
             }
         }
 
-        static void visit(Quaternion* var, const YAML::Node& node) {
+        void visit(Quaternion* var) {
             if(node.IsSequence() && node.size() == 4) {
                 *var = Quaternion(node[0].as<float>((*var)[0]), node[1].as<float>((*var)[1]), node[2].as<float>((*var)[2]), node[3].as<float>((*var)[3]));
             }
         }
 
-        static void visit(int* selection, std::vector<std::string>&, const YAML::Node& node) { *selection = node.as<int>(*selection); }
+        void visit(int* selection, std::vector<std::string>&) { *selection = node.as<int>(*selection); }
 
-        static void visit(ModelAsset*, const YAML::Node&) { }
-        static void visit(ShaderAsset*, const YAML::Node&) { }
-        static void visit(TextureAsset*, const YAML::Node&) { }
-        static void visit(MaterialAsset*, const YAML::Node&) { }
+        void visit(ModelAsset*) { }
+        void visit(ShaderAsset*) { }
+        void visit(TextureAsset*) { }
+        void visit(MaterialAsset*) { }
+
+        const YAML::Node& node;
     };
 
     template <typename T>
     struct PublicVariableSerializeVisitor {
-        static void visit(int* var, YAML::Emitter& emitter) { emitter << *var; }
-        static void visit(float* var, YAML::Emitter& emitter) { emitter << *var; }
-        static void visit(double* var, YAML::Emitter& emitter) { emitter << *var; }
-        static void visit(bool* var, YAML::Emitter& emitter) { emitter << *var; }
-        static void visit(char* var, YAML::Emitter& emitter) { emitter << *var; }
-        static void visit(std::string* var, YAML::Emitter& emitter) { emitter << *var; }
+        PublicVariableSerializeVisitor(YAML::Emitter& emitter) : emitter(emitter) {}
 
-        static void visit(Vector2* var, YAML::Emitter& emitter) {
+        void visit(int* var) { emitter << *var; }
+        void visit(float* var) { emitter << *var; }
+        void visit(double* var) { emitter << *var; }
+        void visit(bool* var) { emitter << *var; }
+        void visit(char* var) { emitter << *var; }
+        void visit(std::string* var) { emitter << *var; }
+
+        void visit(Vector2* var) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << YAML::EndSeq;
         }
 
-        static void visit(Vector3* var, YAML::Emitter& emitter) {
+        void visit(Vector3* var) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << (*var)[2] << YAML::EndSeq;
         }
 
-        static void visit(Vector4* var, YAML::Emitter& emitter) {
+        void visit(Vector4* var) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << (*var)[2] << (*var)[3] << YAML::EndSeq;
         }
 
-        static void visit(Vector2i* var, YAML::Emitter& emitter) {
+        void visit(Vector2i* var) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << YAML::EndSeq;
         }
 
-        static void visit(Vector3i* var, YAML::Emitter& emitter) {
+        void visit(Vector3i* var) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << (*var)[2] << YAML::EndSeq;
         }
 
-        static void visit(Vector4i* var, YAML::Emitter& emitter) {
+        void visit(Vector4i* var) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << (*var)[2] << (*var)[3] << YAML::EndSeq;
         }
 
-        static void visit(Quaternion* var, YAML::Emitter& emitter) {
+        void visit(Quaternion* var) {
             emitter << YAML::Flow;
             emitter << YAML::BeginSeq << (*var)[0] << (*var)[1] << (*var)[2] << (*var)[3] << YAML::EndSeq;
         }
 
-        static void visit(int* selection, std::vector<std::string>&, YAML::Emitter& emitter) { emitter << *selection; }
-        static void visit(ModelAsset* modelAsset, YAML::Emitter& emitter) { emitter << modelAsset->ID(); }
-        static void visit(ShaderAsset* shaderAsset, YAML::Emitter& emitter) { emitter << shaderAsset->ID(); }
-        static void visit(TextureAsset* textureAsset, YAML::Emitter& emitter) { emitter << textureAsset->ID(); }
-        static void visit(MaterialAsset* materialAsset, YAML::Emitter& emitter) { emitter << materialAsset->ID(); }
+        void visit(int* selection, std::vector<std::string>&) { emitter << *selection; }
+        void visit(ModelAsset* modelAsset) { emitter << modelAsset->ID(); }
+        void visit(ShaderAsset* shaderAsset) { emitter << shaderAsset->ID(); }
+        void visit(TextureAsset* textureAsset) { emitter << textureAsset->ID(); }
+        void visit(MaterialAsset* materialAsset) { emitter << materialAsset->ID(); }
+
+        YAML::Emitter& emitter;
     };
 
     std::shared_ptr<Scene> SceneLoader::load(const std::string& filepath) const {
