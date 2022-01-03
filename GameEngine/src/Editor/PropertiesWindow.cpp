@@ -4,6 +4,7 @@
 #include "../Scene.h"
 #include "../Events/EditorEvents.h"
 #include "../Components/ScriptComponentManager.h"
+#include "../Assets/AssetManager.h"
 
 #include "../Components/NameComponent.h"
 
@@ -16,7 +17,7 @@ namespace GameEngine {
 
     template <typename T>
     struct PublicVariablePropertiesVisitor {
-        PublicVariablePropertiesVisitor(const std::string& name) : name(name) {}
+        PublicVariablePropertiesVisitor(const std::string& name, AssetManager* assetManager) : name(name), assetManager(assetManager) {}
 
         void visit(int* var) {
             ImGui::DragInt(name.c_str(), var);
@@ -88,23 +89,24 @@ namespace GameEngine {
             ImGui::Combo(name.c_str(), selection, optionsCharPtr.data(), optionsCharPtr.size());
         }
 
-        void visit(ModelAsset*) {
-            ImGui::Text("name: %s", name.c_str());
+        void visit(ModelAsset* modelAsset) {
+            ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*modelAsset));
         }
 
-        void visit(ShaderAsset*) {
-            ImGui::Text("name: %s", name.c_str());
+        void visit(ShaderAsset* shaderAsset) {
+            ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*shaderAsset));
         }
 
-        void visit(TextureAsset*) {
-            ImGui::Text("name: %s", name.c_str());
+        void visit(TextureAsset* textureAsset) {
+            ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*textureAsset));
         }
 
-        void visit(MaterialAsset*) {
-            ImGui::Text("name: %s", name.c_str());
+        void visit(MaterialAsset* materialAsset) {
+            ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*materialAsset));
         }
 
         const std::string& name;
+        AssetManager* assetManager;
     };
 
     PropertiesWindow::PropertiesWindow(Application* application, Editor* editor) : GuiWindow(application, editor) {
@@ -116,12 +118,12 @@ namespace GameEngine {
             ImGui::Text("%s", entity.getComponent<NameComponent>().getNameCStr());
             ImGui::Separator();
 
-            entity.eachComponent([](Component& component){
+            entity.eachComponent([&](Component& component){
                 std::string cName = component.getName();
                 ImGui::Text("%s", cName.c_str());
 
                 component.eachPublicVariable([&](const std::string& pvName, PublicVariable& pv){
-                    pv.visit<PublicVariablePropertiesVisitor>(component, pvName);
+                    pv.visit<PublicVariablePropertiesVisitor>(component, pvName, getApplication()->getAssetManager());
                 });
 
                 ImGui::Separator();
