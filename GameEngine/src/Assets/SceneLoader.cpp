@@ -1,4 +1,5 @@
 #include "SceneLoader.h"
+#include "AssetManager.h"
 #include "../Components/ScriptComponentManager.h"
 
 #include "../Components/NameComponent.h"
@@ -14,7 +15,7 @@ namespace GameEngine {
 
     template <typename T>
     struct PublicVariableLoadVisitor {
-        PublicVariableLoadVisitor(const YAML::Node& node) : node(node) {}
+        PublicVariableLoadVisitor(const YAML::Node& node, AssetManager* assetManager) : node(node), assetManager(assetManager) {}
 
         void visit(int* var) { *var = node.as<int>(*var); }
         void visit(float* var) { *var = node.as<float>(*var); }
@@ -67,17 +68,18 @@ namespace GameEngine {
 
         void visit(int* selection, std::vector<std::string>&) { *selection = node.as<int>(*selection); }
 
-        void visit(ModelAsset*) { }
-        void visit(ShaderAsset*) { }
-        void visit(TextureAsset*) { }
-        void visit(MaterialAsset*) { }
+        void visit(ModelAsset* var) { *var = assetManager->load<Model>(node.as<std::string>()); }
+        void visit(ShaderAsset* var) { *var = assetManager->load<Shader>(node.as<std::string>()); }
+        void visit(TextureAsset* var) { *var = assetManager->load<Texture>(node.as<std::string>(), true); }
+        void visit(MaterialAsset* var) { *var = assetManager->load<Material>(node.as<std::string>()); }
 
         const YAML::Node& node;
+        AssetManager* assetManager;
     };
 
     template <typename T>
     struct PublicVariableSerializeVisitor {
-        PublicVariableSerializeVisitor(YAML::Emitter& emitter) : emitter(emitter) {}
+        PublicVariableSerializeVisitor(YAML::Emitter& emitter, AssetManager* assetManager) : emitter(emitter), assetManager(assetManager) {}
 
         void visit(int* var) { emitter << *var; }
         void visit(float* var) { emitter << *var; }
@@ -122,15 +124,17 @@ namespace GameEngine {
         }
 
         void visit(int* selection, std::vector<std::string>&) { emitter << *selection; }
-        void visit(ModelAsset* modelAsset) { emitter << modelAsset->ID(); }
-        void visit(ShaderAsset* shaderAsset) { emitter << shaderAsset->ID(); }
-        void visit(TextureAsset* textureAsset) { emitter << textureAsset->ID(); }
-        void visit(MaterialAsset* materialAsset) { emitter << materialAsset->ID(); }
+
+        void visit(ModelAsset* modelAsset) { emitter << assetManager->getFilepath(*modelAsset); }
+        void visit(ShaderAsset* shaderAsset) { emitter << assetManager->getFilepath(*shaderAsset); }
+        void visit(TextureAsset* textureAsset) { emitter << assetManager->getFilepath(*textureAsset); }
+        void visit(MaterialAsset* materialAsset) { emitter << assetManager->getFilepath(*materialAsset); }
 
         YAML::Emitter& emitter;
+        AssetManager* assetManager;
     };
 
-    std::shared_ptr<Scene> SceneLoader::load(const std::string& filepath) const {
+    std::shared_ptr<Scene> SceneLoader::load(const std::string& filepath, AssetManager* assetManager) const {
         YAML::Node node = YAML::LoadFile(filepath);
 
         std::shared_ptr<Scene> scene = std::make_shared<Scene>();
@@ -154,7 +158,7 @@ namespace GameEngine {
                 for(const auto& publicVariableNode : componentNode["publicVariables"]) {
                     PublicVariable* pv = newComponent->getPublicVariable(publicVariableNode.first.as<std::string>());
                     if(pv != nullptr) {
-                        pv->visit<PublicVariableLoadVisitor>(*newComponent, publicVariableNode.second);
+                        pv->visit<PublicVariableLoadVisitor>(*newComponent, publicVariableNode.second, assetManager);
                     }
                 }
             }
@@ -163,7 +167,7 @@ namespace GameEngine {
         return scene;
     }
 
-    void SceneLoader::serialize(const std::string& filepath, const std::string& sceneName, Scene* scene) const {
+    void SceneLoader::serialize(const std::string& filepath, const std::string& sceneName, Scene* scene, AssetManager* assetManager) const {
         YAML::Emitter emitter;
 
         emitter << YAML::BeginMap;
@@ -195,7 +199,7 @@ namespace GameEngine {
                     emitter << YAML::Key << pvName;
 
                     emitter << YAML::Value;
-                    pv.visit<PublicVariableSerializeVisitor>(component, emitter);
+                    pv.visit<PublicVariableSerializeVisitor>(component, emitter, assetManager);
                 });
                 emitter << YAML::EndMap;
 
