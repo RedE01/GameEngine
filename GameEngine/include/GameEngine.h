@@ -2,7 +2,7 @@
 
 #include "../src/Application.h"
 
-#include "../src/Scene.h"
+#include "../src/Scene/Scene.h"
 #include "../src/Components/ScriptComponentManager.h"
 
 #include "../src/Math/Vector.h"

@@ -1,7 +1,7 @@
 #include "PropertiesWindow.h"
 #include "Editor.h"
 #include "../Application.h"
-#include "../Scene.h"
+#include "../Scene/Scene.h"
 #include "../Events/EditorEvents.h"
 #include "../Components/ScriptComponentManager.h"
 #include "../Assets/AssetManager.h"

@@ -1,5 +1,6 @@
 #include "SceneLoader.h"
-#include "AssetManager.h"
+#include "../Scene/Scene.h"
+#include "../Assets/AssetManager.h"
 #include "../Components/ScriptComponentManager.h"
 
 #include "../Components/NameComponent.h"

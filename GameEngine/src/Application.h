@@ -31,7 +31,7 @@ namespace GameEngine {
 	private:
 		std::unique_ptr<Window> m_window;
 		std::unique_ptr<Renderer> m_renderer;
-		std::unique_ptr<Scene> m_scene;
+		std::shared_ptr<Scene> m_scene;
 		std::unique_ptr<AssetManager> m_assetManager;
 
 		std::unique_ptr<Editor> m_editor;

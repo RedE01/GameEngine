@@ -1,8 +1,8 @@
 #include "Scene.h"
-#include "Components/ScriptComponentManager.h"
-#include "Components/TransformComponent.h"
-#include "Components/NameComponent.h"
-#include "Components/CameraComponent.h"
+#include "../Components/ScriptComponentManager.h"
+#include "../Components/TransformComponent.h"
+#include "../Components/NameComponent.h"
+#include "../Components/CameraComponent.h"
 
 namespace GameEngine {
 

@@ -2,7 +2,7 @@
 #include "Rendering/Renderer.h"
 #include "Window.h"
 #include "Input.h"
-#include "Scene.h"
+#include "Scene/Scene.h"
 #include "Components/ScriptComponentManager.h"
 #include "Assets/AssetManager.h"
 #include "Events/ApplicationEvent.h"
@@ -15,7 +15,7 @@ namespace GameEngine {
 	Application::Application(const std::string& name) {
 		m_window = std::make_unique<Window>(name, 640, 480);
 		m_renderer = std::make_unique<Renderer>(getWindow()->getWindowSize());
-		m_scene = std::make_unique<Scene>();
+		m_scene = std::make_shared<Scene>();
 		m_assetManager = std::make_unique<AssetManager>();
 
 		#ifdef GAME_ENGINE_EDITOR

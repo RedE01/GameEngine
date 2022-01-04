@@ -2,7 +2,7 @@
 #include "../Components/MeshRendererComponent.h"
 #include "../Components/LightComponent.h"
 #include "../Components/TransformComponent.h"
-#include "../Scene.h"
+#include "../Scene/Scene.h"
 #include "Model.h"
 #include "Material.h"
 #include "Shader.h"

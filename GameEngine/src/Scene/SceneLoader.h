@@ -1,9 +1,9 @@
 #pragma once
-#include "../Scene.h"
 #include <memory>
 
 namespace GameEngine {
 
+    class Scene;
     class AssetManager;
 
 	struct SceneLoader {
