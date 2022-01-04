@@ -1,6 +1,7 @@
 #include "Gui.h"
 #include "../Application.h"
 #include "../Window.h"
+#include "../Events/EditorEvents.h"
 
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
@@ -45,6 +46,8 @@ namespace GameEngine {
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 if(ImGui::SmallButton("save scene")) {
+                    SceneSaveEvent sceneSaveEvent;
+                    m_eventFunction(&sceneSaveEvent);
                 }
                 ImGui::EndMenu();
             }

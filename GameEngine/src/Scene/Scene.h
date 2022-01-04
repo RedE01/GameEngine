@@ -9,6 +9,8 @@ namespace GameEngine {
 
 	class Scene {
 	public:
+        Scene(const std::string& name);
+
 		Entity createEntity(const std::string& name);
 		void destroyEntity(const Entity& entity);
 
@@ -47,6 +49,7 @@ namespace GameEngine {
         }
 
 		Camera* getActiveCamera();
+        const std::string& getName() const;
 
 	private:
 		void update();
@@ -54,6 +57,7 @@ namespace GameEngine {
 
 	private:
 		entt::registry m_entityRegistry;
+        std::string m_sceneName;
 
 		friend class Application;
 	};

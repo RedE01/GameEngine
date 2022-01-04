@@ -3,6 +3,7 @@
 #include "Window.h"
 #include "Input.h"
 #include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
 #include "Components/ScriptComponentManager.h"
 #include "Assets/AssetManager.h"
 #include "Events/ApplicationEvent.h"
@@ -15,8 +16,8 @@ namespace GameEngine {
 	Application::Application(const std::string& name) {
 		m_window = std::make_unique<Window>(name, 640, 480);
 		m_renderer = std::make_unique<Renderer>(getWindow()->getWindowSize());
-		m_scene = std::make_shared<Scene>();
-		m_assetManager = std::make_unique<AssetManager>();
+		m_assetManager = std::make_shared<AssetManager>();
+        m_sceneManager = std::make_shared<SceneManager>(m_assetManager);
 
 		#ifdef GAME_ENGINE_EDITOR
 		m_editor = std::make_unique<Editor>(this);
@@ -43,20 +44,20 @@ namespace GameEngine {
 			m_window->pollEvents();
 
 			#ifndef GAME_ENGINE_EDITOR
-			m_scene->update();
+			m_sceneManager->getActiveScene()->update();
 			onUpdate();
 
 			m_renderer->beginFrame();
-			m_renderer->renderEntities(m_scene.get(), m_scene->getActiveCamera());
+			m_renderer->renderEntities(m_sceneManager->getActiveScene(), m_sceneManager->getActiveScene()->getActiveCamera());
 			onRender();
-			m_renderer->endFrame(m_scene.get(), m_scene->getActiveCamera());
+			m_renderer->endFrame(m_sceneManager->getActiveScene(), m_sceneManager->getActiveScene()->getActiveCamera());
             m_renderer->renderFrameToDefaultFramebuffer();
 			#else
 			m_editor->update();
 
 			m_renderer->beginFrame();
-			m_renderer->renderEntities(m_scene.get(), m_editor->getEditorCamera());
-            m_renderer->endFrame(m_scene.get(), m_editor->getEditorCamera());
+			m_renderer->renderEntities(m_sceneManager->getActiveScene(), m_editor->getEditorCamera());
+            m_renderer->endFrame(m_sceneManager->getActiveScene(), m_editor->getEditorCamera());
             m_editor->render();
 			#endif
 
@@ -71,8 +72,8 @@ namespace GameEngine {
 		return m_window.get();
 	}
 
-	Scene* Application::getScene() const {
-		return m_scene.get();
+	SceneManager* Application::getSceneManager() const {
+		return m_sceneManager.get();
 	}
 
 	AssetManager* Application::getAssetManager() const {
@@ -90,7 +91,7 @@ namespace GameEngine {
 			else if(event->getEventType() == EventType::WindowResize) {
 				#ifndef GAME_ENGINE_EDITOR
 				m_renderer->setViewportSize(getWindow()->getWindowSize());
-				m_scene->updateCameras(m_window->getWindowSize().x, m_window->getWindowSize().y);
+				m_sceneManager->getActiveScene()->updateCameras(m_window->getWindowSize().x, m_window->getWindowSize().y);
                 #endif
 			}
 		}
@@ -99,8 +100,14 @@ namespace GameEngine {
             if(event->getEventType() == EventType::EditorViewportResize) {
                 Vector2i viewportSize = dynamic_cast<EditorViewportResizeEvent*>(event)->viewportSize;
                 m_renderer->setViewportSize(viewportSize);
-				m_scene->updateCameras(viewportSize.x, viewportSize.y);
+				m_sceneManager->getActiveScene()->updateCameras(viewportSize.x, viewportSize.y);
 				m_editor->updateEditorCameraViewportSize(viewportSize);
+            }
+            if(event->getEventType() == EventType::SaveScene) {
+                const std::string& name = dynamic_cast<SceneSaveEvent*>(event)->name;
+                const std::string& filepath = dynamic_cast<SceneSaveEvent*>(event)->filepath;
+                if(name.size() == 0 || filepath.size() == 0) getSceneManager()->saveActiveScene();
+                else getSceneManager()->saveActiveScene(name, filepath);
             }
             #endif
         }

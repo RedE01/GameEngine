@@ -138,7 +138,7 @@ namespace GameEngine {
     std::shared_ptr<Scene> SceneLoader::load(const std::string& filepath, AssetManager* assetManager) const {
         YAML::Node node = YAML::LoadFile(filepath);
 
-        std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+        std::shared_ptr<Scene> scene = std::make_shared<Scene>(node["name"].as<std::string>());
 
         for(const auto& entityNode : node["entities"]) {
             Entity entity = scene->createEntity(entityNode["name"].as<std::string>());

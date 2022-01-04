@@ -7,8 +7,8 @@ namespace GameEngine {
 	class Window;
 	class Renderer;
 	class Event;
-	class Scene;
 	class AssetManager;
+    class SceneManager;
 	class Editor;
 
 	class Application {
@@ -22,7 +22,7 @@ namespace GameEngine {
 		virtual void onRender() = 0;
 
 		Window* getWindow() const;
-		Scene* getScene() const;
+		SceneManager* getSceneManager() const;
 		AssetManager* getAssetManager() const;
 		
 	private:
@@ -31,8 +31,8 @@ namespace GameEngine {
 	private:
 		std::unique_ptr<Window> m_window;
 		std::unique_ptr<Renderer> m_renderer;
-		std::shared_ptr<Scene> m_scene;
-		std::unique_ptr<AssetManager> m_assetManager;
+		std::shared_ptr<AssetManager> m_assetManager;
+		std::shared_ptr<SceneManager> m_sceneManager;
 
 		std::unique_ptr<Editor> m_editor;
 

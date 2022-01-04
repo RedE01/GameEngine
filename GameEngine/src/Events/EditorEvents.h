@@ -4,6 +4,17 @@
 
 namespace GameEngine {
 
+	class SceneSaveEvent : public Event {
+	public:
+        SceneSaveEvent(const std::string& name = "", const std::string& filepath = "") 
+            : name(name), filepath(filepath) {}
+		virtual EventType getEventType() const override { return EventType::SaveScene; }
+		virtual std::string getName() const override { return "SaveSceneEvent"; }
+		virtual int getCategoryFlags() const override { return (int)EventCategory::Editor; }
+        const std::string name;
+        const std::string filepath;
+	};
+
 	class EditorViewportResizeEvent : public Event {
 	public:
         EditorViewportResizeEvent(Vector2 viewportSize) : viewportSize(viewportSize) {}

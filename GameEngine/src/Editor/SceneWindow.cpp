@@ -1,6 +1,7 @@
 #include "SceneWindow.h"
 #include "Editor.h"
 #include "../Application.h"
+#include "../Scene/SceneManager.h"
 #include "../Scene/Scene.h"
 #include "../Events/EditorEvents.h"
 #include "../Components/NameComponent.h"
@@ -16,7 +17,7 @@ namespace GameEngine {
         static ImGuiTreeNodeFlags baseFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 
         int nodeIndex = 0;
-        getApplication()->getScene()->each([&](Entity entity){
+        getApplication()->getSceneManager()->getActiveScene()->each([&](Entity entity){
             ImGuiTreeNodeFlags nodeFlags = baseFlags;
             nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 

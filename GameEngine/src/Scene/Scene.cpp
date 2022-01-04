@@ -8,6 +8,11 @@ namespace GameEngine {
 
 	CameraComponent* getActiveCameraComponent(entt::registry& registry);
 
+    Scene::Scene(const std::string& name)
+        : m_sceneName(name) {
+
+    }
+
 	Entity Scene::createEntity(const std::string& name) {
 		entt::entity entity = m_entityRegistry.create();
 		
@@ -28,6 +33,10 @@ namespace GameEngine {
 		if(cameraComponent != nullptr) return &(cameraComponent->getCamera());
 		return nullptr;
 	}
+
+    const std::string& Scene::getName() const {
+        return m_sceneName;
+    }
 
 	void Scene::update() {
         ScriptComponentManager::eachComponent(m_entityRegistry, [](Component& component){
