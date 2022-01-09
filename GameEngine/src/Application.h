@@ -24,6 +24,7 @@ namespace GameEngine {
 		Window* getWindow() const;
 		SceneManager* getSceneManager() const;
 		AssetManager* getAssetManager() const;
+        Renderer* getRenderer() const;
 		
 	private:
 		void eventHandler(Event* event);

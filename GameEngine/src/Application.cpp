@@ -16,7 +16,7 @@ namespace GameEngine {
 	Application::Application(const std::string& name) {
 		m_window = std::make_unique<Window>(name, 640, 480);
 		m_renderer = std::make_unique<Renderer>(getWindow()->getWindowSize());
-		m_assetManager = std::make_shared<AssetManager>();
+		m_assetManager = std::make_shared<AssetManager>("Game/Assets");
         m_sceneManager = std::make_shared<SceneManager>(m_assetManager);
 
 		#ifdef GAME_ENGINE_EDITOR
@@ -26,9 +26,6 @@ namespace GameEngine {
 		#endif
 
 		m_window->setEventFunction(std::bind(&Application::eventHandler, this, std::placeholders::_1));
-
-		ShaderAsset defaultShader = m_assetManager->load<Shader>("GameEngine/src/assets/shaders/default.glsl");
-		m_renderer->setDefaultShader(defaultShader);
 	}
 
 	Application::~Application() {
@@ -79,6 +76,10 @@ namespace GameEngine {
 	AssetManager* Application::getAssetManager() const {
 		return m_assetManager.get();
 	}
+
+    Renderer* Application::getRenderer() const {
+        return m_renderer.get();
+    }
 
 	void Application::eventHandler(Event* event) {
 		if(event->isInCategory(EventCategory::Input)) {

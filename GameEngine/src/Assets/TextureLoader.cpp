@@ -32,7 +32,10 @@ namespace GameEngine {
 		return texture;		
 	}
 
-	std::shared_ptr<Texture> TextureLoader::load(const std::string& filepath, bool srgb) const {
+	std::shared_ptr<Texture> TextureLoader::load(AssetData<Texture>* assetData) const {
+        const std::string& filepath = assetData->filepath;
+        const bool& srgb = assetData->srgb;
+
 		stbi_set_flip_vertically_on_load(true);
 
 		int imageWidth;
@@ -48,7 +51,10 @@ namespace GameEngine {
 
 	}
 
-	std::shared_ptr<Texture> TextureLoader::load(const std::string& identifier, unsigned char* textureData, unsigned int dataLength, bool srgb) const {
+	std::shared_ptr<Texture> TextureLoader::load(AssetData<Texture>* assetData, unsigned char* textureData, unsigned int dataLength) const {
+        const std::string& name = assetData->name;
+        const bool& srgb = assetData->srgb;
+
 		stbi_set_flip_vertically_on_load(true);
 
 		int imageWidth;
@@ -56,11 +62,11 @@ namespace GameEngine {
 		int channels;
 		unsigned char* data = stbi_load_from_memory(textureData, dataLength, &imageWidth, &imageHeight, &channels, 0);
 		if(!data) {
-			std::cout << "Could not load texture from memory: " << identifier << std::endl;
+			std::cout << "Could not load texture from memory: " << name << std::endl;
 			return std::shared_ptr<Texture>();
 		}
 
-		return loadTexture(data, imageWidth, imageHeight, channels, identifier, srgb);
+		return loadTexture(data, imageWidth, imageHeight, channels, name, srgb);
 	}
 
 }

@@ -8,10 +8,12 @@ namespace GameEngine {
 	class Texture;
 	class Material;
 
+    using AssetHandleIDtype = uint32_t;
+
     template<typename AssetType>
     class AssetHandle {
     public:
-        using IDtype = uint32_t;
+        using IDtype = AssetHandleIDtype;
 
     public:
         AssetHandle() : m_id(0), m_asset() { }

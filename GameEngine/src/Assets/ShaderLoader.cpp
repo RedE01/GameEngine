@@ -9,7 +9,9 @@ namespace GameEngine {
 
 	std::unordered_map<std::string, std::string> getSourcesFromFile(const char* filepath);
 
-	std::shared_ptr<Shader> ShaderLoader::load(const std::string& filepath) const {
+	std::shared_ptr<Shader> ShaderLoader::load(AssetData<Shader>* assetData) const {
+        const std::string& filepath = assetData->filepath;
+
 		std::unordered_map<std::string, std::string> sources = getSourcesFromFile(filepath.c_str());
 
 		auto vertexShaderSource = sources.find("vertex");

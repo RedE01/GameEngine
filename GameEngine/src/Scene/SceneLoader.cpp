@@ -69,10 +69,10 @@ namespace GameEngine {
 
         void visit(int* selection, std::vector<std::string>&) { *selection = node.as<int>(*selection); }
 
-        void visit(ModelAsset* var) { *var = assetManager->load<Model>(node.as<std::string>()); }
-        void visit(ShaderAsset* var) { *var = assetManager->load<Shader>(node.as<std::string>()); }
-        void visit(TextureAsset* var) { *var = assetManager->load<Texture>(node.as<std::string>(), true); }
-        void visit(MaterialAsset* var) { *var = assetManager->load<Material>(node.as<std::string>()); }
+        void visit(ModelAsset* var) { *var = assetManager->load<Model>(node.as<AssetHandleIDtype>()); }
+        void visit(ShaderAsset* var) { *var = assetManager->load<Shader>(node.as<AssetHandleIDtype>()); }
+        void visit(TextureAsset* var) { *var = assetManager->load<Texture>(node.as<AssetHandleIDtype>()); }
+        void visit(MaterialAsset* var) { *var = assetManager->load<Material>(node.as<AssetHandleIDtype>()); }
 
         const YAML::Node& node;
         AssetManager* assetManager;
@@ -126,17 +126,24 @@ namespace GameEngine {
 
         void visit(int* selection, std::vector<std::string>&) { emitter << *selection; }
 
-        void visit(ModelAsset* modelAsset) { emitter << assetManager->getFilepath(*modelAsset); }
-        void visit(ShaderAsset* shaderAsset) { emitter << assetManager->getFilepath(*shaderAsset); }
-        void visit(TextureAsset* textureAsset) { emitter << assetManager->getFilepath(*textureAsset); }
-        void visit(MaterialAsset* materialAsset) { emitter << assetManager->getFilepath(*materialAsset); }
+        void visit(ModelAsset* modelAsset) { emitter << modelAsset->ID(); }
+        void visit(ShaderAsset* shaderAsset) { emitter << shaderAsset->ID(); }
+        void visit(TextureAsset* textureAsset) { emitter << textureAsset->ID(); }
+        void visit(MaterialAsset* materialAsset) { emitter << materialAsset->ID(); }
 
         YAML::Emitter& emitter;
         AssetManager* assetManager;
     };
 
     std::shared_ptr<Scene> SceneLoader::load(const std::string& filepath, AssetManager* assetManager) const {
-        YAML::Node node = YAML::LoadFile(filepath);
+        YAML::Node node;
+        try {
+            node = YAML::LoadFile(filepath);
+        }
+        catch(const std::exception&) {
+            std::cout << "Could not open file: " << filepath << std::endl;
+            return {};
+        }
 
         std::shared_ptr<Scene> scene = std::make_shared<Scene>(node["name"].as<std::string>());
 

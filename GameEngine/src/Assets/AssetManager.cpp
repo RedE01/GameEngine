@@ -1,4 +1,5 @@
 #include "AssetManager.h"
+#include "AssetDataManager.h"
 #include "ModelLoader.h"
 #include "ShaderLoader.h"
 #include "TextureLoader.h"
@@ -6,42 +7,66 @@
 #include <entt/core/hashed_string.hpp>
 #include <filesystem>
 
+#define EXPLICIT_TEMPLATE_INSTANTIATION(T) \
+    template AssetHandle<T> AssetManager::load(AssetHandleIDtype id); \
+    template AssetHandle<T> AssetManager::reload(AssetHandleIDtype id); \
+    template AssetHandle<T> AssetManager::getHandle<T>(AssetHandleIDtype id); \
+    template bool AssetManager::exists<T>(AssetHandleIDtype id); \
+    template const char* AssetManager::getName(AssetHandle<T> asset); \
+    template const char* AssetManager::getFilepath(AssetHandle<T> asset); \
+    template void AssetManager::clearAssets<T>(); \
+    template size_t AssetManager::numberOfAssets<T>(); \
+    template void AssetManager::each(std::function<void(AssetHandle<T>)> func); \
+    template AssetHandleIDtype AssetManager::import<T>(const std::string&);
+
 namespace GameEngine {
 
     std::string getNameFromFilepath(const std::string& filepath);
 
-    template<typename T, typename ... Args>
-    AssetHandle<T> AssetManager::load(const std::string&, Args...) {
-        // Error: T does not have a loader
-        assert(0);
+    AssetManager::AssetManager(const std::string& assetFolderPath) {
+        m_assetDataManager = std::make_unique<AssetDataManager>(assetFolderPath, this);
+    }
+
+    AssetManager::~AssetManager() {
+
+    }
+
+    template<typename T, typename... Args>
+    AssetHandle<T> AssetManager::load(AssetHandleIDtype id, Args... args) {
+        AssetData<T>* assetData = m_assetDataManager->getAssetData<T>(id);
+        if(assetData) return loadInternal(id, assetData, args...);
         return AssetHandle<T>();
     }
 
-    template<typename T, typename ... Args>
-    AssetHandle<T> AssetManager::reload(const std::string&, Args...) {
-        // Error: T does not have a loader
-        assert(0);
+    template<typename T, typename... Args>
+    AssetHandle<T> AssetManager::reload(AssetHandleIDtype id, Args... args) {
+        AssetData<T>* assetData = m_assetDataManager->getAssetData<T>(id);
+        if(assetData) return reloadInternal(id, assetData, args...);
         return AssetHandle<T>();
     }
 
     template<typename T>
-    AssetHandle<T> AssetManager::getHandle(const std::string& filepath) {
-        return getResourceCache<T>()->getHandle(entt::hashed_string{filepath.c_str()});
+    AssetHandle<T> AssetManager::getHandle(AssetHandleIDtype id) {
+        return getResourceCache<T>()->getHandle(id);
     }
 
     template<typename T>
-    bool AssetManager::exists(const std::string& filepath) {
-        return getResourceCache<T>()->contains(entt::hashed_string{filepath.c_str()});
+    bool AssetManager::exists(AssetHandleIDtype id) {
+        return getResourceCache<T>()->contains(id);
     }
 
     template<typename T>
     const char* AssetManager::getName(AssetHandle<T> asset) {
-        return getResourceCache<T>()->getName(asset.ID());
+        AssetData<T>* assetData = m_assetDataManager->getAssetData<T>(asset.ID());
+        if(assetData) return assetData->name.c_str();
+        return "";
     }
 
     template<typename T>
     const char* AssetManager::getFilepath(AssetHandle<T> asset) {
-        return getResourceCache<T>()->getFilepath(asset.ID());
+        AssetData<T>* assetData = m_assetDataManager->getAssetData<T>(asset.ID());
+        if(assetData) return assetData->filepath.c_str();
+        return "";
     }
 
     template<typename T>
@@ -59,20 +84,9 @@ namespace GameEngine {
         return getResourceCache<T>()->each(func);
     }
 
-    template<typename T>
-    AssetCache<T>* AssetManager::getResourceCache() {
-        assert(false);
-        return nullptr;
-    }
-
-    template<typename T, typename Loader, typename... Args>
-    AssetHandle<T> AssetManager::loadInternal(const std::string& filepath, Args... args) {
-        return getResourceCache<T>()->template load<Loader>(entt::hashed_string{filepath.c_str()}, getNameFromFilepath(filepath), filepath, args...);
-    }
-
-    template<typename T, typename Loader, typename... Args>
-    AssetHandle<T> AssetManager::reloadInternal(const std::string& filepath, Args... args) {
-        return getResourceCache<T>()->template reload<Loader>(entt::hashed_string{filepath.c_str()}, getNameFromFilepath(filepath), filepath, args...);
+    template <typename T>
+    AssetHandleIDtype AssetManager::import(const std::string& filepath) {
+        return m_assetDataManager->importAsset<T>(filepath);
     }
 
     std::string getNameFromFilepath(const std::string& filepath) {
@@ -86,22 +100,16 @@ namespace GameEngine {
     }
 
     template<>
-    AssetHandle<Model> AssetManager::load<Model>(const std::string& filepath) {
-        return loadInternal<Model, ModelLoader>(filepath, filepath, this);
+    AssetHandle<Model> AssetManager::loadInternal(AssetHandleIDtype id, AssetData<Model>* assetData) {
+        return getResourceCache<Model>()->load<ModelLoader>(id, assetData, this);
     }
 
     template<>
-    AssetHandle<Model> AssetManager::reload<Model>(const std::string& filepath) {
-        return reloadInternal<Model, ModelLoader>(filepath, filepath, this);
+    AssetHandle<Model> AssetManager::reloadInternal(AssetHandleIDtype id, AssetData<Model>* assetData) {
+        return getResourceCache<Model>()->reload<ModelLoader>(id, assetData, this);
     }
 
-    template AssetHandle<Model> AssetManager::getHandle<Model>(const std::string& filepath);
-    template bool AssetManager::exists<Model>(const std::string& filepath);
-    template const char* AssetManager::getName(AssetHandle<Model> asset);
-    template const char* AssetManager::getFilepath(AssetHandle<Model> asset);
-    template void AssetManager::clearAssets<Model>();
-    template size_t AssetManager::numberOfAssets<Model>();
-    template void AssetManager::each(std::function<void(AssetHandle<Model>)> func);
+    EXPLICIT_TEMPLATE_INSTANTIATION(Model)
 
     // Shader
     template<>
@@ -110,22 +118,16 @@ namespace GameEngine {
     }
 
     template<>
-    AssetHandle<Shader> AssetManager::load<Shader>(const std::string& filepath) {
-        return loadInternal<Shader, ShaderLoader>(filepath, filepath);
+    AssetHandle<Shader> AssetManager::loadInternal(AssetHandleIDtype id, AssetData<Shader>* assetData) {
+        return getResourceCache<Shader>()->load<ShaderLoader>(id, assetData);
     }
 
     template<>
-    AssetHandle<Shader> AssetManager::reload<Shader>(const std::string& filepath) {
-        return reloadInternal<Shader, ShaderLoader>(filepath, filepath);
+    AssetHandle<Shader> AssetManager::reloadInternal(AssetHandleIDtype id, AssetData<Shader>* assetData) {
+        return getResourceCache<Shader>()->reload<ShaderLoader>(id, assetData);
     }
 
-    template AssetHandle<Shader> AssetManager::getHandle<Shader>(const std::string& filepath);
-    template bool AssetManager::exists<Shader>(const std::string& filepath);
-    template const char* AssetManager::getName(AssetHandle<Shader> asset);
-    template const char* AssetManager::getFilepath(AssetHandle<Shader> asset);
-    template void AssetManager::clearAssets<Shader>();
-    template size_t AssetManager::numberOfAssets<Shader>();
-    template void AssetManager::each(std::function<void(AssetHandle<Shader>)> func);
+    EXPLICIT_TEMPLATE_INSTANTIATION(Shader)
 
     // Texture
     template<>
@@ -134,32 +136,28 @@ namespace GameEngine {
     }
 
     template<>
-    AssetHandle<Texture> AssetManager::load<Texture>(const std::string& filepath, bool srgb) {
-        return loadInternal<Texture, TextureLoader>(filepath, filepath, srgb);
+    AssetHandle<Texture> AssetManager::loadInternal(AssetHandleIDtype id, AssetData<Texture>* assetData) {
+        return getResourceCache<Texture>()->load<TextureLoader>(id, assetData);
     }
 
     template<>
-    AssetHandle<Texture> AssetManager::reload<Texture>(const std::string& filepath, bool srgb) {
-        return reloadInternal<Texture, TextureLoader>(filepath, filepath, srgb);
+    AssetHandle<Texture> AssetManager::reloadInternal(AssetHandleIDtype id, AssetData<Texture>* assetData) {
+        return getResourceCache<Texture>()->reload<TextureLoader>(id, assetData);
     }
 
     template<>
-    AssetHandle<Texture> AssetManager::load<Texture>(const std::string& identifier, unsigned char* data, unsigned int dataLength, bool srgb) {
-        return loadInternal<Texture, TextureLoader>(identifier, identifier, data, dataLength, srgb);
+    AssetHandle<Texture> AssetManager::loadInternal(AssetHandleIDtype id, AssetData<Texture>* assetData, unsigned char* data, unsigned int dataLength) {
+        return getResourceCache<Texture>()->load<TextureLoader>(id, assetData, data, dataLength);
     }
 
     template<>
-    AssetHandle<Texture> AssetManager::reload<Texture>(const std::string& identifier, unsigned char* data, unsigned int dataLength, bool srgb) {
-        return reloadInternal<Texture, TextureLoader>(identifier, identifier, data, dataLength, srgb);
+    AssetHandle<Texture> AssetManager::reloadInternal(AssetHandleIDtype id, AssetData<Texture>* assetData, unsigned char* data, unsigned int dataLength) {
+        return getResourceCache<Texture>()->reload<TextureLoader>(id, assetData, data, dataLength);
     }
 
-    template AssetHandle<Texture> AssetManager::getHandle<Texture>(const std::string& filepath);
-    template bool AssetManager::exists<Texture>(const std::string& filepath);
-    template const char* AssetManager::getName(AssetHandle<Texture> asset);
-    template const char* AssetManager::getFilepath(AssetHandle<Texture> asset);
-    template void AssetManager::clearAssets<Texture>();
-    template size_t AssetManager::numberOfAssets<Texture>();
-    template void AssetManager::each(std::function<void(AssetHandle<Texture>)> func);
+    template AssetHandle<Texture> AssetManager::load(AssetHandleIDtype id, unsigned char* data, unsigned int dataLength);
+    template AssetHandle<Texture> AssetManager::reload(AssetHandleIDtype id, unsigned char* data, unsigned int dataLength);
+    EXPLICIT_TEMPLATE_INSTANTIATION(Texture)
 
     // Material
     template<>
@@ -168,22 +166,16 @@ namespace GameEngine {
     }
 
     template<>
-    AssetHandle<Material> AssetManager::load<Material>(const std::string& filepath) {
-        return loadInternal<Material, MaterialLoader>(filepath);
+    AssetHandle<Material> AssetManager::loadInternal(AssetHandleIDtype id, AssetData<Material>* assetData) {
+        return getResourceCache<Material>()->load<MaterialLoader>(id, assetData, this);
     }
 
     template<>
-    AssetHandle<Material> AssetManager::reload<Material>(const std::string& filepath) {
-        return reloadInternal<Material, MaterialLoader>(filepath);
+    AssetHandle<Material> AssetManager::reloadInternal(AssetHandleIDtype id, AssetData<Material>* assetData) {
+        return getResourceCache<Material>()->reload<MaterialLoader>(id, assetData, this);
     }
 
-    template AssetHandle<Material> AssetManager::getHandle<Material>(const std::string& filepath);
-    template bool AssetManager::exists<Material>(const std::string& filepath);
-    template const char* AssetManager::getName(AssetHandle<Material> asset);
-    template const char* AssetManager::getFilepath(AssetHandle<Material> asset);
-    template void AssetManager::clearAssets<Material>();
-    template size_t AssetManager::numberOfAssets<Material>();
-    template void AssetManager::each(std::function<void(AssetHandle<Material>)> func);
+    EXPLICIT_TEMPLATE_INSTANTIATION(Material)
 
 	// ----
 
