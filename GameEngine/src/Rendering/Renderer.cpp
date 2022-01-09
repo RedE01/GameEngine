@@ -152,48 +152,50 @@ namespace GameEngine {
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
 
-		m_rendererData->getDefaultLightingShader()->useShader();
-		m_rendererData->getDefaultLightingShader()->setUniform1i("u_gPosition", 0);
-		m_rendererData->getDefaultLightingShader()->setUniform1i("u_gNormal", 1);
-		m_rendererData->getDefaultLightingShader()->setUniform1i("u_gAlbedo", 2);
-		glActiveTexture(GL_TEXTURE0);
-		m_rendererData->getGBufferPosition()->bind();
-		glActiveTexture(GL_TEXTURE1);
-		m_rendererData->getGBufferNormal()->bind();
-		glActiveTexture(GL_TEXTURE2);
-		m_rendererData->getGBufferAlbedo()->bind();
+        if(m_rendererData->getDefaultLightingShader()) {
+            m_rendererData->getDefaultLightingShader()->useShader();
+            m_rendererData->getDefaultLightingShader()->setUniform1i("u_gPosition", 0);
+            m_rendererData->getDefaultLightingShader()->setUniform1i("u_gNormal", 1);
+            m_rendererData->getDefaultLightingShader()->setUniform1i("u_gAlbedo", 2);
+            glActiveTexture(GL_TEXTURE0);
+            m_rendererData->getGBufferPosition()->bind();
+            glActiveTexture(GL_TEXTURE1);
+            m_rendererData->getGBufferNormal()->bind();
+            glActiveTexture(GL_TEXTURE2);
+            m_rendererData->getGBufferAlbedo()->bind();
 
-        m_rendererData->getDefaultLightingShader()->setUniformMat4("u_viewMatrix", camera->getViewMatrix());
-        m_rendererData->getDefaultLightingShader()->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
-        m_rendererData->getDefaultLightingShader()->setUniform3f("u_cameraPos", camera->position.x, camera->position.y, camera->position.z);
-        m_rendererData->getDefaultLightingShader()->setUniform2f("u_viewportSize", m_viewportSize.x, m_viewportSize.y);
+            m_rendererData->getDefaultLightingShader()->setUniformMat4("u_viewMatrix", camera->getViewMatrix());
+            m_rendererData->getDefaultLightingShader()->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
+            m_rendererData->getDefaultLightingShader()->setUniform3f("u_cameraPos", camera->position.x, camera->position.y, camera->position.z);
+            m_rendererData->getDefaultLightingShader()->setUniform2f("u_viewportSize", m_viewportSize.x, m_viewportSize.y);
 
-        scene->each<LightComponent>([&](Entity entity, LightComponent& lightComponent){
-			auto& transformComponent = entity.getComponent<TransformComponent>();
+            scene->each<LightComponent>([&](Entity entity, LightComponent& lightComponent){
+                auto& transformComponent = entity.getComponent<TransformComponent>();
 
-            m_rendererData->getDefaultLightingShader()->setUniform1ui("u_lightType", static_cast<unsigned int>(lightComponent.lightType));
-            if(lightComponent.lightType == LightType::PointLight) {
-                m_rendererData->getSphereVAO()->bind();
-                glCullFace(GL_FRONT); // Render the inside of the light spheres
+                m_rendererData->getDefaultLightingShader()->setUniform1ui("u_lightType", static_cast<unsigned int>(lightComponent.lightType));
+                if(lightComponent.lightType == LightType::PointLight) {
+                    m_rendererData->getSphereVAO()->bind();
+                    glCullFace(GL_FRONT); // Render the inside of the light spheres
 
-                Vector3 lightPos = transformComponent.getPosition();
-                m_rendererData->getDefaultLightingShader()->setUniform3f("u_lightPos", lightPos.x, lightPos.y, lightPos.z);
-                m_rendererData->getDefaultLightingShader()->setUniform1f("u_pointLightRange", lightComponent.pointLightRange);
+                    Vector3 lightPos = transformComponent.getPosition();
+                    m_rendererData->getDefaultLightingShader()->setUniform3f("u_lightPos", lightPos.x, lightPos.y, lightPos.z);
+                    m_rendererData->getDefaultLightingShader()->setUniform1f("u_pointLightRange", lightComponent.pointLightRange);
 
-                glDrawElements(GL_TRIANGLES, m_rendererData->getSphereIndexCount(), GL_UNSIGNED_INT, 0);
-            }
-            else if(lightComponent.lightType == LightType::DirectionalLight) {
-                m_rendererData->getRenderQuadVAO()->bind();
-                glCullFace(GL_BACK);
+                    glDrawElements(GL_TRIANGLES, m_rendererData->getSphereIndexCount(), GL_UNSIGNED_INT, 0);
+                }
+                else if(lightComponent.lightType == LightType::DirectionalLight) {
+                    m_rendererData->getRenderQuadVAO()->bind();
+                    glCullFace(GL_BACK);
 
-                Vector3 lightDir = - transformComponent.getForwardVector();
-                m_rendererData->getDefaultLightingShader()->setUniform3f("u_lightDir", lightDir.x, lightDir.y, lightDir.z);
-                m_rendererData->getDefaultLightingShader()->setUniform1f("u_lightIntensity", lightComponent.intensity);
+                    Vector3 lightDir = - transformComponent.getForwardVector();
+                    m_rendererData->getDefaultLightingShader()->setUniform3f("u_lightDir", lightDir.x, lightDir.y, lightDir.z);
+                    m_rendererData->getDefaultLightingShader()->setUniform1f("u_lightIntensity", lightComponent.intensity);
 
-                glDrawElements(GL_TRIANGLES, m_rendererData->getRenderQuadIndexCount(), GL_UNSIGNED_INT, 0);
-            }
+                    glDrawElements(GL_TRIANGLES, m_rendererData->getRenderQuadIndexCount(), GL_UNSIGNED_INT, 0);
+                }
 
-        });
+            });
+        }
 
     }
 
