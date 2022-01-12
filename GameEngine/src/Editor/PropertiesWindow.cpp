@@ -89,20 +89,40 @@ namespace GameEngine {
             ImGui::Combo(name.c_str(), selection, optionsCharPtr.data(), optionsCharPtr.size());
         }
 
-        void visit(ModelAsset* modelAsset) {
-            ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*modelAsset));
+        void visit(ModelAsset* var) {
+            ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*var));
+            if(ImGui::BeginDragDropTarget()) {
+                if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MODEL_ASSET_PAYLOAD")) {
+                    *var = assetManager->load<Model>(*(const int*)payload->Data);
+                }
+            }
         }
 
-        void visit(ShaderAsset* shaderAsset) {
-            ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*shaderAsset));
+        void visit(ShaderAsset* var) {
+            ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*var));
+            if(ImGui::BeginDragDropTarget()) {
+                if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHADER_ASSET_PAYLOAD")) {
+                    *var = assetManager->load<Shader>(*(const int*)payload->Data);
+                }
+            }
         }
 
-        void visit(TextureAsset* textureAsset) {
-            ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*textureAsset));
+        void visit(TextureAsset* var) {
+            ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*var));
+            if(ImGui::BeginDragDropTarget()) {
+                if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE_ASSET_PAYLOAD")) {
+                    *var = assetManager->load<Texture>(*(const int*)payload->Data);
+                }
+            }
         }
 
-        void visit(MaterialAsset* materialAsset) {
-            ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*materialAsset));
+        void visit(MaterialAsset* var) {
+            ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*var));
+            if(ImGui::BeginDragDropTarget()) {
+                if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MATERIAL_ASSET_PAYLOAD")) {
+                    *var = assetManager->load<Material>(*(const int*)payload->Data);
+                }
+            }
         }
 
         const std::string& name;

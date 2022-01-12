@@ -2,6 +2,7 @@
 #include "AssetData.h"
 #include <string>
 #include <unordered_map>
+#include <functional>
 
 namespace GameEngine {
 
@@ -26,6 +27,8 @@ namespace GameEngine {
         void reloadAssetData();
         void clearRegisteredAssets();
 
+        AssetHandleIDtype importAsset(const std::string& assetPath);
+
         template <typename T>
         AssetHandleIDtype importAsset(const std::string& assetPath);
 
@@ -37,6 +40,11 @@ namespace GameEngine {
 
         template <typename T>
         bool isValidFileExtensionForAssetType(const std::string& ext);
+
+        template <typename T>
+        void each(std::function<void(AssetData<T>&)> func) {
+            for(auto& e : getAssetDataMap<T>().map) func(e.second);
+        }
 
     private:
         template <typename T>

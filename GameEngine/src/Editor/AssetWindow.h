@@ -17,6 +17,8 @@ namespace GameEngine {
 
         int m_guiScale = 5;
         AssetType m_assetType = AssetType::Model;
+
+        std::string m_assetToBeImportedPath;
     };
 
 

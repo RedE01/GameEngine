@@ -156,6 +156,15 @@ namespace GameEngine {
         getAssetDataMap<Material>().map.clear();
     }
 
+    AssetHandleIDtype AssetDataManager::importAsset(const std::string& assetPath) {
+        std::string ext = std::filesystem::path(assetPath).extension();
+        if(isValidFileExtensionForAssetType<Model>(ext)) return importAsset<Model>(assetPath);
+        else if(isValidFileExtensionForAssetType<Shader>(ext)) return importAsset<Shader>(assetPath);
+        else if(isValidFileExtensionForAssetType<Texture>(ext)) return importAsset<Texture>(assetPath);
+        else if(isValidFileExtensionForAssetType<Material>(ext)) return importAsset<Material>(assetPath);
+        else return 0;
+    }
+
     template <typename T>
     AssetHandleIDtype AssetDataManager::importAsset(const std::string& assetPath) {
         if(!isValidFileExtensionForAssetType<T>(std::filesystem::path(assetPath).extension())) {

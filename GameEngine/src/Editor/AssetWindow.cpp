@@ -4,27 +4,34 @@
 #include "../Rendering/Texture.h"
 
 #include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
 
 namespace GameEngine {
 
-    template <typename T> void showAsset(AssetHandle<T>, ImVec2) { }
+    template <typename T> void showAsset(AssetData<T>&, AssetHandle<T>, ImVec2) { }
 
-    void showAsset(AssetHandle<Model>, ImVec2 size) {
+    void showAsset(AssetData<Model>&, AssetHandle<Model>, ImVec2 size) {
         ImGui::Dummy(size);
     }
 
-    void showAsset(AssetHandle<Shader>, ImVec2 size) {
+    void showAsset(AssetData<Shader>&, AssetHandle<Shader>, ImVec2 size) {
         ImGui::Dummy(size);
     }
 
-    void showAsset(AssetHandle<Texture> texture, ImVec2 size) {
-        ImGui::Image(reinterpret_cast<ImTextureID>(texture->getTextureID()), size);
+    void showAsset(AssetData<Texture>&, AssetHandle<Texture> assetHandle, ImVec2 size) {
+        if(assetHandle) ImGui::Image(reinterpret_cast<ImTextureID>(assetHandle->getTextureID()), size);
+        else ImGui::Dummy(size);
     }
 
-    void showAsset(AssetHandle<Material>, ImVec2 size) {
+    void showAsset(AssetData<Material>&, AssetHandle<Material>, ImVec2 size) {
         ImGui::Dummy(size);
     }
 
+    template <typename T> const char* getAssetDragDropPayloadString();
+    template <> const char* getAssetDragDropPayloadString<Model>() { return "MODEL_ASSET_PAYLOAD"; }
+    template <> const char* getAssetDragDropPayloadString<Shader>() { return "SHADER_ASSET_PAYLOAD"; }
+    template <> const char* getAssetDragDropPayloadString<Texture>() { return "TEXTURE_ASSET_PAYLOAD"; }
+    template <> const char* getAssetDragDropPayloadString<Material>() { return "MATERIAL_ASSET_PAYLOAD"; }
 
     template<typename T>
     void showAssets(AssetManager* assetManager, int guiScale) {
@@ -33,19 +40,25 @@ namespace GameEngine {
         float windowVisible = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
 
         int n = 0;
-        assetManager->each<T>([&](AssetHandle<T> asset){
+        assetManager->each<T>([&](AssetData<T>& assetData) {
             ImGui::PushID(n);
             ImGui::BeginGroup();
 
-            std::string name = std::string(assetManager->getName(asset));
             std::string nameStr;
-            if(name.size() > 16) nameStr = name.substr(0, 16 - 3) + "...";
-            else nameStr = name;
+            if(assetData.name.size() > 16) nameStr = assetData.name.substr(0, 16 - 3) + "...";
+            else nameStr = assetData.name;
             float textWidth = ImGui::CalcTextSize(nameStr.c_str()).x;
 
             ImGui::Dummy({std::max(0.0f, (textWidth - size.x)) / 2, size.y});
             ImGui::SameLine();
-            showAsset(asset, size);
+            showAsset(assetData, assetManager->getHandle<T>(assetData.ID), size);
+            ImGuiDragDropFlags dragDropFlags = ImGuiDragDropFlags_SourceAllowNullID;
+            if(ImGui::BeginDragDropSource(dragDropFlags)) {
+                ImGui::Text("%s", nameStr.c_str());
+
+                ImGui::SetDragDropPayload(getAssetDragDropPayloadString<T>(), &(assetData.ID), sizeof(assetData.ID));
+                ImGui::EndDragDropSource();
+            }
 
             ImGui::Dummy({std::max(0.0f, (size.x - textWidth)) / 2, size.y});
             ImGui::SameLine();
@@ -64,7 +77,6 @@ namespace GameEngine {
 
             n++;
         });
-
     }
 
     AssetWindow::AssetWindow(Application* application, Editor* editor) : GuiWindow(application, editor) {
@@ -96,6 +108,30 @@ namespace GameEngine {
                 createAssetTypeMenu(AssetType::Material);
 
                 ImGui::EndMenu();
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            if(ImGui::Button("Import asset")) {
+                m_assetToBeImportedPath = "";
+                ImGui::OpenPopup("Import asset");
+            }
+
+            if(ImGui::BeginPopupModal("Import asset")) {
+                ImGui::InputText("Filepath", &m_assetToBeImportedPath);
+
+                if(ImGui::Button("Import", ImVec2(120, 0))) {
+                    getApplication()->getAssetManager()->import(m_assetToBeImportedPath);
+
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::SameLine();
+                if(ImGui::Button("Cancel", ImVec2(120, 0))) ImGui::CloseCurrentPopup();
+
+                ImGui::EndPopup();
             }
 
             ImGui::Spacing();

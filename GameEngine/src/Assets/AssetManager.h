@@ -1,6 +1,7 @@
 #pragma once
 #include "AssetHandle.h"
 #include "AssetCache.h"
+#include "AssetData.h"
 #include <functional>
 
 namespace GameEngine {
@@ -41,6 +42,11 @@ namespace GameEngine {
 
         template<typename T>
         void each(std::function<void(AssetHandle<T>)> func);
+
+        template<typename T>
+        void each(std::function<void(AssetData<T>&)> func);
+
+        AssetHandleIDtype import(const std::string& filepath);
 
         template <typename T>
         AssetHandleIDtype import(const std::string& filepath);
