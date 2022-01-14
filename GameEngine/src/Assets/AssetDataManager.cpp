@@ -177,8 +177,18 @@ namespace GameEngine {
         std::filesystem::path absolutePath = getAbsolutePath(assetPath, m_assetFolderPath);
         std::string filename = absolutePath.filename();
 
+        // Check that the path is valid
         if(!std::filesystem::exists(absolutePath)) {
             std::cout << "Could not import asset: " << absolutePath << ". Path does not exist" << std::endl;
+            return 0;
+        }
+
+        std::filesystem::path testPath = absolutePath;
+        while(testPath.has_relative_path() && testPath != std::filesystem::absolute(m_assetFolderPath)) {
+            testPath = testPath.parent_path();
+        }
+        if(testPath != std::filesystem::absolute(m_assetFolderPath)) {
+            std::cout << "Could not import asset: " << absolutePath << ". Path is not a subpath of " << m_assetFolderPath << std::endl;
             return 0;
         }
 
