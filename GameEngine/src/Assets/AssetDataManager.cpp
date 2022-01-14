@@ -59,12 +59,6 @@ namespace GameEngine {
         emitter << YAML::Value << assetData.srgb;
     }
 
-    template<typename T>
-    AssetHandleIDtype AssetDataManager::AssetDataMap<T>::nextID() {
-        while(map.find(m_nextID) != map.end()) m_nextID++;
-        return m_nextID;
-    }
-
     template <> AssetDataManager::AssetDataMap<Model>& AssetDataManager::getAssetDataMap() {
         return m_modelAssetDataMap;
     }
@@ -130,17 +124,17 @@ namespace GameEngine {
 
                         if(isValidFileExtensionForAssetType<Model>(fileExtenstion)) {
                             std::vector<AssetHandleIDtype> materials = assetNode["materials"].as<std::vector<AssetHandleIDtype>>();
-                            getAssetDataMap<Model>().map.insert({id, AssetData<Model>(id, assetFilepath, name, materials)});
+                            registerAssetData<Model>(id, AssetData<Model>(id, assetFilepath, name, materials));
                         }
                         else if(isValidFileExtensionForAssetType<Shader>(fileExtenstion)) {
-                            getAssetDataMap<Shader>().map.insert({id, AssetData<Shader>(id, assetFilepath, name)});
+                            registerAssetData<Shader>(id, AssetData<Shader>(id, assetFilepath, name));
                         }
                         else if(isValidFileExtensionForAssetType<Texture>(fileExtenstion)) {
                             bool srgb = assetNode["srgb"].as<bool>();
-                            getAssetDataMap<Texture>().map.insert({id, AssetData<Texture>(id, assetFilepath, name, srgb)});
+                            registerAssetData<Texture>(id, AssetData<Texture>(id, assetFilepath, name, srgb));
                         }
                         else if(isValidFileExtensionForAssetType<Material>(fileExtenstion)) {
-                            getAssetDataMap<Material>().map.insert({id, AssetData<Material>(id, assetFilepath, name)});
+                           registerAssetData(id, AssetData<Material>(id, assetFilepath, name));
                         }
                     }
                 }
@@ -195,7 +189,7 @@ namespace GameEngine {
         // Make AssetData, and load in the new data from file
         auto [id, name] = getIDAndNameFromAssetDataFile(absolutePath);
         if(id == 0) {
-            id = getAssetDataMap<T>().nextID();
+            id = nextID();
             name = absolutePath.stem();
         }
 
@@ -238,7 +232,7 @@ namespace GameEngine {
         }
 
         // Register asset data
-        getAssetDataMap<T>().map.insert({assetData.ID, assetData});
+        registerAssetData<T>(assetData.ID, assetData);
         
         return id;
     }
@@ -253,6 +247,16 @@ namespace GameEngine {
     template <typename T>
     bool AssetDataManager::exists(AssetHandleIDtype ID) {
         return getAssetDataMap<T>().map.find(ID) != getAssetDataMap<T>().map.end();
+    }
+
+    AssetHandleIDtype AssetDataManager::nextID() {
+        return m_nextID++;
+    }
+
+    template <typename T>
+    void AssetDataManager::registerAssetData(AssetHandleIDtype id, const AssetData<T>& assetData) {
+        getAssetDataMap<T>().map.insert({id, assetData});
+        if(id >= m_nextID) m_nextID = id + 1;
     }
 
     EXPLICIT_TEMPLATE_INSTANTIATION(Model);

@@ -13,12 +13,7 @@ namespace GameEngine {
         template<typename T>
         class AssetDataMap {
         public:
-            AssetHandleIDtype nextID();
-
             std::unordered_map<AssetHandleIDtype, AssetData<T>> map;
-
-        private:
-            AssetHandleIDtype m_nextID = 1;
         };
 
     public:
@@ -46,9 +41,14 @@ namespace GameEngine {
             for(auto& e : getAssetDataMap<T>().map) func(e.second);
         }
 
+        AssetHandleIDtype nextID();
+
     private:
         template <typename T>
         AssetDataMap<T>& getAssetDataMap();
+
+        template <typename T>
+        void registerAssetData(AssetHandleIDtype id, const AssetData<T>& assetData);
 
     private:
         const std::string m_assetFolderPath;
