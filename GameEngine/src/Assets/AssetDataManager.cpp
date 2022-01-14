@@ -8,8 +8,8 @@
 
 #define EXPLICIT_TEMPLATE_INSTANTIATION(T) \
     template AssetHandleIDtype AssetDataManager::importAsset<T>(const std::string& assetPath); \
-    template AssetData<T>* AssetDataManager::getAssetData(AssetHandleIDtype ID); \
-    template bool AssetDataManager::exists<T>(AssetHandleIDtype ID);
+    template AssetData<T>* AssetDataManager::getAssetData(AssetHandleIDtype ID, AssetHandleIDtype localID); \
+    template bool AssetDataManager::exists<T>(AssetHandleIDtype ID, AssetHandleIDtype localID);
 
 namespace GameEngine {
 
@@ -44,19 +44,53 @@ namespace GameEngine {
     }
 
     template <typename T>
-    void writeAssetData(AssetData<T>&, YAML::Emitter&) {
+    void writeAssetData(const AssetData<T>& assetData, YAML::Emitter& emitter) {
+        emitter << YAML::Key << "name" << YAML::Value << assetData.name;
     }
 
     template <>
-    void writeAssetData<Model>(AssetData<Model>& assetData, YAML::Emitter& emitter) {
-        emitter << YAML::Key << "materials";
-        emitter << YAML::Value << assetData.materialIDs;
-    }
+    void writeAssetData<Texture>(const AssetData<Texture>& assetData, YAML::Emitter& emitter) {
+        emitter << YAML::Key << "name" << YAML::Value << assetData.name;
 
-    template <>
-    void writeAssetData<Texture>(AssetData<Texture>& assetData, YAML::Emitter& emitter) {
         emitter << YAML::Key << "srgb";
         emitter << YAML::Value << assetData.srgb;
+    }
+
+
+    template <>
+    void writeAssetData<Model>(const AssetData<Model>& assetData, YAML::Emitter& emitter) {
+        emitter << YAML::Key << "name" << YAML::Value << assetData.name;
+
+        emitter << YAML::Key << "materials";
+        emitter << YAML::Value << assetData.materialIDs;
+        
+        if(assetData.embeddedTextures.size() > 0) {
+            emitter << YAML::Key << "embeddedTextures";
+            emitter << YAML::Value << YAML::BeginSeq;
+            for(const auto& embeddedTexture : assetData.embeddedTextures) {
+                emitter << YAML::BeginMap;
+                writeAssetData<Texture>(embeddedTexture, emitter);
+                emitter << YAML::EndMap;
+            }
+            emitter << YAML::EndSeq;
+        }
+    }
+
+    template <typename T>
+    AssetData<T> readAssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, const YAML::Node&) {
+        return AssetData<T>(ID, localID, filepath, name);
+    }
+
+    template <>
+    AssetData<Model> readAssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, const YAML::Node& node) {
+        std::vector<AssetHandleIDtype> materials = node["materials"].as<std::vector<AssetHandleIDtype>>();
+        return AssetData<Model>(ID, localID, filepath, name, materials);
+    }
+
+    template <>
+    AssetData<Texture> readAssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, const YAML::Node& node) {
+        bool srgb = node["srgb"].as<bool>();
+        return AssetData<Texture>(ID, localID, filepath, name, srgb);
     }
 
     template <> AssetDataManager::AssetDataMap<Model>& AssetDataManager::getAssetDataMap() {
@@ -123,24 +157,28 @@ namespace GameEngine {
                         std::string fileExtenstion = std::filesystem::path(assetFilepath).extension();
 
                         if(isValidFileExtensionForAssetType<Model>(fileExtenstion)) {
-                            std::vector<AssetHandleIDtype> materials = assetNode["materials"].as<std::vector<AssetHandleIDtype>>();
-                            registerAssetData<Model>(id, AssetData<Model>(id, assetFilepath, name, materials));
+                            registerAssetData<Model>(readAssetData<Model>(id, 0, assetFilepath, name, assetNode));
+
+                            AssetHandleIDtype embeddedTextureID = 1;
+                            for(auto& embeddedTextureNode : assetNode["embeddedTextures"]) {
+                                std::string embeddedTextureName = embeddedTextureNode["name"].as<std::string>();
+                                registerAssetData<Texture>(readAssetData<Texture>(id, embeddedTextureID, assetFilepath, embeddedTextureName, embeddedTextureNode));
+                                embeddedTextureID++;
+                            }
                         }
                         else if(isValidFileExtensionForAssetType<Shader>(fileExtenstion)) {
-                            registerAssetData<Shader>(id, AssetData<Shader>(id, assetFilepath, name));
+                            registerAssetData<Shader>(readAssetData<Shader>(id, 0, assetFilepath, name, assetNode));
                         }
                         else if(isValidFileExtensionForAssetType<Texture>(fileExtenstion)) {
-                            bool srgb = assetNode["srgb"].as<bool>();
-                            registerAssetData<Texture>(id, AssetData<Texture>(id, assetFilepath, name, srgb));
+                            registerAssetData<Texture>(readAssetData<Texture>(id, 0, assetFilepath, name, assetNode));
                         }
                         else if(isValidFileExtensionForAssetType<Material>(fileExtenstion)) {
-                           registerAssetData(id, AssetData<Material>(id, assetFilepath, name));
+                            registerAssetData<Material>(readAssetData<Material>(id, 0, assetFilepath, name, assetNode));
                         }
                     }
                 }
             }
         }
-
     }
 
     void AssetDataManager::clearRegisteredAssets() {
@@ -193,7 +231,7 @@ namespace GameEngine {
             name = absolutePath.stem();
         }
 
-        AssetData<T> assetData(id, absolutePath.string(), name, this);
+        AssetData<T> assetData(id, 0, absolutePath.string(), name, this);
 
         // Load .assetdata file
         std::filesystem::path assetDataPath = absolutePath.parent_path() / ".assetdata";
@@ -214,7 +252,6 @@ namespace GameEngine {
         emitter << YAML::BeginMap;
 
         emitter << YAML::Key << "id" << YAML::Value << assetData.ID;
-        emitter << YAML::Key << "name" << YAML::Value << assetData.name;
         emitter << YAML::Key << "filename" << YAML::Value << filename;
 
         // Write asset-type specific data to .assetdata
@@ -232,21 +269,24 @@ namespace GameEngine {
         }
 
         // Register asset data
-        registerAssetData<T>(assetData.ID, assetData);
+        registerAssetData<T>(assetData);
         
         return id;
     }
 
     template <typename T>
-    AssetData<T>* AssetDataManager::getAssetData(AssetHandleIDtype ID) {
+    AssetData<T>* AssetDataManager::getAssetData(AssetHandleIDtype ID, AssetHandleIDtype localID) {
         auto search = getAssetDataMap<T>().map.find(ID);
-        if(search != getAssetDataMap<T>().map.end()) return &(search->second);
-        return nullptr;
+        if(search == getAssetDataMap<T>().map.end()) return nullptr;
+        auto searchLocal = search->second.find(localID);
+        if(searchLocal == search->second.end()) return nullptr;
+        return &(searchLocal->second);
     }
 
     template <typename T>
-    bool AssetDataManager::exists(AssetHandleIDtype ID) {
-        return getAssetDataMap<T>().map.find(ID) != getAssetDataMap<T>().map.end();
+    bool AssetDataManager::exists(AssetHandleIDtype ID, AssetHandleIDtype localID) {
+        auto search = getAssetDataMap<T>().map.find(ID);
+        return (search != getAssetDataMap<T>().map.end() && search->second.find(localID) != search->second.end());
     }
 
     AssetHandleIDtype AssetDataManager::nextID() {
@@ -254,9 +294,9 @@ namespace GameEngine {
     }
 
     template <typename T>
-    void AssetDataManager::registerAssetData(AssetHandleIDtype id, const AssetData<T>& assetData) {
-        getAssetDataMap<T>().map.insert({id, assetData});
-        if(id >= m_nextID) m_nextID = id + 1;
+    void AssetDataManager::registerAssetData(const AssetData<T>& assetData) {
+        getAssetDataMap<T>().map[assetData.ID].insert({assetData.localID, assetData});
+        if(assetData.ID >= m_nextID) m_nextID = assetData.ID + 1;
     }
 
     EXPLICIT_TEMPLATE_INSTANTIATION(Model);

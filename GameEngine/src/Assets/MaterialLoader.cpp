@@ -11,8 +11,14 @@ namespace GameEngine {
         YAML::Node node = YAML::LoadFile(assetData->filepath);
 
         std::shared_ptr<Material> material = std::make_shared<Material>();
-        if(node["diffuseTexture"]) material->diffuseTexture = assetManager->load<Texture>(node["diffuseTexture"].as<AssetHandleIDtype>());
-        if(node["normalTexture"]) material->normalTexture = assetManager->load<Texture>(node["normalTexture"].as<AssetHandleIDtype>());
+
+        auto loadTexture = [&](const std::string& textureName) {
+            AssetHandleIDtype textureID = node[textureName][0].as<AssetHandleIDtype>();
+            AssetHandleIDtype textureLocalID = node[textureName][1].as<AssetHandleIDtype>();
+            return assetManager->load<Texture>(textureID, textureLocalID);
+        };
+        if(node["diffuseTexture"]) material->diffuseTexture = loadTexture("diffuseTexture");
+        if(node["normalTexture"]) material->normalTexture = loadTexture("normalTexture");
 
         return material;
     }
@@ -25,10 +31,14 @@ namespace GameEngine {
             emitter << YAML::BeginMap;
 
             emitter << YAML::Key << "diffuseTexture";
-            emitter << YAML::Value << material->diffuseTexture.ID();
+            emitter << YAML::Value << YAML::Flow << YAML::BeginSeq;
+            emitter << material->diffuseTexture.ID() << material->diffuseTexture.localID();
+            emitter << YAML::EndSeq;
 
             emitter << YAML::Key << "normalTexture";
-            emitter << YAML::Value << material->normalTexture.ID();
+            emitter << YAML::Value << YAML::Flow << YAML::BeginSeq;
+            emitter << material->normalTexture.ID() << material->normalTexture.localID();
+            emitter << YAML::EndSeq;
 
             emitter << YAML::EndMap;
 

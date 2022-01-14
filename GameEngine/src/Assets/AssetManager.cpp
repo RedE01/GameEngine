@@ -8,10 +8,9 @@
 #include <filesystem>
 
 #define EXPLICIT_TEMPLATE_INSTANTIATION(T) \
-    template AssetHandle<T> AssetManager::load(AssetHandleIDtype id); \
-    template AssetHandle<T> AssetManager::reload(AssetHandleIDtype id); \
-    template AssetHandle<T> AssetManager::getHandle<T>(AssetHandleIDtype id); \
-    template bool AssetManager::exists<T>(AssetHandleIDtype id); \
+    template AssetHandle<T> AssetManager::load(AssetHandleIDtype id, AssetHandleIDtype localID); \
+    template AssetHandle<T> AssetManager::getHandle<T>(AssetHandleIDtype id, AssetHandleIDtype localID); \
+    template bool AssetManager::exists<T>(AssetHandleIDtype id, AssetHandleIDtype localID); \
     template const char* AssetManager::getName(AssetHandle<T> asset); \
     template const char* AssetManager::getFilepath(AssetHandle<T> asset); \
     template void AssetManager::clearAssets<T>(); \
@@ -32,28 +31,44 @@ namespace GameEngine {
 
     }
 
-    template<typename T, typename... Args>
-    AssetHandle<T> AssetManager::load(AssetHandleIDtype id, Args... args) {
-        AssetData<T>* assetData = m_assetDataManager->getAssetData<T>(id);
-        if(assetData) return loadInternal(id, assetData, args...);
-        return AssetHandle<T>();
+    template<typename T>
+    AssetHandle<T> AssetManager::load(AssetHandleIDtype id, AssetHandleIDtype localID) {
+        //std::cout << "Load no args: " << id << ", " << localID << std::endl;
+        if(localID == 0) {
+            AssetData<T>* assetData = m_assetDataManager->getAssetData<T>(id, 0);
+            if(assetData) {
+                return loadInternal(id, localID, assetData);
+            }
+            return AssetHandle<T>();
+        }
+        else {
+            if(getHandle<T>(id, localID)) return getHandle<T>(id, localID);
+            else {
+                loadAny(id);
+                return getHandle<T>(id, localID);
+            }
+        }
+
     }
 
     template<typename T, typename... Args>
-    AssetHandle<T> AssetManager::reload(AssetHandleIDtype id, Args... args) {
-        AssetData<T>* assetData = m_assetDataManager->getAssetData<T>(id);
-        if(assetData) return reloadInternal(id, assetData, args...);
+    AssetHandle<T> AssetManager::load(AssetHandleIDtype id, AssetHandleIDtype localID, Args... args) {
+        //std::cout << "Load with args: " << id << ", " << localID << std::endl;
+        AssetData<T>* assetData = m_assetDataManager->getAssetData<T>(id, localID);
+        if(assetData) {
+            return loadInternal(id, localID, assetData, args...);
+        }
         return AssetHandle<T>();
     }
 
     template<typename T>
-    AssetHandle<T> AssetManager::getHandle(AssetHandleIDtype id) {
-        return getResourceCache<T>()->getHandle(id);
+    AssetHandle<T> AssetManager::getHandle(AssetHandleIDtype id, AssetHandleIDtype localID) {
+        return getResourceCache<T>()->getHandle(id, localID);
     }
 
     template<typename T>
-    bool AssetManager::exists(AssetHandleIDtype id) {
-        return getResourceCache<T>()->contains(id);
+    bool AssetManager::exists(AssetHandleIDtype id, AssetHandleIDtype localID) {
+        return getResourceCache<T>()->contains(id, localID);
     }
 
     template<typename T>
@@ -99,6 +114,13 @@ namespace GameEngine {
         return m_assetDataManager->importAsset<T>(filepath);
     }
 
+    void AssetManager::loadAny(AssetHandleIDtype id) {
+        load<Model>(id, 0);
+        load<Shader>(id, 0);
+        load<Texture>(id, 0);
+        load<Material>(id, 0);
+    }
+
     std::string getNameFromFilepath(const std::string& filepath) {
         return std::filesystem::path(filepath).stem();
     }
@@ -110,13 +132,8 @@ namespace GameEngine {
     }
 
     template<>
-    AssetHandle<Model> AssetManager::loadInternal(AssetHandleIDtype id, AssetData<Model>* assetData) {
-        return getResourceCache<Model>()->load<ModelLoader>(id, assetData, this);
-    }
-
-    template<>
-    AssetHandle<Model> AssetManager::reloadInternal(AssetHandleIDtype id, AssetData<Model>* assetData) {
-        return getResourceCache<Model>()->reload<ModelLoader>(id, assetData, this);
+    AssetHandle<Model> AssetManager::loadInternal(AssetHandleIDtype id, AssetHandleIDtype localID, AssetData<Model>* assetData) {
+        return getResourceCache<Model>()->load<ModelLoader>(id, localID, assetData, this);
     }
 
     EXPLICIT_TEMPLATE_INSTANTIATION(Model)
@@ -128,13 +145,8 @@ namespace GameEngine {
     }
 
     template<>
-    AssetHandle<Shader> AssetManager::loadInternal(AssetHandleIDtype id, AssetData<Shader>* assetData) {
-        return getResourceCache<Shader>()->load<ShaderLoader>(id, assetData);
-    }
-
-    template<>
-    AssetHandle<Shader> AssetManager::reloadInternal(AssetHandleIDtype id, AssetData<Shader>* assetData) {
-        return getResourceCache<Shader>()->reload<ShaderLoader>(id, assetData);
+    AssetHandle<Shader> AssetManager::loadInternal(AssetHandleIDtype id, AssetHandleIDtype localID, AssetData<Shader>* assetData) {
+        return getResourceCache<Shader>()->load<ShaderLoader>(id, localID, assetData);
     }
 
     EXPLICIT_TEMPLATE_INSTANTIATION(Shader)
@@ -146,27 +158,16 @@ namespace GameEngine {
     }
 
     template<>
-    AssetHandle<Texture> AssetManager::loadInternal(AssetHandleIDtype id, AssetData<Texture>* assetData) {
-        return getResourceCache<Texture>()->load<TextureLoader>(id, assetData);
+    AssetHandle<Texture> AssetManager::loadInternal(AssetHandleIDtype id, AssetHandleIDtype localID, AssetData<Texture>* assetData) {
+        return getResourceCache<Texture>()->load<TextureLoader>(id, localID, assetData);
     }
 
     template<>
-    AssetHandle<Texture> AssetManager::reloadInternal(AssetHandleIDtype id, AssetData<Texture>* assetData) {
-        return getResourceCache<Texture>()->reload<TextureLoader>(id, assetData);
+    AssetHandle<Texture> AssetManager::loadInternal(AssetHandleIDtype id, AssetHandleIDtype localID, AssetData<Texture>* assetData, unsigned char* data, unsigned int dataLength) {
+        return getResourceCache<Texture>()->load<TextureLoader>(id, localID, assetData, data, dataLength);
     }
 
-    template<>
-    AssetHandle<Texture> AssetManager::loadInternal(AssetHandleIDtype id, AssetData<Texture>* assetData, unsigned char* data, unsigned int dataLength) {
-        return getResourceCache<Texture>()->load<TextureLoader>(id, assetData, data, dataLength);
-    }
-
-    template<>
-    AssetHandle<Texture> AssetManager::reloadInternal(AssetHandleIDtype id, AssetData<Texture>* assetData, unsigned char* data, unsigned int dataLength) {
-        return getResourceCache<Texture>()->reload<TextureLoader>(id, assetData, data, dataLength);
-    }
-
-    template AssetHandle<Texture> AssetManager::load(AssetHandleIDtype id, unsigned char* data, unsigned int dataLength);
-    template AssetHandle<Texture> AssetManager::reload(AssetHandleIDtype id, unsigned char* data, unsigned int dataLength);
+    template AssetHandle<Texture> AssetManager::load(AssetHandleIDtype id, AssetHandleIDtype localID, unsigned char* data, unsigned int dataLength);
     EXPLICIT_TEMPLATE_INSTANTIATION(Texture)
 
     // Material
@@ -176,13 +177,8 @@ namespace GameEngine {
     }
 
     template<>
-    AssetHandle<Material> AssetManager::loadInternal(AssetHandleIDtype id, AssetData<Material>* assetData) {
-        return getResourceCache<Material>()->load<MaterialLoader>(id, assetData, this);
-    }
-
-    template<>
-    AssetHandle<Material> AssetManager::reloadInternal(AssetHandleIDtype id, AssetData<Material>* assetData) {
-        return getResourceCache<Material>()->reload<MaterialLoader>(id, assetData, this);
+    AssetHandle<Material> AssetManager::loadInternal(AssetHandleIDtype id, AssetHandleIDtype localID, AssetData<Material>* assetData) {
+        return getResourceCache<Material>()->load<MaterialLoader>(id, localID, assetData, this);
     }
 
     EXPLICIT_TEMPLATE_INSTANTIATION(Material)

@@ -13,7 +13,7 @@ namespace GameEngine {
         template<typename T>
         class AssetDataMap {
         public:
-            std::unordered_map<AssetHandleIDtype, AssetData<T>> map;
+            std::unordered_map<AssetHandleIDtype, std::unordered_map<AssetHandleIDtype, AssetData<T>>> map;
         };
 
     public:
@@ -28,17 +28,19 @@ namespace GameEngine {
         AssetHandleIDtype importAsset(const std::string& assetPath);
 
         template <typename T>
-        AssetData<T>* getAssetData(AssetHandleIDtype ID);
+        AssetData<T>* getAssetData(AssetHandleIDtype ID, AssetHandleIDtype localID = 0);
 
         template <typename T>
-        bool exists(AssetHandleIDtype ID);
+        bool exists(AssetHandleIDtype ID, AssetHandleIDtype localID = 0);
 
         template <typename T>
         bool isValidFileExtensionForAssetType(const std::string& ext);
 
         template <typename T>
         void each(std::function<void(AssetData<T>&)> func) {
-            for(auto& e : getAssetDataMap<T>().map) func(e.second);
+            for(auto& e : getAssetDataMap<T>().map) {
+                for(auto& a : e.second) func(a.second);
+            }
         }
 
         AssetHandleIDtype nextID();
@@ -48,7 +50,7 @@ namespace GameEngine {
         AssetDataMap<T>& getAssetDataMap();
 
         template <typename T>
-        void registerAssetData(AssetHandleIDtype id, const AssetData<T>& assetData);
+        void registerAssetData(const AssetData<T>& assetData);
 
     private:
         const std::string m_assetFolderPath;

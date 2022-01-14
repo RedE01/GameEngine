@@ -69,10 +69,10 @@ namespace GameEngine {
 
         void visit(int* selection, std::vector<std::string>&) { *selection = node.as<int>(*selection); }
 
-        void visit(ModelAsset* var) { *var = assetManager->load<Model>(node.as<AssetHandleIDtype>()); }
-        void visit(ShaderAsset* var) { *var = assetManager->load<Shader>(node.as<AssetHandleIDtype>()); }
-        void visit(TextureAsset* var) { *var = assetManager->load<Texture>(node.as<AssetHandleIDtype>()); }
-        void visit(MaterialAsset* var) { *var = assetManager->load<Material>(node.as<AssetHandleIDtype>()); }
+        void visit(ModelAsset* var) { *var = assetManager->load<Model>(node[0].as<AssetHandleIDtype>(), node[1].as<AssetHandleIDtype>()); }
+        void visit(ShaderAsset* var) { *var = assetManager->load<Shader>(node[0].as<AssetHandleIDtype>(), node[1].as<AssetHandleIDtype>()); }
+        void visit(TextureAsset* var) { *var = assetManager->load<Texture>(node[0].as<AssetHandleIDtype>(), node[1].as<AssetHandleIDtype>()); }
+        void visit(MaterialAsset* var) { *var = assetManager->load<Material>(node[0].as<AssetHandleIDtype>(), node[1].as<AssetHandleIDtype>()); }
 
         const YAML::Node& node;
         AssetManager* assetManager;
@@ -126,10 +126,10 @@ namespace GameEngine {
 
         void visit(int* selection, std::vector<std::string>&) { emitter << *selection; }
 
-        void visit(ModelAsset* modelAsset) { emitter << modelAsset->ID(); }
-        void visit(ShaderAsset* shaderAsset) { emitter << shaderAsset->ID(); }
-        void visit(TextureAsset* textureAsset) { emitter << textureAsset->ID(); }
-        void visit(MaterialAsset* materialAsset) { emitter << materialAsset->ID(); }
+        void visit(ModelAsset* var) { emitter << YAML::Flow << YAML::BeginSeq << var->ID() << var->localID() << YAML::EndSeq; }
+        void visit(ShaderAsset* var) { emitter << YAML::Flow << YAML::BeginSeq << var->ID() << var->localID() << YAML::EndSeq; }
+        void visit(TextureAsset* var) { emitter << YAML::Flow << YAML::BeginSeq << var->ID() << var->localID() << YAML::EndSeq; }
+        void visit(MaterialAsset* var) { emitter << YAML::Flow << YAML::BeginSeq << var->ID() << var->localID() << YAML::EndSeq; }
 
         YAML::Emitter& emitter;
         AssetManager* assetManager;

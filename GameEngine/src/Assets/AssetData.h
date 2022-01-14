@@ -8,12 +8,13 @@ namespace GameEngine {
 
     class AssetDataBase {
     public:
-        AssetDataBase(AssetHandleIDtype ID, const std::string& filepath, const std::string name)
-            : ID(ID), filepath(filepath), name(name) {
+        AssetDataBase(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string name)
+            : ID(ID), localID(localID), filepath(filepath), name(name) {
         }
 
     public:
         const AssetHandleIDtype ID;
+        const AssetHandleIDtype localID;
         const std::string filepath;
         std::string name;
     };
@@ -25,30 +26,31 @@ namespace GameEngine {
     template <>
     class AssetData<Model> : public AssetDataBase {
     public:
-        AssetData(AssetHandleIDtype ID, const std::string& filepath, const std::string& name, const std::vector<AssetHandleIDtype>& materialIDs) 
-            : AssetDataBase(ID, filepath, name), materialIDs(materialIDs) {}
-        AssetData(AssetHandleIDtype ID, const std::string& filepath, const std::string& name, AssetDataManager* assetDataManager);
+        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, const std::vector<AssetHandleIDtype>& materialIDs) 
+            : AssetDataBase(ID, localID, filepath, name), materialIDs(materialIDs) {}
+        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, AssetDataManager* assetDataManager);
 
     public:
         std::vector<AssetHandleIDtype> materialIDs;
+        std::vector<AssetData<Texture>> embeddedTextures;
     };
 
     template <>
     class AssetData<Shader> : public AssetDataBase {
     public:
-        AssetData(AssetHandleIDtype ID, const std::string& filepath, const std::string& name)
-            : AssetDataBase(ID, filepath, name) {}
-        AssetData(AssetHandleIDtype ID, const std::string& filepath, const std::string& name, AssetDataManager*)
-            : AssetDataBase(ID, filepath, name) {}
+        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name)
+            : AssetDataBase(ID, localID, filepath, name) {}
+        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, AssetDataManager*)
+            : AssetDataBase(ID, localID, filepath, name) {}
     };
 
     template <>
     class AssetData<Texture> : public AssetDataBase {
     public:
-        AssetData(AssetHandleIDtype ID, const std::string& filepath, const std::string& name, bool srgb)
-            : AssetDataBase(ID, filepath, name), srgb(srgb) {}
-        AssetData(AssetHandleIDtype ID, const std::string& filepath, const std::string& name, AssetDataManager*)
-            : AssetDataBase(ID, filepath, name), srgb(true) {}
+        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, bool srgb)
+            : AssetDataBase(ID, localID, filepath, name), srgb(srgb) {}
+        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, AssetDataManager*)
+            : AssetDataBase(ID, localID, filepath, name), srgb(true) {}
 
     public:
         bool srgb;
@@ -57,10 +59,10 @@ namespace GameEngine {
     template <>
     class AssetData<Material> : public AssetDataBase {
     public:
-        AssetData(AssetHandleIDtype ID, const std::string& filepath, const std::string& name)
-            : AssetDataBase(ID, filepath, name) {}
-        AssetData(AssetHandleIDtype ID, const std::string& filepath, const std::string& name, AssetDataManager*)
-            : AssetDataBase(ID, filepath, name) {}
+        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name)
+            : AssetDataBase(ID, localID, filepath, name) {}
+        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, AssetDataManager*)
+            : AssetDataBase(ID, localID, filepath, name) {}
     };
 
 }

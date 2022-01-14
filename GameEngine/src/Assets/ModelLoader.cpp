@@ -46,12 +46,21 @@ namespace GameEngine {
 			return {};
 		}
 
+        for(unsigned int i = 0; i < scene->mNumTextures; ++i) {
+            aiTexture* embeddedTexture = scene->mTextures[i];
+
+            unsigned int dataLength = embeddedTexture->mWidth;
+            if(embeddedTexture->mHeight != 0) dataLength *= embeddedTexture->mHeight; // If the image is compressed, mHeight = 0 and mWidth is the dataLength
+
+            assetManager->load<Texture>(assetData->ID, i + 1, (unsigned char*)embeddedTexture->pcData, dataLength);
+        }
+
 		std::shared_ptr<Model> model = std::make_shared<Model>();
 		for(unsigned int i = 0; i < scene->mNumMeshes; ++i) {
             aiMesh* mesh = scene->mMeshes[i];
             MaterialAsset materialAsset;
             if(mesh->mMaterialIndex < materialIDs.size()) {
-                materialAsset = assetManager->load<Material>(materialIDs[mesh->mMaterialIndex]);
+                materialAsset = assetManager->load<Material>(materialIDs[mesh->mMaterialIndex], 0);
             }
 			model->meshes.push_back(processMesh(mesh, materialAsset));
 		}

@@ -16,17 +16,17 @@ namespace GameEngine {
         AssetManager(const std::string& assetFolderPath);
         ~AssetManager();
 
-        template<typename T, typename... Args>
-        AssetHandle<T> load(AssetHandleIDtype id, Args... args);
+        template<typename T>
+        AssetHandle<T> load(AssetHandleIDtype id, AssetHandleIDtype localID);
 
         template<typename T, typename... Args>
-        AssetHandle<T> reload(AssetHandleIDtype id, Args... args);
+        AssetHandle<T> load(AssetHandleIDtype id, AssetHandleIDtype localID, Args... args);
 
         template<typename T>
-        AssetHandle<T> getHandle(AssetHandleIDtype id);
+        AssetHandle<T> getHandle(AssetHandleIDtype id, AssetHandleIDtype localID = 0);
 
         template<typename T>
-        bool exists(AssetHandleIDtype id);
+        bool exists(AssetHandleIDtype id, AssetHandleIDtype localID = 0);
 
         template<typename T>
         const char* getName(AssetHandle<T> asset);
@@ -55,11 +55,10 @@ namespace GameEngine {
         template<typename T>
         AssetCache<T>* getResourceCache();
 
-        template<typename T, typename... Args>
-        AssetHandle<T> loadInternal(AssetHandleIDtype id, AssetData<T>* assetData, Args... args);
+        void loadAny(AssetHandleIDtype id);
 
         template<typename T, typename... Args>
-        AssetHandle<T> reloadInternal(AssetHandleIDtype id, AssetData<T>* assetData, Args... args);
+        AssetHandle<T> loadInternal(AssetHandleIDtype id, AssetHandleIDtype localID, AssetData<T>* assetData, Args... args);
 
 	private:
         std::unique_ptr<AssetDataManager> m_assetDataManager;

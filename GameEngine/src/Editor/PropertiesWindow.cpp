@@ -93,7 +93,9 @@ namespace GameEngine {
             ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*var));
             if(ImGui::BeginDragDropTarget()) {
                 if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MODEL_ASSET_PAYLOAD")) {
-                    *var = assetManager->load<Model>(*(const int*)payload->Data);
+                    using assetIDsType = std::pair<AssetHandleIDtype, AssetHandleIDtype>;
+                    assetIDsType assetIDs = *static_cast<assetIDsType*>(payload->Data);
+                    *var = assetManager->load<Model>(assetIDs.first, assetIDs.second);
                 }
             }
         }
@@ -102,7 +104,9 @@ namespace GameEngine {
             ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*var));
             if(ImGui::BeginDragDropTarget()) {
                 if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHADER_ASSET_PAYLOAD")) {
-                    *var = assetManager->load<Shader>(*(const int*)payload->Data);
+                    using assetIDsType = std::pair<AssetHandleIDtype, AssetHandleIDtype>;
+                    assetIDsType assetIDs = *static_cast<assetIDsType*>(payload->Data);
+                    *var = assetManager->load<Shader>(assetIDs.first, assetIDs.second);
                 }
             }
         }
@@ -111,7 +115,9 @@ namespace GameEngine {
             ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*var));
             if(ImGui::BeginDragDropTarget()) {
                 if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE_ASSET_PAYLOAD")) {
-                    *var = assetManager->load<Texture>(*(const int*)payload->Data);
+                    using assetIDsType = std::pair<AssetHandleIDtype, AssetHandleIDtype>;
+                    assetIDsType assetIDs = *static_cast<assetIDsType*>(payload->Data);
+                    *var = assetManager->load<Texture>(assetIDs.first, assetIDs.second);
                 }
             }
         }
@@ -120,7 +126,9 @@ namespace GameEngine {
             ImGui::Text("%s: %s", name.c_str(), assetManager->getName(*var));
             if(ImGui::BeginDragDropTarget()) {
                 if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MATERIAL_ASSET_PAYLOAD")) {
-                    *var = assetManager->load<Material>(*(const int*)payload->Data);
+                    using assetIDsType = std::pair<AssetHandleIDtype, AssetHandleIDtype>;
+                    assetIDsType assetIDs = *static_cast<assetIDsType*>(payload->Data);
+                    *var = assetManager->load<Material>(assetIDs.first, assetIDs.second);
                 }
             }
         }

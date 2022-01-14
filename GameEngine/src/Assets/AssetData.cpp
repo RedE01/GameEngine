@@ -11,41 +11,38 @@
 
 namespace GameEngine {
 
-    Material processMaterial(aiMaterial* aiMat, const aiScene* scene, const std::filesystem::path& baseFolderPath, AssetDataManager* assetDataManager) {
+    Material processMaterial(aiMaterial* aiMat, const aiScene* scene, const std::filesystem::path& baseFolderPath, AssetHandleIDtype ID, AssetDataManager* assetDataManager) {
         Material newMat;
 
-        auto getTexture = [&](aiTextureType type, bool srgb) -> AssetHandleIDtype {
+        auto getTexture = [&](aiTextureType type, bool) -> AssetHandle<Texture> {
             aiString aiTexturePathStr("");
 
             if(aiMat->GetTextureCount(type) > 0) {
                 if(aiMat->GetTexture(type, 0, &aiTexturePathStr) == aiReturn_SUCCESS) {
                     const char* texturePathStr = aiTexturePathStr.C_Str();
-                    const aiTexture* embeddedTexture = scene->GetEmbeddedTexture(texturePathStr);
+                    auto [embeddedTexture, textureIndex] = scene->GetEmbeddedTextureAndIndex(texturePathStr);
 
                     if(embeddedTexture) { // If the texture is embedded
-                        unsigned int dataLength = embeddedTexture->mWidth;
-                        if(embeddedTexture->mHeight != 0) dataLength *= embeddedTexture->mHeight; // If the image is compressed, mHeight = 0 and mWidth is the dataLength
-
-                        assert(false); // Embedded textures have not been implemented yet
+                        return AssetHandle<Texture>(ID, textureIndex + 1, {});
                     }
                     else { // Texture is not embedded
-                        return assetDataManager->importAsset<Texture>(baseFolderPath / std::string(texturePathStr));
+                        return AssetHandle<Texture>(assetDataManager->importAsset<Texture>(baseFolderPath / std::string(texturePathStr)), 0, {});
                     }
                 }
             }
 
-            return 0;
+            return AssetHandle<Texture>();
         };
 
-        newMat.diffuseTexture = TextureAsset(getTexture(aiTextureType::aiTextureType_DIFFUSE, true), {});
-        newMat.normalTexture = TextureAsset(getTexture(aiTextureType::aiTextureType_NORMALS, false), {});
+        newMat.diffuseTexture = getTexture(aiTextureType::aiTextureType_DIFFUSE, true);
+        newMat.normalTexture = getTexture(aiTextureType::aiTextureType_NORMALS, false);
 
         return newMat;
     }
 
 
-    AssetData<Model>::AssetData(AssetHandleIDtype ID, const std::string& filepath, const std::string& name, AssetDataManager* assetDataManager)
-        : AssetDataBase(ID, filepath, name) {
+    AssetData<Model>::AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, AssetDataManager* assetDataManager)
+        : AssetDataBase(ID, localID, filepath, name) {
 
         Assimp::Importer importer;
 
@@ -58,10 +55,15 @@ namespace GameEngine {
 
         std::filesystem::path baseFolderPathAbsolute = std::filesystem::absolute(filepath).parent_path();
 
+        for(unsigned int i = 0; i < scene->mNumTextures; ++i) {
+            aiTexture* aiTexture = scene->mTextures[i];
+            embeddedTextures.push_back(AssetData<Texture>(ID, i + 1, filepath, std::string(aiTexture->mFilename.C_Str()), false));
+        }
+
         for(unsigned int i = 0; i < scene->mNumMaterials; ++i) {
             aiMaterial* aiMat = scene->mMaterials[i];
 
-            Material newMat = processMaterial(aiMat, scene, baseFolderPathAbsolute, assetDataManager);
+            Material newMat = processMaterial(aiMat, scene, baseFolderPathAbsolute, ID, assetDataManager);
             std::string materialName = std::string(aiMat->GetName().C_Str()) + ".mat";
 
             MaterialLoader ml;

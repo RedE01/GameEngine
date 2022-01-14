@@ -51,12 +51,15 @@ namespace GameEngine {
 
             ImGui::Dummy({std::max(0.0f, (textWidth - size.x)) / 2, size.y});
             ImGui::SameLine();
-            showAsset(assetData, assetManager->getHandle<T>(assetData.ID), size);
+            showAsset(assetData, assetManager->getHandle<T>(assetData.ID, assetData.localID), size);
             ImGuiDragDropFlags dragDropFlags = ImGuiDragDropFlags_SourceAllowNullID;
             if(ImGui::BeginDragDropSource(dragDropFlags)) {
                 ImGui::Text("%s", nameStr.c_str());
 
-                ImGui::SetDragDropPayload(getAssetDragDropPayloadString<T>(), &(assetData.ID), sizeof(assetData.ID));
+                
+                using assetIDsType = std::pair<AssetHandleIDtype, AssetHandleIDtype>;
+                assetIDsType assetIDs = {assetData.ID, assetData.localID};
+                ImGui::SetDragDropPayload(getAssetDragDropPayloadString<T>(), &(assetIDs), sizeof(assetIDs));
                 ImGui::EndDragDropSource();
             }
 
