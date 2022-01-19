@@ -25,5 +25,13 @@ namespace GameEngine {
         Vector2i viewportSize;
 	};
 
+    class SaveSettingsEvent : public Event {
+    public:
+        SaveSettingsEvent() {}
+		virtual EventType getEventType() const override { return EventType::SaveSettings; }
+		virtual std::string getName() const override { return "SaveSettingsEvent"; }
+		virtual int getCategoryFlags() const override { return (int)EventCategory::Editor; }
+    };
+
 }
 

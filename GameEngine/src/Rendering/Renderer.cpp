@@ -114,6 +114,10 @@ namespace GameEngine {
         return m_rendererData->getFrameTexture();
     }
 
+    ShaderAsset Renderer::getDefaultShader() const {
+        return m_rendererData->getDefaultLightingShader();
+    }
+
 	void Renderer::renderModel(Model* model, TransformComponent* transform, Camera* camera) {
 		for(auto& mesh : model->meshes) {
 			if(mesh) {

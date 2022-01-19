@@ -10,7 +10,7 @@ namespace GameEngine {
 		KeyPress, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
 		GameStart, GameEnd, SaveScene, GameFocused, GameUnfocused,
-        EditorViewportResize
+        EditorViewportResize, SaveSettings
 	};
 
 	enum class EventCategory {

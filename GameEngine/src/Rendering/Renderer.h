@@ -25,6 +25,7 @@ namespace GameEngine {
 		void setDefaultShader(ShaderAsset shaderAsset);
 
         std::shared_ptr<Texture> getFrameTexture();
+        ShaderAsset getDefaultShader() const;
 
 	private:
 		void renderModel(Model* model, TransformComponent* transform, Camera* camera);

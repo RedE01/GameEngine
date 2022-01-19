@@ -8,6 +8,7 @@
 #include "Assets/AssetManager.h"
 #include "Events/ApplicationEvent.h"
 #include "Events/EditorEvents.h"
+#include "SettingsSerialization.h"
 
 #include "Editor/Editor.h"
 
@@ -26,6 +27,8 @@ namespace GameEngine {
 		#endif
 
 		m_window->setEventFunction(std::bind(&Application::eventHandler, this, std::placeholders::_1));
+
+        SettingsSerialization::updateSettingsFromFile(".gameengineproject", this);
 	}
 
 	Application::~Application() {
@@ -109,6 +112,9 @@ namespace GameEngine {
                 const std::string& filepath = dynamic_cast<SceneSaveEvent*>(event)->filepath;
                 if(name.size() == 0 || filepath.size() == 0) getSceneManager()->saveActiveScene();
                 else getSceneManager()->saveActiveScene(name, filepath);
+            }
+            if(event->getEventType() == EventType::SaveSettings) {
+                SettingsSerialization::saveSettingsToFile(".gameengineproject", this);
             }
             #endif
         }
