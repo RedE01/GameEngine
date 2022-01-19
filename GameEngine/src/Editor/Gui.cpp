@@ -6,6 +6,7 @@
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
+#include <misc/cpp/imgui_stdlib.h>
 
 namespace GameEngine {
 
@@ -49,6 +50,31 @@ namespace GameEngine {
                     SceneSaveEvent sceneSaveEvent;
                     m_eventFunction(&sceneSaveEvent);
                 }
+                if(ImGui::SmallButton("save scene as")) {
+                    m_saveSceneNameStr = "";
+                    m_saveSceneFilepathStr = "";
+                    ImGui::OpenPopup("save scene popup");
+                }
+
+                if(ImGui::BeginPopupModal("save scene popup")) {
+                    ImGui::Text("Save scene as");
+
+                    ImGui::InputText("Name: ", &m_saveSceneNameStr);
+                    ImGui::InputText("Filepath: ", &m_saveSceneFilepathStr);
+
+                    if(ImGui::Button("Save Scene", ImVec2(120, 0))) {
+                        SceneSaveEvent sceneSaveEvent(m_saveSceneNameStr, m_saveSceneFilepathStr);
+                        m_eventFunction(&sceneSaveEvent);
+
+                        ImGui::CloseCurrentPopup();
+                    }
+
+                    ImGui::SameLine();
+                    if(ImGui::Button("Cancel", ImVec2(120, 0))) ImGui::CloseCurrentPopup();
+
+                    ImGui::EndPopup();
+                }
+
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Options")) {

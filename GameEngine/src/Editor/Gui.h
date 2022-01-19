@@ -57,6 +57,9 @@ namespace GameEngine {
         Application* const m_application;
         Editor* const m_editor;
         std::function<void(Event*)> m_eventFunction;
+
+        std::string m_saveSceneNameStr;
+        std::string m_saveSceneFilepathStr;
 	};
 
 }
