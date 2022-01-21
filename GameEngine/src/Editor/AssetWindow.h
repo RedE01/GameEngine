@@ -19,6 +19,9 @@ namespace GameEngine {
         AssetType m_assetType = AssetType::Model;
 
         std::string m_assetToBeImportedPath;
+        std::string m_generatedMaterialsPath;
+        bool m_importMaterials = true;
+        bool m_srgb = true;
     };
 
 

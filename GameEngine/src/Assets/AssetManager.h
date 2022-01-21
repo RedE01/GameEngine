@@ -46,10 +46,8 @@ namespace GameEngine {
         template<typename T>
         void each(std::function<void(AssetData<T>&)> func);
 
-        AssetHandleIDtype import(const std::string& filepath);
-
         template <typename T>
-        AssetHandleIDtype import(const std::string& filepath);
+        AssetHandleIDtype import(const std::string& filepath, ImportSettings<T> importSettings);
 
 	private:
         template<typename T>

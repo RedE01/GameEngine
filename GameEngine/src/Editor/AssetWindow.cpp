@@ -2,6 +2,7 @@
 #include "../Application.h"
 #include "../Assets/AssetManager.h"
 #include "../Rendering/Texture.h"
+#include <filesystem>
 
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
@@ -119,17 +120,47 @@ namespace GameEngine {
 
             if(ImGui::Button("Import asset")) {
                 m_assetToBeImportedPath = "";
+                m_generatedMaterialsPath = "";
                 ImGui::OpenPopup("Import asset");
             }
 
             if(ImGui::BeginPopupModal("Import asset")) {
                 ImGui::InputText("Filepath", &m_assetToBeImportedPath);
 
-                if(ImGui::Button("Import", ImVec2(120, 0))) {
-                    getApplication()->getAssetManager()->import(m_assetToBeImportedPath);
+                auto renderImportButtonFn = [](bool disabled, std::function<void(void)> importFn) {
+                    ImGui::BeginDisabled(disabled);
 
-                    ImGui::CloseCurrentPopup();
+                    if(ImGui::Button("Import", ImVec2(120, 0))) {
+                        importFn();
+
+                        ImGui::CloseCurrentPopup();
+                    }
+
+                    ImGui::EndDisabled();
+                };
+
+                std::string extension = std::filesystem::path(m_assetToBeImportedPath).extension().string();
+                if(isValidFileExtensionForAssetType<Model>(extension)) {
+                    ImGui::Checkbox("Import Materials?", &m_importMaterials);
+                    if(m_importMaterials) {
+                        ImGui::InputText("Material directory", &m_generatedMaterialsPath);
+                    }
+
+                    renderImportButtonFn(false, [&](){
+                        getApplication()->getAssetManager()->import<Model>(m_assetToBeImportedPath, ImportSettings<Model>(m_importMaterials, m_generatedMaterialsPath));
+                    });
                 }
+                else if(isValidFileExtensionForAssetType<Shader>(extension)) {
+                    renderImportButtonFn(false, [&](){ getApplication()->getAssetManager()->import<Shader>(m_assetToBeImportedPath, {}); });
+                }
+                else if(isValidFileExtensionForAssetType<Texture>(extension)) {
+                    ImGui::Checkbox("srgb?", &m_srgb);
+                    renderImportButtonFn(false, [&](){ getApplication()->getAssetManager()->import<Texture>(m_assetToBeImportedPath, ImportSettings<Texture>(m_srgb)); });
+                }
+                else if(isValidFileExtensionForAssetType<Material>(extension)) {
+                    renderImportButtonFn(false, [&](){ getApplication()->getAssetManager()->import<Material>(m_assetToBeImportedPath, {}); });
+                }
+                else renderImportButtonFn(true, [](){});
 
                 ImGui::SameLine();
                 if(ImGui::Button("Cancel", ImVec2(120, 0))) ImGui::CloseCurrentPopup();

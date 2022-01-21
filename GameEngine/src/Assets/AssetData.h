@@ -6,6 +6,28 @@ namespace GameEngine {
 
     class AssetDataManager;
 
+    template <typename T>
+    bool isValidFileExtensionForAssetType(const std::string& ext);
+
+    template <typename T>
+    struct ImportSettings {
+    };
+
+    template <>
+    struct ImportSettings<Model> {
+        ImportSettings(bool importMaterials, const std::string& materialBaseDir)
+            : importMaterials(importMaterials), materialBaseDir(materialBaseDir) {}
+        const bool importMaterials;
+        const std::string materialBaseDir;
+    };
+
+    template <>
+    struct ImportSettings<Texture> {
+        ImportSettings(bool srgb)
+            : srgb(srgb) {}
+        const bool srgb;
+    };
+
     class AssetDataBase {
     public:
         AssetDataBase(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string name)
@@ -28,7 +50,7 @@ namespace GameEngine {
     public:
         AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, const std::vector<AssetHandleIDtype>& materialIDs) 
             : AssetDataBase(ID, localID, filepath, name), materialIDs(materialIDs) {}
-        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, AssetDataManager* assetDataManager);
+        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, ImportSettings<Model> importSettings, AssetDataManager* assetDataManager);
 
     public:
         std::vector<AssetHandleIDtype> materialIDs;
@@ -40,7 +62,7 @@ namespace GameEngine {
     public:
         AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name)
             : AssetDataBase(ID, localID, filepath, name) {}
-        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, AssetDataManager*)
+        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, ImportSettings<Shader>, AssetDataManager*)
             : AssetDataBase(ID, localID, filepath, name) {}
     };
 
@@ -49,7 +71,7 @@ namespace GameEngine {
     public:
         AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, bool srgb)
             : AssetDataBase(ID, localID, filepath, name), srgb(srgb) {}
-        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, AssetDataManager*)
+        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, ImportSettings<Texture>, AssetDataManager*)
             : AssetDataBase(ID, localID, filepath, name), srgb(true) {}
 
     public:
@@ -61,7 +83,7 @@ namespace GameEngine {
     public:
         AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name)
             : AssetDataBase(ID, localID, filepath, name) {}
-        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, AssetDataManager*)
+        AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, ImportSettings<Material>, AssetDataManager*)
             : AssetDataBase(ID, localID, filepath, name) {}
     };
 

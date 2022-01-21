@@ -7,7 +7,7 @@
 #include <iostream>
 
 #define EXPLICIT_TEMPLATE_INSTANTIATION(T) \
-    template AssetHandleIDtype AssetDataManager::importAsset<T>(const std::string& assetPath); \
+    template AssetHandleIDtype AssetDataManager::importAsset<T>(const std::string& assetPath, ImportSettings<T> importSettings); \
     template AssetData<T>* AssetDataManager::getAssetData(AssetHandleIDtype ID, AssetHandleIDtype localID); \
     template bool AssetDataManager::exists<T>(AssetHandleIDtype ID, AssetHandleIDtype localID);
 
@@ -109,31 +109,6 @@ namespace GameEngine {
         return m_materialAssetDataMap;
     }
 
-    template <typename T>
-    bool AssetDataManager::isValidFileExtensionForAssetType(const std::string& ext) {
-        return false;
-    }
-
-    template <>
-    bool AssetDataManager::isValidFileExtensionForAssetType<Model>(const std::string& ext) {
-        return (ext == ".blend" || ext == ".fbx" || ext == ".gltf" || ext == ".glb" || ext == ".obj");
-    }
-
-    template <>
-    bool AssetDataManager::isValidFileExtensionForAssetType<Shader>(const std::string& ext) {
-        return (ext == ".glsl" || ext == ".shader");
-    }
-
-    template <>
-    bool AssetDataManager::isValidFileExtensionForAssetType<Texture>(const std::string& ext) {
-        return (ext == ".jpg" || ext == ".png");
-    }
-
-    template <>
-    bool AssetDataManager::isValidFileExtensionForAssetType<Material>(const std::string& ext) {
-        return (ext == ".mat");
-    }
-
     AssetDataManager::AssetDataManager(const std::string& assetFolderPath, AssetManager* assetManager)
         : m_assetFolderPath(assetFolderPath), m_assetManager(assetManager) {
 
@@ -188,17 +163,8 @@ namespace GameEngine {
         getAssetDataMap<Material>().map.clear();
     }
 
-    AssetHandleIDtype AssetDataManager::importAsset(const std::string& assetPath) {
-        std::string ext = std::filesystem::path(assetPath).extension();
-        if(isValidFileExtensionForAssetType<Model>(ext)) return importAsset<Model>(assetPath);
-        else if(isValidFileExtensionForAssetType<Shader>(ext)) return importAsset<Shader>(assetPath);
-        else if(isValidFileExtensionForAssetType<Texture>(ext)) return importAsset<Texture>(assetPath);
-        else if(isValidFileExtensionForAssetType<Material>(ext)) return importAsset<Material>(assetPath);
-        else return 0;
-    }
-
     template <typename T>
-    AssetHandleIDtype AssetDataManager::importAsset(const std::string& assetPath) {
+    AssetHandleIDtype AssetDataManager::importAsset(const std::string& assetPath, ImportSettings<T> importSettings) {
         if(!isValidFileExtensionForAssetType<T>(std::filesystem::path(assetPath).extension())) {
             std::cout << "Could not import asset: " << assetPath << ". Invalid file extension" << std::endl;
             return 0;
@@ -231,7 +197,7 @@ namespace GameEngine {
             name = absolutePath.stem();
         }
 
-        AssetData<T> assetData(id, 0, absolutePath.string(), name, this);
+        AssetData<T> assetData(id, 0, absolutePath.string(), name, importSettings, this);
 
         // Load .assetdata file
         std::filesystem::path assetDataPath = absolutePath.parent_path() / ".assetdata";

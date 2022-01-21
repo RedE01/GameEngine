@@ -22,19 +22,14 @@ namespace GameEngine {
         void reloadAssetData();
         void clearRegisteredAssets();
 
-        AssetHandleIDtype importAsset(const std::string& assetPath);
-
         template <typename T>
-        AssetHandleIDtype importAsset(const std::string& assetPath);
+        AssetHandleIDtype importAsset(const std::string& assetPath, ImportSettings<T> importSettings);
 
         template <typename T>
         AssetData<T>* getAssetData(AssetHandleIDtype ID, AssetHandleIDtype localID = 0);
 
         template <typename T>
         bool exists(AssetHandleIDtype ID, AssetHandleIDtype localID = 0);
-
-        template <typename T>
-        bool isValidFileExtensionForAssetType(const std::string& ext);
 
         template <typename T>
         void each(std::function<void(AssetData<T>&)> func) {
@@ -44,6 +39,8 @@ namespace GameEngine {
         }
 
         AssetHandleIDtype nextID();
+
+        std::string getAssetFolderPath() const { return m_assetFolderPath; }
 
     private:
         template <typename T>

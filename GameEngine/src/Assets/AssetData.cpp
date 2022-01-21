@@ -11,10 +11,36 @@
 
 namespace GameEngine {
 
+    template <typename T>
+    bool isValidFileExtensionForAssetType(const std::string& ext) {
+        return false;
+    }
+
+    template <>
+    bool isValidFileExtensionForAssetType<Model>(const std::string& ext) {
+        return (ext == ".blend" || ext == ".fbx" || ext == ".gltf" || ext == ".glb" || ext == ".obj");
+    }
+
+    template <>
+    bool isValidFileExtensionForAssetType<Shader>(const std::string& ext) {
+        return (ext == ".glsl" || ext == ".shader");
+    }
+
+    template <>
+    bool isValidFileExtensionForAssetType<Texture>(const std::string& ext) {
+        return (ext == ".jpg" || ext == ".png");
+    }
+
+    template <>
+    bool isValidFileExtensionForAssetType<Material>(const std::string& ext) {
+        return (ext == ".mat");
+    }
+
+
     Material processMaterial(aiMaterial* aiMat, const aiScene* scene, const std::filesystem::path& baseFolderPath, AssetHandleIDtype ID, AssetDataManager* assetDataManager) {
         Material newMat;
 
-        auto getTexture = [&](aiTextureType type, bool) -> AssetHandle<Texture> {
+        auto getTexture = [&](aiTextureType type, bool srgb) -> AssetHandle<Texture> {
             aiString aiTexturePathStr("");
 
             if(aiMat->GetTextureCount(type) > 0) {
@@ -26,7 +52,7 @@ namespace GameEngine {
                         return AssetHandle<Texture>(ID, textureIndex + 1, {});
                     }
                     else { // Texture is not embedded
-                        return AssetHandle<Texture>(assetDataManager->importAsset<Texture>(baseFolderPath / std::string(texturePathStr)), 0, {});
+                        return AssetHandle<Texture>(assetDataManager->importAsset<Texture>(baseFolderPath / std::string(texturePathStr), ImportSettings<Texture>(srgb)), 0, {});
                     }
                 }
             }
@@ -41,7 +67,7 @@ namespace GameEngine {
     }
 
 
-    AssetData<Model>::AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, AssetDataManager* assetDataManager)
+    AssetData<Model>::AssetData(AssetHandleIDtype ID, AssetHandleIDtype localID, const std::string& filepath, const std::string& name, ImportSettings<Model> importSettings, AssetDataManager* assetDataManager)
         : AssetDataBase(ID, localID, filepath, name) {
 
         Assimp::Importer importer;
@@ -53,24 +79,28 @@ namespace GameEngine {
             return;
         }
 
-        std::filesystem::path baseFolderPathAbsolute = std::filesystem::absolute(filepath).parent_path();
-
         for(unsigned int i = 0; i < scene->mNumTextures; ++i) {
             aiTexture* aiTexture = scene->mTextures[i];
             embeddedTextures.push_back(AssetData<Texture>(ID, i + 1, filepath, std::string(aiTexture->mFilename.C_Str()), false));
         }
 
-        for(unsigned int i = 0; i < scene->mNumMaterials; ++i) {
-            aiMaterial* aiMat = scene->mMaterials[i];
+        if(importSettings.importMaterials) {
+            std::filesystem::path baseFolderPath = std::filesystem::absolute(assetDataManager->getAssetFolderPath()) / filepath;
+            std::filesystem::path materialBaseFolderPath = std::filesystem::absolute(assetDataManager->getAssetFolderPath()) / importSettings.materialBaseDir;
 
-            Material newMat = processMaterial(aiMat, scene, baseFolderPathAbsolute, ID, assetDataManager);
-            std::string materialName = std::string(aiMat->GetName().C_Str()) + ".mat";
+            for(unsigned int i = 0; i < scene->mNumMaterials; ++i) {
+                aiMaterial* aiMat = scene->mMaterials[i];
+                if(aiMat->GetName().length == 0) continue;
 
-            MaterialLoader ml;
-            ml.save(&newMat, baseFolderPathAbsolute / materialName);
-            AssetHandleIDtype materialID = assetDataManager->importAsset<Material>(baseFolderPathAbsolute / materialName);
-            
-            materialIDs.push_back(materialID);
+                Material newMat = processMaterial(aiMat, scene, baseFolderPath, ID, assetDataManager);
+                std::string materialName = std::string(aiMat->GetName().C_Str()) + ".mat";
+
+                MaterialLoader ml;
+                ml.save(&newMat, materialBaseFolderPath / materialName);
+                AssetHandleIDtype materialID = assetDataManager->importAsset<Material>(materialBaseFolderPath / materialName, {});
+                
+                materialIDs.push_back(materialID);
+            }
         }
     }
 

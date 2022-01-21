@@ -17,7 +17,7 @@
     template size_t AssetManager::numberOfAssets<T>(); \
     template void AssetManager::each(std::function<void(AssetHandle<T>)> func); \
     template void AssetManager::each(std::function<void(AssetData<T>&)> func); \
-    template AssetHandleIDtype AssetManager::import<T>(const std::string&);
+    template AssetHandleIDtype AssetManager::import<T>(const std::string&, ImportSettings<T> importSettings);
 
 namespace GameEngine {
 
@@ -105,13 +105,9 @@ namespace GameEngine {
         return m_assetDataManager->each<T>(func);
     }
 
-    AssetHandleIDtype AssetManager::import(const std::string& filepath) {
-        return m_assetDataManager->importAsset(filepath);
-    }
-
     template <typename T>
-    AssetHandleIDtype AssetManager::import(const std::string& filepath) {
-        return m_assetDataManager->importAsset<T>(filepath);
+    AssetHandleIDtype AssetManager::import(const std::string& filepath, ImportSettings<T> importSettings) {
+        return m_assetDataManager->importAsset<T>(filepath, importSettings);
     }
 
     void AssetManager::loadAny(AssetHandleIDtype id) {
