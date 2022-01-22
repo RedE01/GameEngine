@@ -53,7 +53,13 @@ namespace GameEngine {
 	}
 
     Entity Editor::getSelectedEntity() {
-        return m_selectedEntity;
+        if(std::holds_alternative<Entity>(m_selected)) return std::get<Entity>(m_selected);
+        return Entity();
+    }
+
+    AssetVariant Editor::getSelectedAsset() {
+        if(std::holds_alternative<AssetVariant>(m_selected)) return std::get<AssetVariant>(m_selected);
+        return AssetVariant();
     }
 
     void Editor::setEventFunction(std::function<void(Event*)> eventFunction) {
@@ -73,7 +79,11 @@ namespace GameEngine {
 
 
     void Editor::selectEntity(Entity entity) {
-        m_selectedEntity = entity;
+        m_selected = entity;
+    }
+
+    void Editor::selectAsset(AssetVariant asset) {
+        m_selected = asset;
     }
 
 }

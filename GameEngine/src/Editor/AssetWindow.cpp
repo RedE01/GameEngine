@@ -1,4 +1,5 @@
 #include "AssetWindow.h"
+#include "Editor.h"
 #include "../Application.h"
 #include "../Assets/AssetManager.h"
 #include "../Rendering/Texture.h"
@@ -35,7 +36,7 @@ namespace GameEngine {
     template <> const char* getAssetDragDropPayloadString<Material>() { return "MATERIAL_ASSET_PAYLOAD"; }
 
     template<typename T>
-    void showAssets(AssetManager* assetManager, int guiScale) {
+    void showAssets(AssetManager* assetManager, Editor* editor, int guiScale) {
         ImGuiStyle& style = ImGui::GetStyle();
         ImVec2 size(16 * guiScale, 16 * guiScale);
         float windowVisible = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
@@ -69,6 +70,11 @@ namespace GameEngine {
             ImGui::Text("%s", nameStr.c_str());
 
             ImGui::EndGroup();
+
+            if(ImGui::IsMouseReleased(ImGuiMouseButton_Left) && ImGui::IsItemHovered()) {
+                AssetHandle<T> assetHandle = assetManager->getHandle<T>(assetData.ID);
+                editor->selectAsset(assetHandle);
+            }
 
 
             float lastGroup = ImGui::GetItemRectMax().x;
@@ -178,10 +184,10 @@ namespace GameEngine {
         }
 
         switch(m_assetType) {
-            case AssetType::Model: showAssets<Model>(getApplication()->getAssetManager(), m_guiScale); break;
-            case AssetType::Shader: showAssets<Shader>(getApplication()->getAssetManager(), m_guiScale); break;
-            case AssetType::Texture: showAssets<Texture>(getApplication()->getAssetManager(), m_guiScale); break;
-            case AssetType::Material: showAssets<Material>(getApplication()->getAssetManager(), m_guiScale); break;
+            case AssetType::Model: showAssets<Model>(getApplication()->getAssetManager(), getEditor(), m_guiScale); break;
+            case AssetType::Shader: showAssets<Shader>(getApplication()->getAssetManager(), getEditor(), m_guiScale); break;
+            case AssetType::Texture: showAssets<Texture>(getApplication()->getAssetManager(), getEditor(), m_guiScale); break;
+            case AssetType::Material: showAssets<Material>(getApplication()->getAssetManager(), getEditor(), m_guiScale); break;
         }
     }
 

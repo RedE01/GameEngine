@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <variant>
 
 namespace GameEngine {
 
@@ -81,4 +82,5 @@ namespace GameEngine {
 	using TextureAsset = AssetHandle<Texture>;
 	using MaterialAsset = AssetHandle<Material>;
 
+    using AssetVariant = std::variant<ModelAsset, ShaderAsset, TextureAsset, MaterialAsset>;
 }

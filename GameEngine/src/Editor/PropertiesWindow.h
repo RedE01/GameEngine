@@ -9,6 +9,11 @@ namespace GameEngine {
 
         inline virtual const char* getWindowName() override { return "Properties"; }
         virtual void renderWindow() override;
+
+    private:
+        void renderEntityProperties();
+        void renderAssetProperties();
+        void renderSettings();
     };
 
 

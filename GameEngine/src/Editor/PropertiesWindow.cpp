@@ -13,6 +13,9 @@
 #include <misc/cpp/imgui_stdlib.h>
 
 #include "../Rendering/Model.h"
+#include "../Rendering/Material.h"
+
+template<class> inline constexpr bool always_false_v = false;
 
 namespace GameEngine {
 
@@ -134,7 +137,7 @@ namespace GameEngine {
             }
         }
 
-        const std::string& name;
+        const std::string name;
         AssetManager* assetManager;
     };
 
@@ -143,47 +146,109 @@ namespace GameEngine {
 
     void PropertiesWindow::renderWindow() {
         if(ImGui::BeginTabBar("##tabs")) {
-            if(ImGui::BeginTabItem("Entity")) {
-                Entity entity = getEditor()->getSelectedEntity();
-                if(entity.isValid()) {
-                    ImGui::Text("%s", entity.getComponent<NameComponent>().getNameCStr());
-                    ImGui::Separator();
-
-                    entity.eachComponent([&](Component& component){
-                        std::string cName = component.getName();
-                        ImGui::Text("%s", cName.c_str());
-
-                        component.eachPublicVariable([&](const std::string& pvName, PublicVariable& pv){
-                            pv.visit<PublicVariablePropertiesVisitor>(component, pvName, getApplication()->getAssetManager());
-                        });
-
-                        ImGui::Separator();
-                    });
-                }
-
+            if(ImGui::BeginTabItem("Properties")) {
+                renderEntityProperties();
+                renderAssetProperties();
                 ImGui::EndTabItem();
             }
-            if(ImGui::BeginTabItem("Renderer")) {
-                ImGui::Text("Default shader: %s", getApplication()->getAssetManager()->getName(getApplication()->getRenderer()->getDefaultShader()));
-
-                if(ImGui::BeginDragDropTarget()) {
-                    if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHADER_ASSET_PAYLOAD")) {
-                        using assetIDsType = std::pair<AssetHandleIDtype, AssetHandleIDtype>;
-                        assetIDsType assetIDs = *static_cast<assetIDsType*>(payload->Data);
-
-                        ShaderAsset shader = getApplication()->getAssetManager()->load<Shader>(assetIDs.first, assetIDs.second);
-                        getApplication()->getRenderer()->setDefaultShader(shader);
-
-                        SaveSettingsEvent e;
-                        dispatchEvent(&e);
-                    }
-                }
-                
+            if(ImGui::BeginTabItem("Settings")) {
+                renderSettings();
                 ImGui::EndTabItem();
             }
 
             ImGui::EndTabBar();
         }
     }
+
+    void PropertiesWindow::renderEntityProperties() {
+        Entity entity = getEditor()->getSelectedEntity();
+        if(entity.isValid()) {
+            ImGui::Text("%s", entity.getComponent<NameComponent>().getNameCStr());
+            ImGui::Separator();
+            ImGui::Separator();
+
+            entity.eachComponent([&](Component& component){
+                std::string cName = component.getName();
+                ImGui::Text("%s", cName.c_str());
+
+                component.eachPublicVariable([&](const std::string& pvName, PublicVariable& pv){
+                    pv.visit<PublicVariablePropertiesVisitor>(component, pvName, getApplication()->getAssetManager());
+                });
+
+                ImGui::Separator();
+            });
+        }
+
+    }
+
+    void PropertiesWindow::renderAssetProperties() { 
+        AssetVariant assetVariant = getEditor()->getSelectedAsset();
+
+        AssetManager* assetManager = getApplication()->getAssetManager();
+        std::visit([&](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if(!arg) return;
+
+            auto renderAssetName = [&](const char* assetTypeName) {
+                ImGui::Text("%s: %s", assetTypeName, assetManager->getName(arg));
+                ImGui::Separator();
+                ImGui::Separator();
+            };
+
+            if constexpr(std::is_same_v<T, ModelAsset>) {
+                ModelAsset asset = static_cast<ModelAsset>(arg);
+                renderAssetName("Model");
+
+                for(size_t i = 0; i < asset->meshes.size(); ++i) {
+                    ImGui::Text("Mesh %lu", i);
+                    ImGui::Text("IndexCount: %i", asset->meshes[i]->getIndexCount());
+
+                    PublicVariablePropertiesVisitor<MaterialAsset> v("Material: ", assetManager);
+                    v.visit(&(asset->meshes[i]->material));
+                }
+                ImGui::Separator();
+            }
+            else if constexpr(std::is_same_v<T, ShaderAsset>) {
+                renderAssetName("Shader");
+            }
+            else if constexpr(std::is_same_v<T, TextureAsset>) {
+                renderAssetName("Texture");
+            }
+            else if constexpr(std::is_same_v<T, MaterialAsset>) {
+                MaterialAsset asset = static_cast<MaterialAsset>(arg);
+                renderAssetName("Material");
+
+                PublicVariablePropertiesVisitor<TextureAsset> v1("Diffuse texture: ", assetManager);
+                v1.visit(static_cast<TextureAsset*>(&(asset->diffuseTexture)));
+
+                PublicVariablePropertiesVisitor<TextureAsset> v2("Normal texture: ", assetManager);
+                v2.visit(static_cast<TextureAsset*>(&(asset->normalTexture)));
+            }
+            else static_assert(always_false_v<T>, "Non exhaustive visitor");
+        }, assetVariant);
+    }
+
+    void PropertiesWindow::renderSettings() {
+        ImGui::Separator();
+        ImGui::Text("Renderer");
+        ImGui::Separator();
+        ImGui::Text("Default shader: %s", getApplication()->getAssetManager()->getName(getApplication()->getRenderer()->getDefaultShader()));
+
+        if(ImGui::BeginDragDropTarget()) {
+            if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHADER_ASSET_PAYLOAD")) {
+                using assetIDsType = std::pair<AssetHandleIDtype, AssetHandleIDtype>;
+                assetIDsType assetIDs = *static_cast<assetIDsType*>(payload->Data);
+
+                ShaderAsset shader = getApplication()->getAssetManager()->load<Shader>(assetIDs.first, assetIDs.second);
+                getApplication()->getRenderer()->setDefaultShader(shader);
+
+                SaveSettingsEvent e;
+                dispatchEvent(&e);
+            }
+        }
+        ImGui::Separator();
+        ImGui::Separator();
+    }
+
 
 }
