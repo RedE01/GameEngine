@@ -85,7 +85,7 @@ namespace GameEngine {
         }
 
         if(importSettings.importMaterials) {
-            std::filesystem::path baseFolderPath = std::filesystem::absolute(assetDataManager->getAssetFolderPath()) / filepath;
+            std::filesystem::path baseFolderPath = std::filesystem::absolute(filepath).parent_path();
             std::filesystem::path materialBaseFolderPath = std::filesystem::absolute(assetDataManager->getAssetFolderPath()) / importSettings.materialBaseDir;
 
             for(unsigned int i = 0; i < scene->mNumMaterials; ++i) {
