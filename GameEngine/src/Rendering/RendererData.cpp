@@ -8,6 +8,7 @@
 #include "IndexBuffer.h"
 
 #include "../assets/models/sphere.h"
+#include "../assets/shaders/default.h"
 
 namespace GameEngine {
 
@@ -207,7 +208,7 @@ namespace GameEngine {
         m_sphereIBO->setData(sphereIndexData, sizeof(sphereIndexData), BufferDataUsage::STATIC_DRAW);
         m_sphereVAO->unbind();
 
-
+        m_lightingShader = std::make_unique<Shader>(defaultShaderVertexSource, defaultShaderFragmentSource);
 	}
 
 	RendererData::~RendererData() {
