@@ -18,7 +18,6 @@ namespace GameEngine {
 		RendererData(Vector2i viewportSize);
 		~RendererData();
 
-		void setDefaultShader(ShaderAsset defaultShader);
         void setViewportSize(Vector2i viewportSize);
 
 		VertexArrayObject* getRenderQuadVAO() const;
@@ -34,7 +33,7 @@ namespace GameEngine {
 		Texture* getGBufferNormal() const;
 		Texture* getGBufferAlbedo() const;
 
-		ShaderAsset getDefaultLightingShader() const;
+		Shader* getDefaultLightingShader() const;
 		Framebuffer* getLightingFramebuffer() const;
 		Texture* getLightingTexture() const;
 
@@ -60,7 +59,7 @@ namespace GameEngine {
 		std::unique_ptr<Texture> m_gBufferAlbedo;
 		std::unique_ptr<Renderbuffer> m_gBufferDepthStencil;
 
-		ShaderAsset m_lightingShader;
+        std::unique_ptr<Shader> m_lightingShader;
 		std::unique_ptr<Framebuffer> m_lightingFramebuffer;
 		std::unique_ptr<Texture> m_lightingTexture;
 		std::unique_ptr<Renderbuffer> m_lightingDepthStencil;

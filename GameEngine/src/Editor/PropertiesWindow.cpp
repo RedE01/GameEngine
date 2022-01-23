@@ -229,25 +229,6 @@ namespace GameEngine {
     }
 
     void PropertiesWindow::renderSettings() {
-        ImGui::Separator();
-        ImGui::Text("Renderer");
-        ImGui::Separator();
-        ImGui::Text("Default shader: %s", getApplication()->getAssetManager()->getName(getApplication()->getRenderer()->getDefaultShader()));
-
-        if(ImGui::BeginDragDropTarget()) {
-            if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHADER_ASSET_PAYLOAD")) {
-                using assetIDsType = std::pair<AssetHandleIDtype, AssetHandleIDtype>;
-                assetIDsType assetIDs = *static_cast<assetIDsType*>(payload->Data);
-
-                ShaderAsset shader = getApplication()->getAssetManager()->load<Shader>(assetIDs.first, assetIDs.second);
-                getApplication()->getRenderer()->setDefaultShader(shader);
-
-                SaveSettingsEvent e;
-                dispatchEvent(&e);
-            }
-        }
-        ImGui::Separator();
-        ImGui::Separator();
     }
 
 

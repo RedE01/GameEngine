@@ -10,16 +10,12 @@ namespace GameEngine {
 
     namespace SettingsSerialization {
 
-        void saveSettingsToFile(const char* filepath, Application* application) {
+        void saveSettingsToFile(const char* filepath, Application*) {
             YAML::Emitter emitter;
             emitter << YAML::BeginMap;
 
             emitter << YAML::Key << "Settings";
             emitter << YAML::Value << YAML::BeginMap;
-
-            emitter << YAML::Key << "defaultShader";
-            ShaderAsset defaultShader = application->getRenderer()->getDefaultShader();
-            emitter << YAML::Value << YAML::Flow << YAML::BeginSeq << defaultShader.ID() << defaultShader.localID() << YAML::EndSeq;
 
             emitter << YAML::EndMap;
             emitter << YAML::EndMap;
@@ -34,7 +30,7 @@ namespace GameEngine {
             }
         }
 
-        void updateSettingsFromFile(const char* filepath, Application* application) {
+        void updateSettingsFromFile(const char* filepath, Application*) {
 
             YAML::Node node; 
             try {
@@ -44,13 +40,6 @@ namespace GameEngine {
 
             if(node.IsMap()) {
                 YAML::Node settingsNode = node["Settings"];
-
-                if(settingsNode["defaultShader"]) {
-                    YAML::Node defaultShaderNode = settingsNode["defaultShader"];
-                    ShaderAsset defaultShader = application->getAssetManager()->load<Shader>(defaultShaderNode[0].as<AssetHandleIDtype>(), defaultShaderNode[1].as<AssetHandleIDtype>());
-                    application->getRenderer()->setDefaultShader(defaultShader);
-                }
-
             }
         }
 

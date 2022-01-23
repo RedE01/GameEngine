@@ -22,10 +22,8 @@ namespace GameEngine {
 		void renderEntities(Scene* scene, Camera* camera);
 
 		void setViewportSize(Vector2i viewportSize);
-		void setDefaultShader(ShaderAsset shaderAsset);
 
         std::shared_ptr<Texture> getFrameTexture();
-        ShaderAsset getDefaultShader() const;
 
 	private:
 		void renderModel(Model* model, TransformComponent* transform, Camera* camera);

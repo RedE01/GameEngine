@@ -207,13 +207,10 @@ namespace GameEngine {
         m_sphereIBO->setData(sphereIndexData, sizeof(sphereIndexData), BufferDataUsage::STATIC_DRAW);
         m_sphereVAO->unbind();
 
+
 	}
 
 	RendererData::~RendererData() {
-	}
-
-	void RendererData::setDefaultShader(ShaderAsset defaultShader) {
-		m_lightingShader = defaultShader;
 	}
 
     void RendererData::setViewportSize(Vector2i viewportSize) {
@@ -269,8 +266,8 @@ namespace GameEngine {
 		return m_gBufferAlbedo.get();
 	}
 
-	ShaderAsset RendererData::getDefaultLightingShader() const {
-		return m_lightingShader;
+	Shader* RendererData::getDefaultLightingShader() const {
+		return m_lightingShader.get();
 	}
 
 	Framebuffer* RendererData::getLightingFramebuffer() const {
