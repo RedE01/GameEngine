@@ -3,6 +3,11 @@
 
 namespace GameEngine {
 
+    CameraComponent::CameraComponent() 
+        : m_camera(ProjectionType::Perspective, glm::radians(90.0), Vector2(1.0, 1.0)) {
+
+    }
+
 	CameraComponent::CameraComponent(ProjectionType type, float fov, Vector2 size)
 		: m_camera(type, fov, size) {
 

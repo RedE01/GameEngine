@@ -6,8 +6,10 @@ namespace GameEngine {
 
 	class CameraComponent : public Component {
 	public:
+        CameraComponent();
 		CameraComponent(ProjectionType type, float fov, Vector2 size);
-        virtual std::string getName() const override { return "Camera"; }
+        virtual std::string getName() const override { return GetName(); }
+        static std::string GetName() { return "Camera"; }
 
 		void updateCamera();
 

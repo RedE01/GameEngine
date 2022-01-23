@@ -9,7 +9,8 @@ namespace GameEngine {
     class TransformComponent : public Component {
     public:
         TransformComponent();
-        virtual std::string getName() const override { return "Transform"; }
+        virtual std::string getName() const override { return GetName(); }
+        static std::string GetName() { return "Transform"; }
 
         Vector3 getPosition() const;
         Quaternion getOrientation() const;

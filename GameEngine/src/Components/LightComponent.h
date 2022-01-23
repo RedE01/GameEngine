@@ -15,7 +15,8 @@ namespace GameEngine {
             registerPublicVariable("pointLightRange", &LightComponent::pointLightRange);
             registerPublicVariable("intensity", &LightComponent::intensity);
         }
-        virtual std::string getName() const override { return "Light"; }
+        virtual std::string getName() const override { return GetName(); }
+        static std::string GetName() { return "Light"; }
         LightType lightType = LightType::PointLight;
         
         // Point light stuff
