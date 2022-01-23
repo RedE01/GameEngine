@@ -11,9 +11,24 @@
 namespace GameEngine {
 
     SceneWindow::SceneWindow(Application* application, Editor* editor) : GuiWindow(application, editor) {
+        setWindowFlags(ImGuiWindowFlags_MenuBar);
     }
 
     void SceneWindow::renderWindow() {
+        if(ImGui::BeginMenuBar()) {
+            Scene* activeScene = getApplication()->getSceneManager()->getActiveScene();
+            ImGui::BeginDisabled(activeScene == nullptr);
+
+            if(ImGui::Button("Create entity")) {
+                if(activeScene) {
+                    activeScene->createEntity("New Entity");
+                }
+            }
+            ImGui::EndDisabled();
+
+            ImGui::EndMenuBar();
+        }
+
         static ImGuiTreeNodeFlags baseFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 
         int nodeIndex = 0;

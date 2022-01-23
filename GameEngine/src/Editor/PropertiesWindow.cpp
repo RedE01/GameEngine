@@ -6,9 +6,9 @@
 #include "../Components/ScriptComponentManager.h"
 #include "../Assets/AssetManager.h"
 #include "../Rendering/Renderer.h"
-
 #include "../Components/NameComponent.h"
 
+#include <unordered_set>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
@@ -163,7 +163,20 @@ namespace GameEngine {
     void PropertiesWindow::renderEntityProperties() {
         Entity entity = getEditor()->getSelectedEntity();
         if(entity.isValid()) {
-            ImGui::Text("%s", entity.getComponent<NameComponent>().getNameCStr());
+            if(m_renamingBeginFrame == 0) {
+                ImGui::Text("%s", entity.getComponent<NameComponent>().getNameCStr());
+                if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                    m_renamingBeginFrame = ImGui::GetFrameCount() + 1;
+                }
+            }
+            else {
+                if(m_renamingBeginFrame == ImGui::GetFrameCount()) ImGui::SetKeyboardFocusHere();
+                ImGui::InputText("##Entity name", &entity.getComponent<NameComponent>().name);
+
+                if(ImGui::IsItemDeactivated()) {
+                    m_renamingBeginFrame = 0;
+                }
+            }
             ImGui::Separator();
             ImGui::Separator();
 
@@ -177,8 +190,30 @@ namespace GameEngine {
 
                 ImGui::Separator();
             });
-        }
 
+            if(ImGui::Button("Add Component")) {
+                ImGui::OpenPopup("addComponentPopup");
+            }
+
+            if(ImGui::BeginPopup("addComponentPopup")) {
+                ImGui::Text("Add Component");
+                ImGui::Separator();
+
+                std::unordered_set<std::string> componentAlreadyExists;
+                entity.eachComponent([&](Component& component) {
+                    componentAlreadyExists.insert(component.getName());
+                });
+
+                ScriptComponentManager::eachComponentTypeName([&](const std::string& componentTypeName) {
+                    ImGui::BeginDisabled(componentAlreadyExists.contains(componentTypeName));
+                    if(ImGui::Selectable(componentTypeName.c_str())) {
+                        ScriptComponentManager::createComponent(componentTypeName, entity);
+                    }
+                    ImGui::EndDisabled();
+                });
+                ImGui::EndPopup();
+            }
+        }
     }
 
     void PropertiesWindow::renderAssetProperties() { 

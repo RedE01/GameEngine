@@ -14,6 +14,9 @@ namespace GameEngine {
         void renderEntityProperties();
         void renderAssetProperties();
         void renderSettings();
+
+    private:
+        int m_renamingBeginFrame = 0;
     };
 
 
