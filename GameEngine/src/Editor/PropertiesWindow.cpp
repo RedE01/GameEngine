@@ -6,6 +6,10 @@
 #include "../Components/ScriptComponentManager.h"
 #include "../Assets/AssetManager.h"
 #include "../Rendering/Renderer.h"
+
+#include "../Components/CameraComponent.h"
+#include "../Components/LightComponent.h"
+#include "../Components/MeshRendererComponent.h"
 #include "../Components/NameComponent.h"
 
 #include <unordered_set>
@@ -141,6 +145,16 @@ namespace GameEngine {
         AssetManager* assetManager;
     };
 
+    template <typename T>
+    void renderAddComponentSelectable(Entity& entity) {
+        ImGui::BeginDisabled(entity.hasComponent<T>());
+        if(ImGui::Selectable(T::GetName().c_str())) {
+            entity.addComponent<T>();
+        }
+        ImGui::EndDisabled();
+
+    }
+
     PropertiesWindow::PropertiesWindow(Application* application, Editor* editor) : GuiWindow(application, editor) {
     }
 
@@ -204,6 +218,10 @@ namespace GameEngine {
             if(ImGui::BeginPopup("addComponentPopup")) {
                 ImGui::Text("Add Component");
                 ImGui::Separator();
+
+                renderAddComponentSelectable<CameraComponent>(entity);
+                renderAddComponentSelectable<LightComponent>(entity);
+                renderAddComponentSelectable<MeshRendererComponent>(entity);
 
                 std::unordered_set<std::string> componentAlreadyExists;
                 entity.eachComponent([&](Component& component) {
