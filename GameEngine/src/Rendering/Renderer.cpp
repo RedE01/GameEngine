@@ -106,16 +106,8 @@ namespace GameEngine {
         glViewport(0, 0, viewportSize.x, viewportSize.y);
 	}
 
-	void Renderer::setDefaultShader(ShaderAsset shaderAsset) {
-		m_rendererData->setDefaultShader(shaderAsset);
-	}
-
     std::shared_ptr<Texture> Renderer::getFrameTexture() {
         return m_rendererData->getFrameTexture();
-    }
-
-    ShaderAsset Renderer::getDefaultShader() const {
-        return m_rendererData->getDefaultLightingShader();
     }
 
 	void Renderer::renderModel(Model* model, TransformComponent* transform, Camera* camera) {
