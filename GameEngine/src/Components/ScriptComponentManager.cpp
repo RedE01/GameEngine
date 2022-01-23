@@ -5,6 +5,7 @@ namespace GameEngine {
     std::vector<ScriptComponentManager::eachComponentFunctionType> ScriptComponentManager::m_eachComponentFunction;
     std::vector<ScriptComponentManager::eachComponentOfEntityFunctionType> ScriptComponentManager::m_eachComponentOfEntityFunction;
     std::unordered_map<std::string, ScriptComponentManager::createComponentFunctionType> ScriptComponentManager::m_createComponentFunctions;
+    std::vector<std::string> ScriptComponentManager::m_componentTypeNames;
 
     void ScriptComponentManager::eachComponent(entt::registry& registry, std::function<void(Component&)> function) {
         for(auto& componentFunction : m_eachComponentFunction) {
@@ -15,6 +16,12 @@ namespace GameEngine {
     void ScriptComponentManager::eachComponent(Entity entity, std::function<void(Component&)> function) {
         for(auto& componentFunction : m_eachComponentOfEntityFunction) {
             componentFunction(entity, function);
+        }
+    }
+
+    void ScriptComponentManager::eachComponentTypeName(std::function<void(const std::string&)> function) {
+        for(auto& componentTypeName : m_componentTypeNames) {
+            function(componentTypeName);
         }
     }
 
