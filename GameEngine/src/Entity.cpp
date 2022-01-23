@@ -13,6 +13,9 @@ namespace GameEngine {
     template<class T>
     void handleComponent(Entity& entity, std::function<void(Component&)> function);
 
+    template<class T>
+    bool tryDeleteComponentFromName(Entity& entity, const std::string& componentTypeName);
+
 	Entity::Entity() : m_entityID(entt::null), m_entityRegistry(nullptr) {
 	}
 
@@ -20,6 +23,18 @@ namespace GameEngine {
 		: m_entityID(entityID), m_entityRegistry(entityRegistry) {
 
 	}
+
+    void Entity::removeComponent(Component& component) {
+        assert(isValid());
+
+        std::string componentTypeName = component.getName();
+        std::cout << "removing: " << componentTypeName << std::endl;
+        if(tryDeleteComponentFromName<CameraComponent>(*this, componentTypeName)) return;
+        if(tryDeleteComponentFromName<LightComponent>(*this, componentTypeName)) return;
+        if(tryDeleteComponentFromName<MeshRendererComponent>(*this, componentTypeName)) return;
+
+        ScriptComponentManager::removeComponent(componentTypeName, *this);
+    }
 
 	bool Entity::isValid() const {
 		if(m_entityRegistry == nullptr) return false;
@@ -58,5 +73,13 @@ namespace GameEngine {
         }
     };
 
+    template<class T>
+    bool tryDeleteComponentFromName(Entity& entity, const std::string& componentTypeName) {
+        if(entity.hasComponent<T>() && entity.getComponent<T>().getName() == componentTypeName) {
+            entity.removeComponent<T>();
+            return true;
+        }
+        return false;
+    }
 
 }

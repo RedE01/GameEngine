@@ -34,21 +34,31 @@ namespace GameEngine {
                     return static_cast<Component*>(&(entity.addComponent<T>()));
                 }
             });
+
+            m_removeComponentFunctions.insert({
+                instance.getName(),
+                [](Entity& entity) -> void {
+                    entity.removeComponent<T>();
+                }
+            });
 		}
 
 		static void eachComponent(entt::registry& registry, std::function<void(Component&)> function);
 		static void eachComponent(Entity entity, std::function<void(Component&)> function);
         static void eachComponentTypeName(std::function<void(const std::string&)> function);
         static Component* createComponent(const std::string& componentTypeName, Entity& entity);
+        static bool removeComponent(const std::string& componentTypeName, Entity& entity);
 
 	private:
         using eachComponentFunctionType = std::function<void(entt::registry&, std::function<void(Component&)>)>;
         using eachComponentOfEntityFunctionType = std::function<void(Entity, std::function<void(Component&)>)>;
         using createComponentFunctionType = std::function<Component*(Entity&)>;
+        using removeComponentFunctionType = std::function<void(Entity&)>;
 		static std::vector<eachComponentFunctionType> m_eachComponentFunction;
 		static std::vector<eachComponentOfEntityFunctionType> m_eachComponentOfEntityFunction;
         static std::vector<std::string> m_componentTypeNames;
         static std::unordered_map<std::string, createComponentFunctionType> m_createComponentFunctions;
+        static std::unordered_map<std::string, removeComponentFunctionType> m_removeComponentFunctions;
 	};
 
 }

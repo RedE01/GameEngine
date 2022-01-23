@@ -183,6 +183,12 @@ namespace GameEngine {
             entity.eachComponent([&](Component& component){
                 std::string cName = component.getName();
                 ImGui::Text("%s", cName.c_str());
+                ImGui::SameLine(ImGui::GetContentRegionMax().x - 16);
+                ImGui::PushID(cName.c_str());
+                if(ImGui::Button("X")) {
+                    entity.removeComponent(component);
+                }
+                ImGui::PopID();
 
                 component.eachPublicVariable([&](const std::string& pvName, PublicVariable& pv){
                     pv.visit<PublicVariablePropertiesVisitor>(component, pvName, getApplication()->getAssetManager());

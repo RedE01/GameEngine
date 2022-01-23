@@ -34,6 +34,8 @@ namespace GameEngine {
 			m_entityRegistry->remove<T>(m_entityID);
 		}
 
+        void removeComponent(Component& component);
+
 		template <typename T>
 		T& getComponent() {
 			assert(isValid());
