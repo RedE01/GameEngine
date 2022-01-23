@@ -44,7 +44,6 @@ namespace GameEngine {
 	private:
         using eachComponentFunctionType = std::function<void(entt::registry&, std::function<void(Component&)>)>;
         using eachComponentOfEntityFunctionType = std::function<void(Entity, std::function<void(Component&)>)>;
-        //using eachComponentTypeFunctionType = std::function<void(const std::)>
         using createComponentFunctionType = std::function<Component*(Entity&)>;
 		static std::vector<eachComponentFunctionType> m_eachComponentFunction;
 		static std::vector<eachComponentOfEntityFunctionType> m_eachComponentOfEntityFunction;
