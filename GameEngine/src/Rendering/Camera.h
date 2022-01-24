@@ -35,6 +35,7 @@ namespace GameEngine {
 		bool isActive = true;
 		Vector3 position;
 		Quaternion orientation;
+        float exposure = 1.0;
 
 	private:
 		ProjectionType m_projectionType = ProjectionType::Perspective;

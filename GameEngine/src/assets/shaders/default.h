@@ -87,7 +87,7 @@ static const char* defaultShaderFragmentSource = R"END(
         vec3 halfDir = (viewDir + lightDir) / 2.0;
         float specular = pow(max(0.0, dot(halfDir, normal)), 16) * specularStrength;
 
-        float brightness = min(1.0, ambient + diffuse + specular);
+        float brightness = ambient + diffuse + specular;
 
         FragColor = vec4(albedo * brightness * attenuation, 1.0);
     }

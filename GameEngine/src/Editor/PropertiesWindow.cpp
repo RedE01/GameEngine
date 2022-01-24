@@ -288,6 +288,10 @@ namespace GameEngine {
     }
 
     void PropertiesWindow::renderSettings() {
+        ImGui::Text("Renderer");
+        ImGui::DragFloat("Editor camera exposure", &(getEditor()->getEditorCamera()->exposure), 0.01, 0.0, 100.0);
+
+        ImGui::Separator();
     }
 
 

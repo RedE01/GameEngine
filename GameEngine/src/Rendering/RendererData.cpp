@@ -42,11 +42,14 @@ namespace GameEngine {
 		"out vec4 FragColor;\n"
 		"in vec2 textureCoords;\n"
 		"uniform sampler2D u_frameTexture;\n"
+        "uniform float u_exposure;\n"
 		"\n"
 		"void main() {\n"
 		"    float gamma = 2.2;\n"
-        "    vec3 fragColor = texture(u_frameTexture, textureCoords).rgb;"
-		"    FragColor = vec4(pow(fragColor, vec3(1.0 / gamma)), 1.0);\n"
+        "    vec3 fragColor = texture(u_frameTexture, textureCoords).rgb;\n"
+        "    fragColor = vec3(1.0) - exp(-fragColor * u_exposure);\n" // Tone mapping
+        "    fragColor = pow(fragColor, vec3(1.0 / gamma));\n" // Gamma correction
+		"    FragColor = vec4(fragColor, 1.0);\n"
 		"}\n"
 	);
 

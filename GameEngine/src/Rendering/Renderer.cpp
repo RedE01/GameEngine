@@ -64,6 +64,7 @@ namespace GameEngine {
         m_rendererData->getPostProcessingShader()->useShader();
         glActiveTexture(GL_TEXTURE0);
         m_rendererData->getLightingTexture()->bind();
+        m_rendererData->getPostProcessingShader()->setUniform1f("u_exposure", camera->exposure);
         m_rendererData->getPostProcessingShader()->setUniform1i("u_frameTexture", 0);
 
         glDrawElements(GL_TRIANGLES, m_rendererData->getRenderQuadIndexCount(), GL_UNSIGNED_INT, 0);
